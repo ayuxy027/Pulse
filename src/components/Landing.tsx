@@ -1,3 +1,6 @@
+import { SiBento, SiRobotframework } from 'react-icons/si'; 
+import { BsGraphUpArrow } from 'react-icons/bs';
+
 const LandingPage = () => {
   return (
     <div className="w-full bg-[#f8f6f1] min-h-screen">
@@ -36,20 +39,20 @@ const LandingPage = () => {
         </div>
         {/* Heading */}
         <div className="relative mt-10 md:mt-0">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tighter text-gray-900 leading-tight max-w-3xl">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tighter text-gray-900 leading-tight max-w-4xl">
             <img
               src="https://i.postimg.cc/T3qqmkbv/begin.png"
               alt="begin icon"
               className="w-6 h-6 md:w-8 md:h-8 absolute -top-1 -left-5 md:-top-2 md:-left-6"
             />
-            Eat smart. Live
+            Eat smart with AI. 
             <img
               src="https://i.postimg.cc/PxcrR416/star.png"
               className="absolute -right-5 -top-1 w-6 h-6 md:-right-6 md:-top-2 md:w-8 md:h-8"
               alt="star icon"
             />
             <br />
-            healthier
+            Live Healthier and Immune ready.
           </h1>
         </div>
 
@@ -59,6 +62,31 @@ const LandingPage = () => {
           <span className="hidden sm:inline"><br /></span>
           personalized diet plans, and smart food scanning.
         </p>
+
+        {/* Additional Benefits */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          <div className="text-center p-4">
+            <div className="flex justify-center mb-2">
+              <SiBento size={24} className="text-gray-600" />
+            </div>
+            <h3 className="font-semibold text-gray-900 text-sm mb-1">Smart Food Scanner</h3>
+            <p className="text-gray-600 text-xs">Snap your meal and get instant nutrition analysis with AI-powered insights</p>
+          </div>
+          <div className="text-center p-4">
+            <div className="flex justify-center mb-2">
+              <SiRobotframework size={24} className="text-gray-600" />
+            </div>
+            <h3 className="font-semibold text-gray-900 text-sm mb-1">AI Health Coach</h3>
+            <p className="text-gray-600 text-xs">Ask questions like "Can I eat pizza tonight?" and get personalized advice</p>
+          </div>
+          <div className="text-center p-4">
+            <div className="flex justify-center mb-2">
+              <BsGraphUpArrow size={24} className="text-gray-600" />
+            </div>
+            <h3 className="font-semibold text-gray-900 text-sm mb-1">Health Dashboard</h3>
+            <p className="text-gray-600 text-xs">Track streaks, earn badges, and see your immunity score improve</p>
+          </div>
+        </div>
 
         {/* CTA Button */}
         <button className="mt-4 px-6 py-3 md:px-8 md:py-4 bg-black text-white font-semibold text-base rounded-xl md:rounded-2xl hover:opacity-90 transition">

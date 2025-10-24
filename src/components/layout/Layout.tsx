@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { DashboardPage, ChatPage } from '../../pages';
+import ScannerPage from '../../pages/ScannerPage';
 import LandingPage from '../Landing';
 
 /**
@@ -16,7 +17,7 @@ const Layout: React.FC = () => {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/scanner" element={<div className="w-full bg-[#f8f6f1] p-8"><div className="p-[30px]"><h1 className="text-2xl font-bold">Food Scanner</h1><p>Coming soon...</p></div></div>} />
+            <Route path="/scanner" element={<ScannerPage />} />
             <Route path="/diet" element={<div className="w-full bg-[#f8f6f1] p-8"><div className="p-[30px]"><h1 className="text-2xl font-bold">Diet Plan</h1><p>Coming soon...</p></div></div>} />
             <Route path="/dairy" element={<div className="w-full bg-[#f8f6f1] p-8"><div className="p-[30px]"><h1 className="text-2xl font-bold">Dairy</h1><p>Coming soon...</p></div></div>} />
             <Route path="/chats" element={<ChatPage />} />
