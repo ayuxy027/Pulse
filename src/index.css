@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+/* Global base styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Markdown syntax highlighting for textarea */
+.markdown-textarea {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* Markdown preview styles */
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3 {
+  margin: 8px 0 4px 0;
+  font-weight: bold;
+}
+
+.markdown-preview ul,
+.markdown-preview ol {
+  margin: 4px 0;
+  padding-left: 20px;
+}
+
+.markdown-preview li {
+  margin: 2px 0;
+}
+
+.markdown-preview code {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.markdown-preview blockquote {
+  border-left: 3px solid #ddd;
+  margin: 4px 0;
+  padding-left: 12px;
+  font-style: italic;
+  color: rgba(44, 62, 80, 0.7);
+}
