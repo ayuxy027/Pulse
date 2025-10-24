@@ -57,7 +57,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ userName = "Toni" }) => (
                 margin: 0,
             }}
         >
-            How can I help you today?
+            How are your fitness goals today?
         </p>
     </div>
 );

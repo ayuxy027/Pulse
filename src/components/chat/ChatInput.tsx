@@ -84,7 +84,7 @@ const ChatInput: React.FC = () => {
               ? "Processing..."
               : isEnhancing
                 ? "Enhancing prompt..."
-                : "Ask anything, use @ to tag files and collections"
+                : "How can I help you today"
           }
           className="bg-transparent outline-none w-full"
           style={{
