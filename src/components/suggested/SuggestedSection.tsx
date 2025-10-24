@@ -49,26 +49,26 @@ const SuggestedSection: React.FC = () => {
     const features = [
         {
             id: 1,
-            title: "Image Query of Food",
-            subtitle: "Upload meal photos for instant nutrition analysis",
+            title: "Snap Your Meal",
+            subtitle: "Take a photo of your food and get instant nutrition breakdown, calories, and health verdict",
             icon: Camera
         },
         {
             id: 2,
-            title: "Intake & Diet Management",
-            subtitle: "Track daily nutrition and hydration with AI recommendations",
+            title: "Smart Diet Tracking",
+            subtitle: "Get personalized meal recommendations and track your daily nutrition goals automatically",
             icon: Utensils
         },
         {
             id: 3,
-            title: "Dual-Agent Chat System",
-            subtitle: "Real-time health guidance through intelligent chat",
+            title: "Health Coach Chat",
+            subtitle: "Ask questions like 'Can I eat pizza tonight?' and get personalized advice based on your data",
             icon: MessageCircle
         },
         {
             id: 4,
-            title: "Tracker & Dashboard",
-            subtitle: "Monitor health metrics with gamification and progress tracking",
+            title: "Your Health Dashboard",
+            subtitle: "Track streaks, earn badges, and see your immunity score improve with daily habits",
             icon: BarChart3
         }
     ];
@@ -83,7 +83,7 @@ const SuggestedSection: React.FC = () => {
                 <div className="w-10 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
             </div>
 
-            {/* AI Intelligence Card */}
+            {/* Daily Health Tip Card */}
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 p-4 group cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-gray-200/50 flex-shrink-0">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-white shadow-sm group-hover:shadow-md transition-all duration-300">
@@ -91,25 +91,38 @@ const SuggestedSection: React.FC = () => {
                     </div>
                     <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 text-base mb-1">
-                            AI Intelligence
+                            Today's Health Tip
                         </h3>
                         <p className="text-gray-600 text-xs leading-relaxed">
-                            Latest insights and recommendations
+                            "Drink a glass of water before each meal to help with portion control and digestion"
                         </p>
                     </div>
                 </div>
             </div>
 
-            {/* Features List */}
-            <div className="flex-1 overflow-y-auto space-y-3">
-                {features.map((feature) => (
-                    <SuggestedItem
-                        key={feature.id}
-                        title={feature.title}
-                        subtitle={feature.subtitle}
-                        icon={feature.icon}
-                    />
-                ))}
+            {/* Features List - Infinite Marquee */}
+            <div className="flex-1 overflow-hidden">
+                <div className="marquee-container">
+                    <div className="marquee-content space-y-3">
+                        {features.map((feature) => (
+                            <SuggestedItem
+                                key={feature.id}
+                                title={feature.title}
+                                subtitle={feature.subtitle}
+                                icon={feature.icon}
+                            />
+                        ))}
+                        {/* Duplicate for seamless loop */}
+                        {features.map((feature) => (
+                            <SuggestedItem
+                                key={`duplicate-${feature.id}`}
+                                title={feature.title}
+                                subtitle={feature.subtitle}
+                                icon={feature.icon}
+                            />
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
