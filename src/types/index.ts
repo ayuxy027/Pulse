@@ -129,4 +129,7 @@ export interface RecentItemProps {
   title: string;
   isActive?: boolean;
   onClick?: () => void;
-} 
+}
+
+// Export diet types
+export * from './diet'; 

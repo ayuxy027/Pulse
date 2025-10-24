@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { HomePage, ChatPage, CasesPage, InboxPage } from '../../pages';
+import { HomePage, ChatPage, CasesPage, InboxPage, DietPage } from '../../pages';
 
 /**
  * Layout - Main layout component with sidebar navigation and page routing
@@ -27,6 +27,7 @@ const Layout: React.FC = () => {
             <Route path="/chats" element={<ChatPage sidebarOpen={sidebarOpen} />} />
             <Route path="/cases" element={<CasesPage sidebarOpen={sidebarOpen} />} />
             <Route path="/inbox" element={<InboxPage sidebarOpen={sidebarOpen} />} />
+            <Route path="/diet" element={<DietPage sidebarOpen={sidebarOpen} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
