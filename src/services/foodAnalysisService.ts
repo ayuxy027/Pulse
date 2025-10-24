@@ -38,6 +38,12 @@ export const analyzeFoodImage = async (
   imageData: string,
   config?: FoodAnalysisConfig
 ): Promise<FoodAnalysisResult> => {
+  // Check if API key is available
+  if (!API_KEY) {
+    console.warn('VITE_GEMINI_API_KEY not found. Using mock data for demonstration.');
+    return getMockAnalysisResult();
+  }
+
   try {
     const { data } = await axios.post(API_URL, {
       contents: [{
@@ -114,4 +120,41 @@ export const analyzeFoodImage = async (
       analysisSummary: "Analysis could not be completed"
     };
   }
+};
+
+// Mock analysis result for when API key is not available
+const getMockAnalysisResult = (): FoodAnalysisResult => {
+  return {
+    foodName: "Grilled Chicken Salad",
+    calories: 320,
+    nutrientBreakdown: {
+      protein: 28,
+      carbs: 12,
+      fat: 18,
+      fiber: 4,
+      sugar: 6,
+      sodium: 450
+    },
+    healthVerdict: {
+      isHealthy: true,
+      rating: 8,
+      reason: "High protein, low carbs, good fiber content"
+    },
+    immunityImpact: {
+      boosting: ["Vitamin C from vegetables", "Protein for immune function"],
+      suppressing: [],
+      overall: "positive"
+    },
+    prosAndCons: {
+      pros: ["High protein", "Low calorie", "Rich in vitamins"],
+      cons: ["Moderate sodium content"]
+    },
+    recommendations: [
+      "Add more leafy greens for extra nutrients",
+      "Consider reducing dressing for lower calories",
+      "Include a variety of colorful vegetables"
+    ],
+    confidenceLevel: 85,
+    analysisSummary: "Healthy grilled chicken salad with good nutritional balance (Mock data - API key not configured)"
+  };
 };

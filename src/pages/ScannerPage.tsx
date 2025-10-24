@@ -55,6 +55,7 @@ const ScannerPage: React.FC = () => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 setUploadedImage(e.target?.result as string);
+                setIsImageUploaded(true); // Fix: Set this state to show preview
             };
             reader.readAsDataURL(file);
         }
@@ -169,6 +170,19 @@ const ScannerPage: React.FC = () => {
                     >
                         Advanced AI-powered food analysis with real-time nutrition insights and health recommendations
                     </motion.p>
+
+                    {!import.meta.env.VITE_GEMINI_API_KEY && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg"
+                        >
+                            <p className="text-sm text-yellow-800">
+                                <strong>Demo Mode:</strong> API key not configured. Using mock data for demonstration.
+                            </p>
+                        </motion.div>
+                    )}
                 </motion.div>
 
                 {/* Upload Section */}
@@ -301,6 +315,12 @@ const ScannerPage: React.FC = () => {
                                 onClick={() => {
                                     setUploadedImage(null);
                                     setIsImageUploaded(false);
+                                    setAnalysisResult(null);
+                                    setError(null);
+                                    setIsAnalyzing(false);
+                                    setAnalysisProgress(0);
+                                    setProcessingSteps([]);
+                                    setCurrentStep(0);
                                 }}
                             >
                                 <XCircle className="w-5 h-5 text-red-700" />
@@ -717,6 +737,7 @@ const ScannerPage: React.FC = () => {
                                         setProcessingSteps([]);
                                         setCurrentStep(0);
                                         setError(null);
+                                        setIsAnalyzing(false);
                                     }}
                                 >
                                     <Sparkles className="w-5 h-5" />
