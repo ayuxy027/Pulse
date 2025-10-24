@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Droplets, Utensils, Target, Heart, Zap, TrendingUp, Calendar, ArrowUpRight } from 'lucide-react';
+import { Activity, Droplets, Utensils, Target, Heart, Zap } from 'lucide-react';
 
 // BMI Background with Shorter Bars
 const BMIBackground = () => (
@@ -149,7 +149,6 @@ interface HealthStatCardProps {
   subtitle?: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   color: string;
-  size: 'small' | 'medium' | 'large';
   chart?: React.ComponentType;
 }
 
@@ -159,7 +158,6 @@ const HealthStatCard: React.FC<HealthStatCardProps> = ({
   subtitle,
   icon: Icon,
   color,
-  size,
   chart: Chart
 }) => {
   return (
@@ -275,7 +273,6 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           subtitle="Normal"
           icon={Activity}
           color="bg-gradient-to-br from-gray-600 to-gray-700"
-          size="small"
           chart={BMIBackground}
         />
         <HealthStatCard
@@ -284,7 +281,6 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           subtitle="Goal: 2.5L"
           icon={Droplets}
           color="bg-gradient-to-br from-gray-500 to-gray-600"
-          size="small"
           chart={WaterBackground}
         />
         <HealthStatCard
@@ -293,7 +289,6 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           subtitle="Goal: 2,000"
           icon={Utensils}
           color="bg-gradient-to-br from-gray-700 to-gray-800"
-          size="small"
           chart={CaloriesBackground}
         />
         <HealthStatCard
@@ -302,7 +297,6 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           subtitle="Goal: 10,000"
           icon={Target}
           color="bg-gradient-to-br from-gray-600 to-gray-700"
-          size="small"
           chart={StepsBackground}
         />
         <HealthStatCard
