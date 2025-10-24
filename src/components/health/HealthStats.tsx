@@ -154,7 +154,7 @@ interface HealthStatsProps {
 const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
   if (loading) {
     return (
-      <div className="h-full flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4">
         {/* Section Header */}
         <div className="space-y-1 flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">
@@ -164,7 +164,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
         </div>
 
         {/* Loading Cards */}
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
               <div className="flex items-center gap-3 mb-3">
@@ -185,7 +185,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
 
   if (error) {
     return (
-      <div className="h-full flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4">
         {/* Section Header */}
         <div className="space-y-1 flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">
@@ -194,7 +194,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           <div className="w-10 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
         </div>
 
-        <div className="flex-1 bg-white rounded-xl border border-gray-200 p-6 text-center flex items-center justify-center">
+        <div className="bg-white rounded-xl border border-gray-200 p-6 text-center flex items-center justify-center min-h-[200px]">
           <p className="text-red-500 text-sm">Error: {error}</p>
         </div>
       </div>
@@ -202,7 +202,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
   }
 
   return (
-    <div className="h-full flex flex-col space-y-4">
+    <div className="flex flex-col space-y-4">
       {/* Section Header */}
       <div className="space-y-1 flex-shrink-0">
         <h2 className="text-xl font-bold text-gray-900 tracking-tight">
@@ -212,7 +212,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
       </div>
 
       {/* Health Stats Grid */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <HealthStatCard
           title="BMI"
           value="22.5"

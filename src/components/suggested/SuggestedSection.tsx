@@ -94,7 +94,7 @@ const SuggestedSection: React.FC = () => {
     ];
 
     return (
-        <div className="h-full flex flex-col space-y-4">
+        <div className="flex flex-col space-y-4">
             {/* Section Header */}
             <div className="space-y-1 flex-shrink-0">
                 <h2 className="text-xl font-bold text-gray-900 tracking-tight">
@@ -121,7 +121,7 @@ const SuggestedSection: React.FC = () => {
             </div>
 
             {/* Features List - Infinite Marquee */}
-            <div className="flex-1 overflow-hidden">
+            <div className="overflow-hidden">
                 <div className="marquee-container">
                     <div className="marquee-content space-y-3">
                         {features.map((feature) => (

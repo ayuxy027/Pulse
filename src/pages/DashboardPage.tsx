@@ -30,7 +30,7 @@ const DashboardPage: React.FC = () => {
     }, []);
 
     return (
-        <div className="h-[calc(120vh)] w-screen flex flex-col bg-[#f8f6f1] overflow-hidden">
+        <div className="w-full flex flex-col bg-[#f8f6f1] min-h-screen">
             {/* Hero Section - Compact */}
             <div className="px-8 pt-6 pb-4 flex-shrink-0">
                 <div className="max-w-7xl mx-auto">
@@ -38,17 +38,17 @@ const DashboardPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Main Content Area - Optimized for viewport */}
-            <div className="flex-1 px-8 pb-4 overflow-hidden">
-                <div className="max-w-7xl mx-auto h-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+            {/* Main Content Area - Dynamic scrolling */}
+            <div className="flex-1 px-8 pb-4">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         {/* Left Column - Suggested Items with Marquee */}
-                        <div className="lg:col-span-5 h-full overflow-hidden p-[15px]">
+                        <div className="lg:col-span-5 p-[15px]">
                             <SuggestedSection />
                         </div>
 
                         {/* Right Column - Health Stats */}
-                        <div className="lg:col-span-7 h-full overflow-hidden p-[15px]">
+                        <div className="lg:col-span-7 p-[15px]">
                             <HealthStats
                                 loading={loading}
                                 error={error}

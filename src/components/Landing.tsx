@@ -1,6 +1,6 @@
 const LandingPage = () => {
   return (
-    <div className="h-full w-full bg-[#f8f6f1] overflow-hidden">
+    <div className="w-full bg-[#f8f6f1] min-h-screen">
       {/* Hero */}
 
       <section className="w-full bg-[url('./bg.png')] bg-repeat bg-[#f8f6f1] py-6 md:py-8 flex flex-col items-center text-center rounded-t-2xl px-4 p-[30px]">

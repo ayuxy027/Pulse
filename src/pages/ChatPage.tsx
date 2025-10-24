@@ -55,12 +55,12 @@ const ChatPage: React.FC = () => {
     };
 
     return (
-        <div className="h-full w-full bg-[#f8f6f1] flex flex-col overflow-hidden">
+        <div className="w-full bg-[#f8f6f1] flex flex-col min-h-screen">
             <ChatHeader
                 conversations={conversations}
                 onSearchResults={handleSearchResults}
             />
-            <div className="flex-1 flex gap-6 p-6 min-h-0">
+            <div className="flex-1 flex gap-6 p-6">
                 <div className="flex-1 bg-white rounded-lg border border-gray-200 shadow-sm p-[30px]">
                     <ChatInterface
                         searchResults={searchResults}
