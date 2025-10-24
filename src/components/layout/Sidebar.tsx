@@ -4,16 +4,14 @@ import {
     Plus,
     Search,
     Home,
-    Inbox,
-    FolderOpen,
     MessageCircle,
     Command,
     ChevronDown,
     LucideIcon,
-    PlusCircle,
     PanelLeftClose,
     PanelLeft,
-    Activity
+    Activity,
+    Utensils
 } from 'lucide-react';
 import Avatar from '../ui/Avatar';
 import avatar from '../../assets/Icon/Avatar.svg';
@@ -151,11 +149,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
     const getCurrentView = () => {
         const path = location.pathname;
         if (path === '/') return 'home';
-        if (path === '/image-query') return 'image-query';
-        if (path === '/diet-plan') return 'diet-plan';
-        if (path === '/health-tracker') return 'health-tracker';
+        if (path === '/scanner') return 'scanner';
+        if (path === '/diet') return 'diet';
+        if (path === '/tracker') return 'tracker';
         if (path === '/chats') return 'chats';
-        if (path === '/history') return 'history';
         return 'home';
     };
 
@@ -293,25 +290,32 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                     }`}>
                     <div className="p-3 space-y-1">
                         <NavItem
-                            icon={Search}
-                            label="Image Query"
-                            isActive={currentView === 'image-query'}
+                            icon={Home}
+                            label="Home"
+                            isActive={currentView === 'home'}
                             isCollapsed={!isSidebarOpen}
-                            onClick={() => navigate('/image-query')}
+                            onClick={() => navigate('/')}
                         />
                         <NavItem
-                            icon={Home}
-                            label="Diet Plan"
-                            isActive={currentView === 'diet-plan'}
+                            icon={Search}
+                            label="Food Scanner"
+                            isActive={currentView === 'scanner'}
                             isCollapsed={!isSidebarOpen}
-                            onClick={() => navigate('/diet-plan')}
+                            onClick={() => navigate('/scanner')}
+                        />
+                        <NavItem
+                            icon={Utensils}
+                            label="Diet"
+                            isActive={currentView === 'diet'}
+                            isCollapsed={!isSidebarOpen}
+                            onClick={() => navigate('/diet')}
                         />
                         <NavItem
                             icon={Activity}
-                            label="Health Tracker"
-                            isActive={currentView === 'health-tracker'}
+                            label="Tracker"
+                            isActive={currentView === 'tracker'}
                             isCollapsed={!isSidebarOpen}
-                            onClick={() => navigate('/health-tracker')}
+                            onClick={() => navigate('/tracker')}
                         />
                         <NavItem
                             icon={MessageCircle}
@@ -319,13 +323,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                             isActive={currentView === 'chats'}
                             isCollapsed={!isSidebarOpen}
                             onClick={() => navigate('/chats')}
-                        />
-                        <NavItem
-                            icon={FolderOpen}
-                            label="History"
-                            isActive={currentView === 'history'}
-                            isCollapsed={!isSidebarOpen}
-                            onClick={() => navigate('/history')}
                         />
                     </div>
 
