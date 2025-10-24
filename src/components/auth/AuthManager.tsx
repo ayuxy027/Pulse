@@ -8,7 +8,7 @@ const AuthManager = () => {
   useEffect(() => {
     const upsertUser = async () => {
       if (session) {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('users')
           .upsert({
             id: session.user.id,

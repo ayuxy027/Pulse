@@ -1,6 +1,5 @@
 import React from 'react';
 import SearchBar from './SearchBar';
-import { useNavigate } from 'react-router-dom';
 import { ChatConversation } from '../../services/mockDataService';
 import { SearchResult } from '../../services/searchService';
 
@@ -13,7 +12,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   conversations,
   onSearchResults
 }) => {
-  const navigate = useNavigate();
+  // Navigation not used here
 
   return (
     <header className="bg-white border-b border-gray-200 px-12 py-[13px] flex items-center justify-between flex-shrink-0">

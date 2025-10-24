@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Home,
@@ -49,12 +49,11 @@ const NavItem: React.FC<NavItemProps> = ({
  */
 const Navbar: React.FC = () => {
     const navigate = useNavigate();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    // No mobile menu currently used
     const session = useSession();
 
     const handleNavigation = (path: string) => {
         navigate(path);
-        setIsMenuOpen(false);
     };
 
     // Sign out is handled inside the Profile page now
