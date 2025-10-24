@@ -133,7 +133,7 @@ const ChatInput: React.FC = () => {
             />
             {(isLoading || isEnhancing) ? (
               <div className="w-5 h-5 flex items-center justify-center">
-                <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-3 h-3 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
               </div>
             ) : (
               <ArrowUpCircle

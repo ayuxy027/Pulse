@@ -5,7 +5,7 @@ export { PriorityBadge, StatusBadge, type Priority } from './ui/Badge';
 
 
 // Layout Components
-export { default as Sidebar } from './layout/Sidebar';
+export { default as Navbar } from './layout/Navbar';
 export { default as HeroSection } from './layout/HeroSection';
 export { default as Layout } from './layout/Layout';
 

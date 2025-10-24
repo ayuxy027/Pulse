@@ -6,7 +6,7 @@ import { Analytics } from "@vercel/analytics/react"
  * Main Knowlia Interface component
  * 
  * This component renders the complete Knowlia interface with:
- * - Layout component with sidebar navigation and routing
+ * - Layout component with navbar navigation and routing
  * - Page-based routing system with React Router
  * - Analytics integration
  */
