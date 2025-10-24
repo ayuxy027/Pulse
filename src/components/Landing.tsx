@@ -1,9 +1,9 @@
 const LandingPage = () => {
   return (
-    <div className="h-[calc(120vh)] w-screen bg-[#f8f6f1] overflow-hidden">
+    <div className="h-full w-full bg-[#f8f6f1] overflow-hidden">
       {/* Hero */}
 
-      <section className="w-full bg-[url('./bg.png')] bg-repeat bg-[#f8f6f1] py-6 md:py-8 flex flex-col items-center text-center rounded-t-2xl px-4">
+      <section className="w-full bg-[url('./bg.png')] bg-repeat bg-[#f8f6f1] py-6 md:py-8 flex flex-col items-center text-center rounded-t-2xl px-4 p-[30px]">
 
         {/* Users row */}
         <div className="flex items-center gap-2 mb-2 md:mb-4">
@@ -73,7 +73,7 @@ const LandingPage = () => {
           className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 max-h-[90%] sm:max-h-[100%] object-contain w-auto max-w-full"
         />
       </div> */}
-      <div className='flex justify-center items-center'>
+      <div className='flex justify-center items-center p-[30px]'>
         <img src="https://i.postimg.cc/RhkhNRF3/hola.png" alt="" />
       </div>
     </div>

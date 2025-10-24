@@ -43,12 +43,12 @@ const DashboardPage: React.FC = () => {
                 <div className="max-w-7xl mx-auto h-full">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
                         {/* Left Column - Suggested Items with Marquee */}
-                        <div className="lg:col-span-5 h-full overflow-hidden">
+                        <div className="lg:col-span-5 h-full overflow-hidden p-[15px]">
                             <SuggestedSection />
                         </div>
 
                         {/* Right Column - Health Stats */}
-                        <div className="lg:col-span-7 h-full overflow-hidden">
+                        <div className="lg:col-span-7 h-full overflow-hidden p-[15px]">
                             <HealthStats
                                 loading={loading}
                                 error={error}
@@ -59,9 +59,9 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* Chat Input - Fixed at bottom */}
-            <div className="px-8 pb-4 flex-shrink-0">
+            <div className="px-8 pb-4 flex-shrink-0 bg-[#f8f6f1]">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex justify-center">
+                    <div className="flex justify-center p-[15px]">
                         <ChatInput />
                     </div>
                 </div>

@@ -55,13 +55,13 @@ const ChatPage: React.FC = () => {
     };
 
     return (
-        <div className="h-[calc(100vh-80px)] w-screen bg-[#f8f6f1] flex flex-col overflow-hidden">
+        <div className="h-full w-full bg-[#f8f6f1] flex flex-col overflow-hidden">
             <ChatHeader
                 conversations={conversations}
                 onSearchResults={handleSearchResults}
             />
             <div className="flex-1 flex gap-6 p-6 min-h-0">
-                <div className="flex-1 bg-white rounded-lg border border-gray-200 shadow-sm">
+                <div className="flex-1 bg-white rounded-lg border border-gray-200 shadow-sm p-[30px]">
                     <ChatInterface
                         searchResults={searchResults}
                         isSearching={isSearching}
@@ -70,7 +70,7 @@ const ChatPage: React.FC = () => {
                         error={error}
                     />
                 </div>
-                <div className="w-80 bg-white rounded-lg border border-gray-200 shadow-sm flex-shrink-0">
+                <div className="w-80 bg-white rounded-lg border border-gray-200 shadow-sm flex-shrink-0 p-[30px]">
                     <div className="p-6 h-full flex flex-col">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-lg font-semibold text-gray-900">Project Knowledge</h2>
