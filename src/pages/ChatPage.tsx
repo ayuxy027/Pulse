@@ -1,15 +1,19 @@
+import React, { useEffect, useState } from 'react';
 import ChatInterface from '../components/chat/ChatInterface';
 import ChatHeader from '../components/chat/ChatHeader';
 import { Plus, FileText, MoreVertical } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { fetchDocuments, fetchChatConversations } from '../services/mockDataService';
 import { Document, ChatConversation } from '../services/mockDataService';
 import { SearchResult } from '../services/searchService';
 
-/*
-* ChatPage - Clean chat interface with proper layout and design principles
-*/
-const ChatPage = () => {
+/**
+ * ChatPage - Clean chat interface with proper layout and design principles
+ */
+interface ChatPageProps {
+    sidebarOpen?: boolean;
+}
+
+const ChatPage: React.FC<ChatPageProps> = ({ sidebarOpen = true }) => {
     const [documents, setDocuments] = useState<Document[]>([]);
     const [conversations, setConversations] = useState<ChatConversation[]>([]);
     const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -55,7 +59,7 @@ const ChatPage = () => {
     };
 
     return (
-        <div className="h-screen bg-gray-50 flex flex-col">
+        <div className={`h-screen bg-gray-50 flex flex-col transition-all duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
             <ChatHeader
                 conversations={conversations}
                 onSearchResults={handleSearchResults}

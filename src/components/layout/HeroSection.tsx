@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * HeroSection - Main greeting section displaying personalized welcome message and help prompt
+ * HeroSection - Modern greeting section with enhanced typography and spacing
  * 
  * @param userName - The name of the user to greet
  */
@@ -10,55 +10,14 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ userName = "Toni" }) => (
-    <div
-        style={{
-            width: 405,
-            height: 84,
-            position: 'relative',
-            top: 90,
-            left: 43,
-            opacity: 1,
-            boxSizing: 'border-box',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            padding: 0,
-        }}
-    >
-        <h1
-            style={{
-                width: 405,
-                height: 42,
-                opacity: 1,
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: 600,
-                fontStyle: 'normal',
-                fontSize: 32,
-                lineHeight: '42px',
-                letterSpacing: '-0.75px',
-                color: '#0A0C11',
-                margin: 0,
-            }}
-        >
+    <div className="flex flex-col space-y-3">
+        <h1 className="text-5xl font-bold text-gray-900 tracking-tight leading-tight">
             Hello, {userName}
         </h1>
-        <p
-            style={{
-                width: 405,
-                height: 42,
-                opacity: 1,
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: 600,
-                fontStyle: 'normal',
-                fontSize: 32,
-                lineHeight: '42px',
-                letterSpacing: '-0.75px',
-                color: '#8897AE',
-                margin: 0,
-            }}
-        >
-            How can I help you today?
+        <p className="text-2xl font-semibold text-gray-600 leading-relaxed">
+            How are your fitness goals today?
         </p>
+        <div className="w-16 h-1 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
     </div>
 );
 

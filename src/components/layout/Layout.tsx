@@ -23,10 +23,10 @@ const Layout: React.FC = () => {
 
         <div className="flex-1 overflow-hidden relative">
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/chats" element={<ChatPage />} />
-            <Route path="/cases" element={<CasesPage />} />
-            <Route path="/inbox" element={<InboxPage />} />
+            <Route path="/" element={<HomePage sidebarOpen={sidebarOpen} />} />
+            <Route path="/chats" element={<ChatPage sidebarOpen={sidebarOpen} />} />
+            <Route path="/cases" element={<CasesPage sidebarOpen={sidebarOpen} />} />
+            <Route path="/inbox" element={<InboxPage sidebarOpen={sidebarOpen} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

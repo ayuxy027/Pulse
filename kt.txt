@@ -1,0 +1,111 @@
+🧬 AI-Based Healthcare Platform – Feature KT
+1. Image Query of Food 🍱
+
+Purpose: Let users upload or snap a picture of their meal to get instant nutrition analysis.
+
+Functionality:
+
+Detects the dish via AI/ML image recognition.
+
+Returns:
+
+Calories
+
+Nutrient breakdown
+
+Pros & cons
+
+Healthy / Not verdict
+
+Immunity impact (boosting/suppressing foods based on user profile)
+
+Notes for Devs: Use AI model + Supabase for dietary context (e.g., allergies, diet type).
+
+2. Intake & Diet Management 🥤
+
+Purpose: Track and manage daily nutrition and hydration, aligned with immunity goals.
+
+Functionality:
+
+Diet Agent checks daily intake limits, calorie goals, and water intake.
+
+Recommends recipes and supplements based on user profile.
+
+Integrates with the tracker to update logs automatically.
+
+Notes: Ensure diet recommendations consider user’s diet type (veg/non-veg/jain), allergies, and health goals.
+
+3. Dual-Agent Chat System 💬
+
+Purpose: Provide real-time, context-aware health guidance through a single chat interface.
+
+Agents & Flow:
+
+Analyzer Agent:
+
+Reads Supabase user data (meals, water intake, BMI, health goals, lifestyle habits).
+
+Summarizes current status and immunity-related context.
+
+Coach Agent:
+
+Reads context from Analyzer and responds to user queries.
+
+Provides advice on food choices, supplements, and lifestyle adjustments.
+
+Example:
+
+User: “Can I eat pizza tonight?”
+AI: “You’ve already had pizza today and calorie intake is high — better skip tonight 🍕.”
+
+Notes: Single chat interface, context auto-updates after every interaction.
+
+4. Chat History Section 📜
+
+Purpose: Allow users to quickly recall previous interactions and advice.
+
+Functionality:
+
+Displays recent chats on homepage.
+
+Clicking a chat opens the full dual-agent chat.
+
+Notes: Not a major feature — purely supportive. Data fetched from Supabase chat_history table.
+
+5. Tracker / Dashboard 📊
+
+Purpose: Unified interface for monitoring all health metrics and progress.
+
+Functionality:
+
+Diet Planner: View weekly meal plans, intake logs, and nutrition summaries.
+
+Water & Workout Tracker: Log daily water intake and workouts.
+
+Calendar View: Visualize total calories, water, workouts, and other metrics over days/weeks.
+
+Immunity Index (Optional): Simple score calculated from BMI, diet, hydration, last illness, and activity.
+
+Gamification Layer:
+
+Track streaks (hydration streak, workout streak, diet compliance).
+
+Reward badges or points for meeting goals.
+
+Encourage engagement via personalized messages and progress feedback.
+
+Notes: Dashboard acts as central hub — all other features feed into it for a unified experience.
+
+Key Points for Teammates
+
+All features feed into Supabase: user profile, intake logs, chat history.
+
+Dual-agent chat is the core intelligence layer — all recommendations flow through it.
+
+Gamification + personalized immunity scoring = increases user engagement.
+
+Feature hierarchy:
+
+Core: Dual-agent chat + Diet management
+
+Supporting: Image query + Tracker + Chat history

@@ -25,7 +25,7 @@ const InboxPage: React.FC<InboxPageProps> = ({ sidebarOpen = true }) => {
               <Inbox size={24} className="text-gray-500" />
               <h2 className="text-xl font-semibold text-gray-900">Messages</h2>
             </div>
-            
+
             <div className="space-y-4">
               <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
                 <Mail size={20} className="text-blue-500" />
