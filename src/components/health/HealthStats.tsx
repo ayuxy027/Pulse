@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Droplets, Utensils, Target, Heart, Zap, TrendingUp, Calendar, ArrowUpRight } from 'lucide-react';
+import { Activity, Droplets, Utensils, Target, Heart, Zap } from 'lucide-react';
 
 // BMI Background with Shorter Bars
 const BMIBackground = () => (
@@ -159,7 +159,6 @@ const HealthStatCard: React.FC<HealthStatCardProps> = ({
   subtitle,
   icon: Icon,
   color,
-  size,
   chart: Chart
 }) => {
   return (
