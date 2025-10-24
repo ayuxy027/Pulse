@@ -8,6 +8,7 @@ import {
 import { LuBookText } from 'react-icons/lu';
 import { TbZoomScan, TbCookieMan } from 'react-icons/tb';
 import knowliaLogo from '../../assets/Icon/KnowliaLogo.svg';
+import Button from '../ui/Button';
 
 /**
  * NavItem - Individual navigation item component for navbar
@@ -103,12 +104,13 @@ const Navbar: React.FC = () => {
                     </div>
 
                     {/* Desktop CTA Button */}
-                    <button
-                        className="hidden md:block bg-black text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-800 transition"
+                    <Button
+                        variant="primary"
+                        className="hidden md:block !w-auto !h-auto px-6 py-3 rounded-xl font-semibold"
                         onClick={() => handleNavigation('/dashboard')}
                     >
                         Get Started
-                    </button>
+                    </Button>
 
                     {/* Mobile Menu Button */}
                     <button
@@ -155,12 +157,13 @@ const Navbar: React.FC = () => {
                             label="Coach"
                             onClick={() => handleNavigation('/chats')}
                         />
-                        <button
-                            className="w-full bg-black text-white px-6 py-3 rounded-xl font-semibold mt-4 hover:bg-gray-800 transition"
+                        <Button
+                            variant="primary"
+                            className="w-full !h-auto px-6 py-3 rounded-xl font-semibold mt-4"
                             onClick={() => handleNavigation('/dashboard')}
                         >
                             Get Started
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}
