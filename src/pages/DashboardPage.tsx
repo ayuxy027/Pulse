@@ -30,25 +30,25 @@ const DashboardPage: React.FC = () => {
     }, []);
 
     return (
-        <div className="h-[calc(120vh)] w-screen flex flex-col bg-[#f8f6f1] overflow-hidden">
+        <div className="w-full flex flex-col bg-[#f8f6f1] min-h-screen">
             {/* Hero Section - Compact */}
-            <div className="px-8 pt-6 pb-4 flex-shrink-0">
+            <div className="px-6 pt-4 pb-2 flex-shrink-0">
                 <div className="max-w-7xl mx-auto">
                     <HeroSection />
                 </div>
             </div>
 
-            {/* Main Content Area - Optimized for viewport */}
-            <div className="flex-1 px-8 pb-4 overflow-hidden">
-                <div className="max-w-7xl mx-auto h-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+            {/* Main Content Area - Dynamic scrolling */}
+            <div className="px-6 pb-2">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                         {/* Left Column - Suggested Items with Marquee */}
-                        <div className="lg:col-span-5 h-full overflow-hidden">
+                        <div className="lg:col-span-5 p-3">
                             <SuggestedSection />
                         </div>
 
                         {/* Right Column - Health Stats */}
-                        <div className="lg:col-span-7 h-full overflow-hidden">
+                        <div className="lg:col-span-7 p-3">
                             <HealthStats
                                 loading={loading}
                                 error={error}
@@ -59,7 +59,7 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* Chat Input - Fixed at bottom */}
-            <div className="px-8 pb-4 flex-shrink-0">
+            <div className="px-6 pb-4 flex-shrink-0 bg-[#f8f6f1]">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex justify-center">
                         <ChatInput />

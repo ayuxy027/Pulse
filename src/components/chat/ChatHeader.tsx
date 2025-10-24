@@ -12,8 +12,6 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   conversations,
   onSearchResults
 }) => {
-  // Navigation not used here
-
   return (
     <header className="bg-white border-b border-gray-200 px-12 py-[13px] flex items-center justify-between flex-shrink-0">
       <h1 className="text-xl font-semibold text-gray-900">Chats</h1>

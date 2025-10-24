@@ -13,14 +13,14 @@ import ProfilePage from './pages/ProfilePage';
 import AuthManager from './components/auth/AuthManager';
 
 /**
- * Main Knowlia Interface component
+ * Main Pulse.ai Interface component
  * 
- * This component renders the complete Knowlia interface with:
+ * This component renders the complete Pulse.ai interface with:
  * - Layout component with navbar navigation and routing
  * - Page-based routing system with React Router
  * - Analytics integration
  */
-const KnowliaInterface: React.FC = () => {
+const PulseaiInterface: React.FC = () => {
   return (
     <SessionContextProvider supabaseClient={supabase}>
       <AuthManager />
@@ -46,4 +46,4 @@ const KnowliaInterface: React.FC = () => {
   );
 };
 
-export default KnowliaInterface;
+export default PulseaiInterface;
