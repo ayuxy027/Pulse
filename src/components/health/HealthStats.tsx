@@ -20,7 +20,7 @@ const BMIBackground = () => (
 
 const WaterBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-cyan-300 to-cyan-200 rounded-lg"></div>
+    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     {/* Line Chart Spanning Card */}
     <div className="absolute inset-4">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -45,7 +45,7 @@ const WaterBackground = () => (
 
 const CaloriesBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-orange-300 to-orange-200 rounded-lg"></div>
+    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     {/* Shorter Bars - Reduced Height Values */}
     <div className="absolute inset-4 flex items-end justify-between">
       {[0.15, 0.25, 0.2, 0.35, 0.3, 0.4, 0.25, 0.45, 0.35, 0.3, 0.4, 0.3, 0.35, 0.45, 0.4].map((height, i) => (
@@ -61,7 +61,7 @@ const CaloriesBackground = () => (
 
 const StepsBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-green-300 to-green-200 rounded-lg"></div>
+    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     {/* Double line chart spanning card */}
     <div className="absolute inset-8">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -222,7 +222,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="22.5"
           subtitle="Normal"
           icon={Activity}
-          color="bg-gradient-to-br from-blue-500 to-blue-600"
+          color="bg-gradient-to-br from-gray-600 to-gray-700"
           size="small"
           chart={BMIBackground}
         />
@@ -231,7 +231,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="2.5L"
           subtitle="Goal: 2.5L"
           icon={Droplets}
-          color="bg-gradient-to-br from-cyan-500 to-cyan-600"
+          color="bg-gradient-to-br from-gray-500 to-gray-600"
           size="small"
           chart={WaterBackground}
         />
@@ -240,7 +240,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="2,200"
           subtitle="Goal: 2,000"
           icon={Utensils}
-          color="bg-gradient-to-br from-orange-500 to-orange-600"
+          color="bg-gradient-to-br from-gray-700 to-gray-800"
           size="small"
           chart={CaloriesBackground}
         />
@@ -249,7 +249,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="8,432"
           subtitle="Goal: 10,000"
           icon={Target}
-          color="bg-gradient-to-br from-green-500 to-green-600"
+          color="bg-gradient-to-br from-gray-600 to-gray-700"
           size="small"
           chart={StepsBackground}
         />
