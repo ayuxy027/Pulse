@@ -127,10 +127,6 @@ const HealthStatCard: React.FC<HealthStatCardProps> = ({
               </h4>
             </div>
           </div>
-          <div className="flex items-center text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors">
-            <span>View Details</span>
-            <ArrowUpRight size={12} className="ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </div>
         </div>
 
         <div className="flex-1 flex flex-col justify-center">

@@ -30,7 +30,7 @@ const DashboardPage: React.FC = () => {
     }, []);
 
     return (
-        <div className="h-screen w-screen flex flex-col bg-[#f8f6f1] overflow-hidden">
+        <div className="h-[calc(120vh)] w-screen flex flex-col bg-[#f8f6f1] overflow-hidden">
             {/* Hero Section - Compact */}
             <div className="px-8 pt-6 pb-4 flex-shrink-0">
                 <div className="max-w-7xl mx-auto">
@@ -61,7 +61,7 @@ const DashboardPage: React.FC = () => {
             {/* Chat Input - Fixed at bottom */}
             <div className="px-8 pb-4 flex-shrink-0">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex justify-end">
+                    <div className="flex justify-center">
                         <ChatInput />
                     </div>
                 </div>
