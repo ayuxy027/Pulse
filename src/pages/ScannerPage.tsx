@@ -146,17 +146,6 @@ const ScannerPage: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-12 text-center"
                 >
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex gap-2 items-center px-4 py-2 mb-6 rounded-full border shadow-lg backdrop-blur-md bg-white/80 border-gray-500/20"
-                    >
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
-                        <span className="text-sm font-semibold text-gray-600">
-                            AI-Powered Nutrition Analysis
-                        </span>
-                    </motion.div>
-
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
