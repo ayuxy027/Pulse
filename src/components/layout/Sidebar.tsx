@@ -2,9 +2,7 @@ import React, { ReactNode, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
     Plus,
-    Search,
     Home,
-    MessageCircle,
     Command,
     ChevronDown,
     LucideIcon,
@@ -13,6 +11,7 @@ import {
     Utensils
 } from 'lucide-react';
 import { LuBookText } from 'react-icons/lu';
+import { TbZoomScan, TbCookieMan } from 'react-icons/tb';
 import Avatar from '../ui/Avatar';
 import avatar from '../../assets/Icon/Avatar.svg';
 import knowliaLogo from '../../assets/Icon/KnowliaLogo.svg';
@@ -309,7 +308,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                             onClick={() => navigate('/')}
                         />
                         <NavItem
-                            icon={Search}
+                            icon={TbZoomScan}
                             label="Food Scanner"
                             isActive={currentView === 'scanner'}
                             isCollapsed={!isSidebarOpen}
@@ -330,8 +329,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                             onClick={() => navigate('/dairy')}
                         />
                         <NavItem
-                            icon={MessageCircle}
-                            label="Chat"
+                            icon={TbCookieMan}
+                            label="Coach"
                             isActive={currentView === 'chats'}
                             isCollapsed={!isSidebarOpen}
                             onClick={() => navigate('/chats')}
