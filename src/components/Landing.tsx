@@ -95,7 +95,7 @@ const LandingPage = () => {
           variant="primary"
           className="mt-4 !w-auto !h-auto px-6 py-3 md:px-8 md:py-4 text-base font-semibold rounded-xl md:rounded-2xl hover:scale-105 transition-all duration-300"
         >
-          <GiMuscleUp size={20} className="mr-2" />
+          <GiMuscleUp size={20} className="mr-2 stroke-1" />
           Start Your Journey
         </Button>
       </section>
