@@ -10,14 +10,14 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ userName = "Toni" }) => (
-    <div className="flex flex-col space-y-2">
-        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+    <div className="flex flex-col space-y-3">
+        <h1 className="text-5xl font-bold text-gray-900 tracking-tight leading-tight">
             Hello, {userName}
         </h1>
-        <p className="text-lg font-medium text-gray-600 leading-relaxed">
+        <p className="text-2xl font-semibold text-gray-600 leading-relaxed">
             How are your fitness goals today?
         </p>
-        <div className="w-12 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
+        <div className="w-16 h-1 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
     </div>
 );
 

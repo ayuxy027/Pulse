@@ -4,7 +4,6 @@ import SuggestedSection from '../components/suggested/SuggestedSection';
 import HealthStats from '../components/health/HealthStats';
 import ChatInput from '../components/chat/ChatInput';
 import { fetchCases } from '../services/mockDataService';
-import { Case } from '../services/mockDataService';
 
 /**
  * HomePage - Modern fitness dashboard with clean, aesthetic design

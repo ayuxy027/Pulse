@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Sparkles, ArrowUpRight, TrendingUp, Target, Zap } from 'lucide-react';
-import { fetchSuggestedItems } from '../../services/mockDataService';
-import { SuggestedItem as SuggestedItemType } from '../../services/mockDataService';
+import React from 'react';
+import { Sparkles, ArrowUpRight, Camera, Utensils, MessageCircle, BarChart3 } from 'lucide-react';
 
 /**
  * SuggestedItem - Modern suggested content item with enhanced styling
@@ -45,37 +43,42 @@ const SuggestedItem: React.FC<SuggestedItemProps> = ({
 );
 
 /**
- * SuggestedSection - Modern suggested content section with enhanced design
+ * SuggestedSection - Features from KT document
  */
 const SuggestedSection: React.FC = () => {
-    const [suggestedItems, setSuggestedItems] = useState<SuggestedItemType[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const loadSuggestedItems = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                const fetchedItems = await fetchSuggestedItems();
-                setSuggestedItems(fetchedItems);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to load suggested items');
-                console.error('Error loading suggested items:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadSuggestedItems();
-    }, []);
+    const features = [
+        {
+            id: 1,
+            title: "Image Query of Food",
+            subtitle: "Upload meal photos for instant nutrition analysis",
+            icon: Camera
+        },
+        {
+            id: 2,
+            title: "Intake & Diet Management",
+            subtitle: "Track daily nutrition and hydration with AI recommendations",
+            icon: Utensils
+        },
+        {
+            id: 3,
+            title: "Dual-Agent Chat System",
+            subtitle: "Real-time health guidance through intelligent chat",
+            icon: MessageCircle
+        },
+        {
+            id: 4,
+            title: "Tracker & Dashboard",
+            subtitle: "Monitor health metrics with gamification and progress tracking",
+            icon: BarChart3
+        }
+    ];
 
     return (
         <div className="h-full flex flex-col space-y-4">
             {/* Section Header */}
             <div className="space-y-1 flex-shrink-0">
                 <h2 className="text-xl font-bold text-gray-900 tracking-tight">
-                    Suggested
+                    Features
                 </h2>
                 <div className="w-10 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
             </div>
@@ -97,41 +100,16 @@ const SuggestedSection: React.FC = () => {
                 </div>
             </div>
 
-            {/* Suggested Items - Scrollable area */}
+            {/* Features List */}
             <div className="flex-1 overflow-y-auto space-y-3">
-                {loading ? (
-                    <div className="space-y-3">
-                        {Array.from({ length: 3 }).map((_, i) => (
-                            <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-6 h-6 bg-gray-200 rounded-lg"></div>
-                                    <div className="h-3 bg-gray-200 rounded w-20"></div>
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="h-3 bg-gray-200 rounded w-full"></div>
-                                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : error ? (
-                    <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-                        <p className="text-red-500 text-sm">Error: {error}</p>
-                    </div>
-                ) : suggestedItems.length > 0 ? (
-                    suggestedItems.map((item, index) => (
-                        <SuggestedItem
-                            key={item.id}
-                            title={item.title}
-                            subtitle={item.subtitle}
-                            icon={[TrendingUp, Target, Zap][index % 3]}
-                        />
-                    ))
-                ) : (
-                    <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-                        <p className="text-gray-500 text-sm">No suggested items found</p>
-                    </div>
-                )}
+                {features.map((feature) => (
+                    <SuggestedItem
+                        key={feature.id}
+                        title={feature.title}
+                        subtitle={feature.subtitle}
+                        icon={feature.icon}
+                    />
+                ))}
             </div>
         </div>
     );
