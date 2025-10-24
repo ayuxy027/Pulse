@@ -50,9 +50,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ userName = "Toni" }) => (
                 fontFamily: 'Inter, sans-serif',
                 fontWeight: 600,
                 fontStyle: 'normal',
-                fontSize: 32,
+                fontSize: 28,
                 lineHeight: '42px',
-                letterSpacing: '-0.75px',
+                letterSpacing: '-0.5px',
                 color: '#8897AE',
                 margin: 0,
             }}
