@@ -1,13 +1,13 @@
 import React from 'react';
 import { Activity, Droplets, Utensils, Target, Heart, Zap, TrendingUp, Calendar, ArrowUpRight } from 'lucide-react';
 
-// Large, visible decorative graphs spanning entire card area
+// BMI Background with Shorter Bars
 const BMIBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Large trend chart spanning entire card */}
+    {/* Shorter Bars - Reduced Height Values */}
     <div className="absolute inset-4 flex items-end justify-between">
-      {[0.2, 0.4, 0.3, 0.6, 0.4, 0.7, 0.5, 0.8, 0.6, 0.9, 0.7, 0.8].map((height, i) => (
+      {[0.1, 0.2, 0.15, 0.3, 0.25, 0.4, 0.3, 0.45, 0.35, 0.5, 0.4, 0.45].map((height, i) => (
         <div
           key={i}
           className="bg-gray-500 rounded-t-md flex-1 mx-0.5"
@@ -21,23 +21,22 @@ const BMIBackground = () => (
 const WaterBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-gradient-to-br from-cyan-300 to-cyan-200 rounded-lg"></div>
-    {/* Large circular progress spanning card */}
-    <div className="absolute inset-8 flex items-center justify-center">
-      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-        <path
-          className="text-gray-400"
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="none"
-          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
-        />
-        <path
+    {/* Line Chart Spanning Card */}
+    <div className="absolute inset-4">
+      <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <polyline
           className="text-gray-600"
           stroke="currentColor"
-          strokeWidth="4"
+          strokeWidth="3"
           fill="none"
-          strokeDasharray="100, 100"
-          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
+          points="5,80 15,70 25,75 35,60 45,65 55,50 65,55 75,40 85,45 95,35"
+        />
+        <polyline
+          className="text-gray-500"
+          stroke="currentColor"
+          strokeWidth="2"
+          fill="none"
+          points="5,85 15,75 25,80 35,65 45,70 55,55 65,60 75,45 85,50 95,40"
         />
       </svg>
     </div>
@@ -47,25 +46,15 @@ const WaterBackground = () => (
 const CaloriesBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-gradient-to-br from-orange-300 to-orange-200 rounded-lg"></div>
-    {/* Large circular progress spanning card */}
-    <div className="absolute inset-8 flex items-center justify-center">
-      <svg className="w-full h-full" viewBox="0 0 100 100">
-        <path
-          className="text-gray-400"
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="none"
-          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
+    {/* Shorter Bars - Reduced Height Values */}
+    <div className="absolute inset-4 flex items-end justify-between">
+      {[0.15, 0.25, 0.2, 0.35, 0.3, 0.4, 0.25, 0.45, 0.35, 0.3, 0.4, 0.3, 0.35, 0.45, 0.4].map((height, i) => (
+        <div
+          key={i}
+          className="bg-gray-600 rounded-t-sm flex-1 mx-0.5"
+          style={{ height: `${height * 100}%` }}
         />
-        <path
-          className="text-gray-600"
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="none"
-          strokeDasharray="110, 100"
-          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
-        />
-      </svg>
+      ))}
     </div>
   </div>
 );
@@ -73,23 +62,25 @@ const CaloriesBackground = () => (
 const StepsBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-gradient-to-br from-green-300 to-green-200 rounded-lg"></div>
-    {/* Large circular progress spanning card */}
-    <div className="absolute inset-8 flex items-center justify-center">
-      <svg className="w-full h-full" viewBox="0 0 100 100">
-        <path
-          className="text-gray-400"
+    {/* Double line chart spanning card */}
+    <div className="absolute inset-4">
+      <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        {/* Goal line */}
+        <polyline
+          className="text-gray-500"
           stroke="currentColor"
-          strokeWidth="4"
+          strokeWidth="2"
           fill="none"
-          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
+          strokeDasharray="5,5"
+          points="5,30 15,32 25,28 35,31 45,29 55,30 65,28 75,31 85,29 95,30"
         />
-        <path
+        {/* Actual progress line */}
+        <polyline
           className="text-gray-600"
           stroke="currentColor"
-          strokeWidth="4"
+          strokeWidth="3"
           fill="none"
-          strokeDasharray="84, 100"
-          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
+          points="5,50 15,48 25,45 35,42 45,40 55,38 65,36 75,34 85,32 95,30"
         />
       </svg>
     </div>

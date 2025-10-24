@@ -2,7 +2,7 @@ import React from 'react';
 import { Sparkles, ArrowUpRight, Camera, Utensils, MessageCircle, BarChart3 } from 'lucide-react';
 
 /**
- * SuggestedItem - Modern suggested content item with enhanced styling
+ * SuggestedItem - Modern Suggested Content Item with Enhanced Styling
  */
 interface SuggestedItemProps {
     title: string;
@@ -43,32 +43,32 @@ const SuggestedItem: React.FC<SuggestedItemProps> = ({
 );
 
 /**
- * SuggestedSection - Features from KT document
+ * SuggestedSection - Features from KT Document
  */
 const SuggestedSection: React.FC = () => {
     const features = [
         {
             id: 1,
             title: "Snap Your Meal",
-            subtitle: "Take a photo of your food and get instant nutrition breakdown, calories, and health verdict",
+            subtitle: "Take a Photo of Your Food and Get Instant Nutrition Breakdown, Calories, and Health Verdict",
             icon: Camera
         },
         {
             id: 2,
             title: "Smart Diet Tracking",
-            subtitle: "Get personalized meal recommendations and track your daily nutrition goals automatically",
+            subtitle: "Get Personalized Meal Recommendations and Track Your Daily Nutrition Goals Automatically",
             icon: Utensils
         },
         {
             id: 3,
             title: "Health Coach Chat",
-            subtitle: "Ask questions like 'Can I eat pizza tonight?' and get personalized advice based on your data",
+            subtitle: "Ask Questions Like 'Can I Eat Pizza Tonight?' and Get Personalized Advice Based on Your Data",
             icon: MessageCircle
         },
         {
             id: 4,
             title: "Your Health Dashboard",
-            subtitle: "Track streaks, earn badges, and see your immunity score improve with daily habits",
+            subtitle: "Track Streaks, Earn Badges, and See Your Immunity Score Improve with Daily Habits",
             icon: BarChart3
         }
     ];
@@ -94,7 +94,7 @@ const SuggestedSection: React.FC = () => {
                             Today's Health Tip
                         </h3>
                         <p className="text-gray-600 text-xs leading-relaxed">
-                            "Drink a glass of water before each meal to help with portion control and digestion"
+                            "Drink a Glass of Water Before Each Meal to Help with Portion Control and Digestion"
                         </p>
                     </div>
                 </div>

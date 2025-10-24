@@ -6,7 +6,7 @@ import ChatInput from '../components/chat/ChatInput';
 import { fetchCases } from '../services/mockDataService';
 
 /**
- * HomePage - Modern fitness dashboard with clean, aesthetic design
+ * HomePage - Modern Fitness Dashboard with Clean, Aesthetic Design
  */
 interface HomePageProps {
     sidebarOpen?: boolean;

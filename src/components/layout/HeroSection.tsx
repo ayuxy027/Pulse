@@ -1,9 +1,9 @@
 import React from 'react';
 
 /**
- * HeroSection - Modern greeting section with enhanced typography and spacing
+ * HeroSection - Modern Greeting Section with Enhanced Typography and Spacing
  * 
- * @param userName - The name of the user to greet
+ * @param userName - The Name of the User to Greet
  */
 interface HeroSectionProps {
     userName?: string;
@@ -15,7 +15,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ userName = "Toni" }) => (
             Hello, {userName}
         </h1>
         <p className="text-2xl font-semibold text-gray-600 leading-relaxed">
-            How are your fitness goals today?
+            How are your Fitness Goals Today?
         </p>
         <div className="w-16 h-1 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
     </div>
