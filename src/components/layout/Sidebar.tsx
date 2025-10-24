@@ -112,16 +112,16 @@ interface UserProfileProps {
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({ name, role, avatar, isCollapsed = false }) => (
-    <div className={`flex items-center gap-3 p-4 border-t border-gray-100 bg-gray-50/50 hover:bg-gray-100/50 transition-colors duration-200 cursor-pointer group ${isCollapsed ? 'justify-center' : ''
+    <div className={`flex items-center gap-1 p-5 border-t border-gray-100 bg-gray-50/50 hover:bg-gray-100/50 transition-colors duration-200 cursor-pointer group ${isCollapsed ? 'justify-center px-2' : ''
         }`}>
         <Avatar src={avatar} alt={name} size="w-9 h-9" />
 
         <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ease-out ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto'
             }`}>
-            <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-gray-800 transition-colors duration-200">
+            <p className="text-sm ml-2 font-semibold text-gray-900 truncate group-hover:text-gray-800 transition-colors duration-200">
                 {name}
             </p>
-            <p className="text-xs text-gray-500 truncate">{role}</p>
+            <p className="text-xs ml-2 text-gray-500 truncate">{role}</p>
         </div>
 
         <ChevronDown
@@ -363,8 +363,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             </div>
 
             {/* User Profile */}
-            <div className={`transition-opacity duration-200 ease-out ${isSidebarOpen ? 'opacity-100' : 'opacity-0'
-                }`}>
+            <div className="transition-opacity duration-200 ease-out">
                 <UserProfile
                     name="Toni Nijm"
                     role="Patent attorney"

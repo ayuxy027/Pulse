@@ -63,7 +63,7 @@ const StepsBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-gradient-to-br from-green-300 to-green-200 rounded-lg"></div>
     {/* Double line chart spanning card */}
-    <div className="absolute inset-4">
+    <div className="absolute inset-8">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         {/* Goal line */}
         <polyline
