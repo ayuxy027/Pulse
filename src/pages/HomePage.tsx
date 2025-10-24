@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import HeroSection from '../components/layout/HeroSection';
 import SuggestedSection from '../components/suggested/SuggestedSection';
-import CaseCard from '../components/cases/CaseCard';
+import HealthStats from '../components/health/HealthStats';
 import ChatInput from '../components/chat/ChatInput';
 import { fetchCases } from '../services/mockDataService';
 import { Case } from '../services/mockDataService';
-import { Priority } from '../types';
 
-/*
-* HomePage - Main dashboard page displaying hero section, suggested items, and case cards
-*/
+/**
+ * HomePage - Fitness dashboard displaying hero section, suggested items, and health stats
+ */
 interface HomePageProps {
     sidebarOpen?: boolean;
 }
@@ -37,57 +36,28 @@ const HomePage: React.FC<HomePageProps> = ({ sidebarOpen = true }) => {
         loadCases();
     }, []);
 
-    const normalizePriority = (value: string): Priority => {
-        const lower = (value || '').toLowerCase();
-        if (lower === 'high') return 'High';
-        if (lower === 'medium') return 'Medium';
-        if (lower === 'low') return 'Low';
-        return 'Low';
-    };
-
-
     return (
         <div className={`flex-1 flex flex-col h-screen bg-gray-50/30 transition-all duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
-            <HeroSection />
+            {/* Greeting Section */}
+            <div className="px-8 pt-8">
+                <HeroSection />
+            </div>
 
-            {/* Content Area */}
-            <div className="flex-1">
-                <div className="p-8" style={{ marginTop: '80px' }}>
-                    <div className="max-w-7xl mx-auto">
-                        <div className="grid grid-cols-12 gap-8">
-                            {/* Left Column - Suggested */}
-                            <div className="col-span-4" style={{ paddingLeft: '30px' }}>
-                                <SuggestedSection />
-                            </div>
+            {/* Main Content Area */}
+            <div className="flex-1 px-8 py-6">
+                <div className="max-w-7xl mx-auto h-full">
+                    <div className="grid grid-cols-12 gap-8 h-full">
+                        {/* Left Column - Suggested Items */}
+                        <div className="col-span-4">
+                            <SuggestedSection />
+                        </div>
 
-                            {/* Right Column - Case Cards */}
-                            <div className="col-span-8">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-15">
-                                    {loading ? (
-                                        <div className="col-span-2">
-                                            <p>Loading cases...</p>
-                                        </div>
-                                    ) : error ? (
-                                        <div className="col-span-2">
-                                            <p className="text-red-500">Error: {error}</p>
-                                        </div>
-                                    ) : cases.length > 0 ? (
-                                        cases.map((caseItem) => (
-                                            <CaseCard
-                                                key={caseItem.id}
-                                                title={caseItem.title}
-                                                priority={normalizePriority(caseItem.priority as unknown as string)}
-                                                status={caseItem.status}
-                                                description={caseItem.description}
-                                            />
-                                        ))
-                                    ) : (
-                                        <div className="col-span-2">
-                                            <p>No cases found</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                        {/* Right Column - Health Stats 3x2 Grid */}
+                        <div className="col-span-8">
+                            <HealthStats
+                                loading={loading}
+                                error={error}
+                            />
                         </div>
                     </div>
                 </div>
