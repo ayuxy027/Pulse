@@ -8,7 +8,7 @@ import {
 import { LuBookText } from 'react-icons/lu';
 import { TbZoomScan, TbCookieMan } from 'react-icons/tb';
 import knowliaLogo from '../../assets/Icon/KnowliaLogo.svg';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSession } from '@supabase/auth-helpers-react';
 import Button from '../ui/Button';
 import Avatar from '../ui/Avatar';
 
@@ -51,17 +51,13 @@ const Navbar: React.FC = () => {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const session = useSession();
-    const supabase = useSupabaseClient();
 
     const handleNavigation = (path: string) => {
         navigate(path);
         setIsMenuOpen(false);
     };
 
-    async function signOut() {
-        await supabase.auth.signOut();
-        navigate('/');
-    }
+    // Sign out is handled inside the Profile page now
 
     return (
         <div className="w-full bg-[#f8f6f1] border-b border-gray-200 shadow-sm">
