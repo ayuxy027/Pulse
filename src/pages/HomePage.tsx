@@ -7,14 +7,13 @@ import { fetchCases } from '../services/mockDataService';
 import { Case } from '../services/mockDataService';
 
 /**
- * HomePage - Fitness dashboard displaying hero section, suggested items, and health stats
+ * HomePage - Modern fitness dashboard with clean, aesthetic design
  */
 interface HomePageProps {
     sidebarOpen?: boolean;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ sidebarOpen = true }) => {
-    const [cases, setCases] = useState<Case[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -23,8 +22,7 @@ const HomePage: React.FC<HomePageProps> = ({ sidebarOpen = true }) => {
             try {
                 setLoading(true);
                 setError(null);
-                const fetchedCases = await fetchCases();
-                setCases(fetchedCases);
+                await fetchCases();
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load cases');
                 console.error('Error loading cases:', err);
@@ -37,23 +35,25 @@ const HomePage: React.FC<HomePageProps> = ({ sidebarOpen = true }) => {
     }, []);
 
     return (
-        <div className={`flex-1 flex flex-col h-screen bg-gray-50/30 transition-all duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
-            {/* Greeting Section */}
-            <div className="px-8 pt-8">
-                <HeroSection />
+        <div className={`flex-1 flex flex-col h-screen bg-gradient-to-br from-slate-50 to-gray-50 transition-all duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
+            {/* Hero Section - Compact */}
+            <div className="px-8 pt-6 pb-4">
+                <div className="max-w-7xl mx-auto">
+                    <HeroSection />
+                </div>
             </div>
 
-            {/* Main Content Area */}
-            <div className="flex-1 px-8 py-6">
+            {/* Main Content Area - Optimized for viewport */}
+            <div className="flex-1 px-8 pb-4 overflow-hidden">
                 <div className="max-w-7xl mx-auto h-full">
-                    <div className="grid grid-cols-12 gap-8 h-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
                         {/* Left Column - Suggested Items */}
-                        <div className="col-span-4">
+                        <div className="lg:col-span-5 h-full overflow-hidden">
                             <SuggestedSection />
                         </div>
 
-                        {/* Right Column - Health Stats 3x2 Grid */}
-                        <div className="col-span-8">
+                        {/* Right Column - Health Stats */}
+                        <div className="lg:col-span-7 h-full overflow-hidden">
                             <HealthStats
                                 loading={loading}
                                 error={error}
@@ -63,14 +63,18 @@ const HomePage: React.FC<HomePageProps> = ({ sidebarOpen = true }) => {
                 </div>
             </div>
 
-            {/* Chat Input - Positioned to the right with responsive offset based on sidebar state */}
-            <div
-                className="flex justify-end px-8 pb-4 transition-all duration-500 ease-in-out"
-                style={{
-                    marginRight: sidebarOpen ? '360px' : '350px' // 360px - (226px - 64px) = 198px
-                }}
-            >
-                <ChatInput />
+            {/* Chat Input - Fixed at bottom */}
+            <div className="px-8 pb-4 flex-shrink-0">
+                <div className="max-w-7xl mx-auto">
+                    <div
+                        className="flex justify-end transition-all duration-500 ease-in-out"
+                        style={{
+                            marginRight: sidebarOpen ? '360px' : '350px'
+                        }}
+                    >
+                        <ChatInput />
+                    </div>
+                </div>
             </div>
         </div>
     );
