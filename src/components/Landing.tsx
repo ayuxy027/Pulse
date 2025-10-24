@@ -54,7 +54,7 @@ const LandingPage = () => {
               alt="star icon"
             />
             <br />
-            Live Healthier and Immune ready.
+            Live Healthier & Immune ready.
           </h1>
         </div>
 
