@@ -1,5 +1,7 @@
-import { SiBento, SiRobotframework } from 'react-icons/si'; 
+import { SiBento, SiRobotframework } from 'react-icons/si';
 import { BsGraphUpArrow } from 'react-icons/bs';
+import { GiMuscleUp } from 'react-icons/gi';
+import Button from './ui/Button';
 
 const LandingPage = () => {
   return (
@@ -45,7 +47,7 @@ const LandingPage = () => {
               alt="begin icon"
               className="w-6 h-6 md:w-8 md:h-8 absolute -top-1 -left-5 md:-top-2 md:-left-6"
             />
-            Eat smart with AI. 
+            Eat smart with AI.
             <img
               src="https://i.postimg.cc/PxcrR416/star.png"
               className="absolute -right-5 -top-1 w-6 h-6 md:-right-6 md:-top-2 md:w-8 md:h-8"
@@ -89,9 +91,13 @@ const LandingPage = () => {
         </div>
 
         {/* CTA Button */}
-        <button className="mt-4 px-6 py-3 md:px-8 md:py-4 bg-black text-white font-semibold text-base rounded-xl md:rounded-2xl hover:opacity-90 transition">
+        <Button
+          variant="primary"
+          className="mt-4 !w-auto !h-auto px-6 py-3 md:px-8 md:py-4 text-base font-semibold rounded-xl md:rounded-2xl hover:scale-105 transition-all duration-300"
+        >
+          <GiMuscleUp size={20} className="mr-2" />
           Start Your Journey
-        </button>
+        </Button>
       </section>
 
       {/* <div className="h-60 sm:h-72 md:h-96 bg-[url('./bg.png')] bg-repeat bg-[#f8f6f1] relative flex items-start justify-center px-4">
