@@ -1,124 +1,100 @@
 import React from 'react';
 import { Activity, Droplets, Utensils, Target, Heart, Zap, TrendingUp, Calendar, ArrowUpRight } from 'lucide-react';
 
-// Redesigned chart components with proper frames and sizing
-const BMITrendChart = ({ bmi }: { bmi: number }) => {
-  // Generate trend data based on BMI (simulate 7-day trend)
-  const trendData = [bmi - 0.3, bmi - 0.1, bmi + 0.1, bmi - 0.2, bmi + 0.2, bmi + 0.4, bmi];
-  const maxBMI = Math.max(...trendData);
-  const minBMI = Math.min(...trendData);
-  const range = maxBMI - minBMI || 1;
-
-  return (
-    <div className="w-full h-20 bg-gray-50 rounded-lg border border-gray-200 p-3">
-      <div className="flex items-end justify-between h-full space-x-1">
-        {trendData.map((value, i) => {
-          const height = ((value - minBMI) / range) * 0.7 + 0.3; // 30% to 100% height
-          return (
-            <div
-              key={i}
-              className="bg-gradient-to-t from-gray-500 to-gray-400 rounded-t-md flex-1"
-              style={{ height: `${height * 100}%` }}
-            />
-          );
-        })}
-      </div>
+// Large, visible decorative graphs spanning entire card area
+const BMIBackground = () => (
+  <div className="absolute inset-0 opacity-25">
+    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
+    {/* Large trend chart spanning entire card */}
+    <div className="absolute inset-4 flex items-end justify-between">
+      {[0.2, 0.4, 0.3, 0.6, 0.4, 0.7, 0.5, 0.8, 0.6, 0.9, 0.7, 0.8].map((height, i) => (
+        <div
+          key={i}
+          className="bg-gray-500 rounded-t-md flex-1 mx-0.5"
+          style={{ height: `${height * 100}%` }}
+        />
+      ))}
     </div>
-  );
-};
+  </div>
+);
 
-const WaterIntakeChart = ({ current, goal }: { current: number; goal: number }) => {
-  const percentage = Math.min((current / goal) * 100, 100);
-
-  return (
-    <div className="w-full h-20 bg-gray-50 rounded-lg border border-gray-200 p-3 flex items-center justify-center">
-      <div className="relative w-16 h-16">
-        <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-          <path
-            className="text-gray-200"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-          />
-          <path
-            className="text-gray-600"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-            strokeDasharray={`${percentage}, 100`}
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-sm font-bold text-gray-700">{Math.round(percentage)}%</span>
-        </div>
-      </div>
+const WaterBackground = () => (
+  <div className="absolute inset-0 opacity-25">
+    <div className="w-full h-full bg-gradient-to-br from-cyan-300 to-cyan-200 rounded-lg"></div>
+    {/* Large circular progress spanning card */}
+    <div className="absolute inset-8 flex items-center justify-center">
+      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+        <path
+          className="text-gray-400"
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="none"
+          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
+        />
+        <path
+          className="text-gray-600"
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="none"
+          strokeDasharray="100, 100"
+          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
+        />
+      </svg>
     </div>
-  );
-};
+  </div>
+);
 
-const CaloriesChart = ({ current, goal }: { current: number; goal: number }) => {
-  const percentage = Math.min((current / goal) * 100, 100);
-
-  return (
-    <div className="w-full h-20 bg-gray-50 rounded-lg border border-gray-200 p-3 flex items-center justify-center">
-      <div className="relative w-16 h-16">
-        <svg className="w-16 h-16" viewBox="0 0 36 36">
-          <path
-            className="text-gray-200"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-          />
-          <path
-            className="text-gray-600"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-            strokeDasharray={`${percentage}, 100`}
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-sm font-bold text-gray-700">{Math.round(percentage)}%</span>
-        </div>
-      </div>
+const CaloriesBackground = () => (
+  <div className="absolute inset-0 opacity-25">
+    <div className="w-full h-full bg-gradient-to-br from-orange-300 to-orange-200 rounded-lg"></div>
+    {/* Large circular progress spanning card */}
+    <div className="absolute inset-8 flex items-center justify-center">
+      <svg className="w-full h-full" viewBox="0 0 100 100">
+        <path
+          className="text-gray-400"
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="none"
+          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
+        />
+        <path
+          className="text-gray-600"
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="none"
+          strokeDasharray="110, 100"
+          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
+        />
+      </svg>
     </div>
-  );
-};
+  </div>
+);
 
-const StepsChart = ({ current, goal }: { current: number; goal: number }) => {
-  const percentage = Math.min((current / goal) * 100, 100);
-
-  return (
-    <div className="w-full h-20 bg-gray-50 rounded-lg border border-gray-200 p-3 flex items-center justify-center">
-      <div className="relative w-16 h-16">
-        <svg className="w-16 h-16" viewBox="0 0 36 36">
-          <path
-            className="text-gray-200"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-          />
-          <path
-            className="text-gray-500"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-            strokeDasharray={`${percentage}, 100`}
-            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-sm font-bold text-gray-700">{Math.round(percentage)}%</span>
-        </div>
-      </div>
+const StepsBackground = () => (
+  <div className="absolute inset-0 opacity-25">
+    <div className="w-full h-full bg-gradient-to-br from-green-300 to-green-200 rounded-lg"></div>
+    {/* Large circular progress spanning card */}
+    <div className="absolute inset-8 flex items-center justify-center">
+      <svg className="w-full h-full" viewBox="0 0 100 100">
+        <path
+          className="text-gray-400"
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="none"
+          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
+        />
+        <path
+          className="text-gray-600"
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="none"
+          strokeDasharray="84, 100"
+          d="M50 10 a 40 40 0 0 1 0 80 a 40 40 0 0 1 0 -80"
+        />
+      </svg>
     </div>
-  );
-};
+  </div>
+);
 
 interface HealthStatCardProps {
   title: string;
@@ -140,8 +116,15 @@ const HealthStatCard: React.FC<HealthStatCardProps> = ({
   chart: Chart
 }) => {
   return (
-    <div className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 bg-white rounded-xl border border-gray-100 hover:border-gray-200 overflow-hidden">
-      <div className="p-4 h-full flex flex-col">
+    <div className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 bg-white rounded-xl border border-gray-100 hover:border-gray-200 overflow-hidden relative">
+      {/* Subtle background visualization */}
+      {Chart && (
+        <div className="absolute inset-0">
+          <Chart />
+        </div>
+      )}
+
+      <div className="p-4 h-full flex flex-col relative z-10">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300 ${color}`}>
@@ -159,8 +142,8 @@ const HealthStatCard: React.FC<HealthStatCardProps> = ({
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col justify-between">
-          <div className="space-y-1 mb-4">
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="space-y-1">
             <div className="text-2xl font-bold text-gray-900 tracking-tight">
               {value}
             </div>
@@ -170,13 +153,6 @@ const HealthStatCard: React.FC<HealthStatCardProps> = ({
               </p>
             )}
           </div>
-
-          {/* Chart - dedicated frame */}
-          {Chart && (
-            <div className="flex-1">
-              <Chart />
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -257,7 +233,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           icon={Activity}
           color="bg-gradient-to-br from-blue-500 to-blue-600"
           size="small"
-          chart={() => <BMITrendChart bmi={22.5} />}
+          chart={BMIBackground}
         />
         <HealthStatCard
           title="Water Intake"
@@ -266,7 +242,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           icon={Droplets}
           color="bg-gradient-to-br from-cyan-500 to-cyan-600"
           size="small"
-          chart={() => <WaterIntakeChart current={2.5} goal={2.5} />}
+          chart={WaterBackground}
         />
         <HealthStatCard
           title="Calories"
@@ -275,7 +251,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           icon={Utensils}
           color="bg-gradient-to-br from-orange-500 to-orange-600"
           size="small"
-          chart={() => <CaloriesChart current={2200} goal={2000} />}
+          chart={CaloriesBackground}
         />
         <HealthStatCard
           title="Steps"
@@ -284,7 +260,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           icon={Target}
           color="bg-gradient-to-br from-green-500 to-green-600"
           size="small"
-          chart={() => <StepsChart current={8432} goal={10000} />}
+          chart={StepsBackground}
         />
       </div>
     </div>
