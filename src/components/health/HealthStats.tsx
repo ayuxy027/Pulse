@@ -87,6 +87,62 @@ const StepsBackground = () => (
   </div>
 );
 
+const SleepBackground = () => (
+  <div className="absolute inset-0 opacity-25">
+    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
+    {/* Sleep pattern wave chart */}
+    <div className="absolute inset-6">
+      <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        {/* Sleep wave pattern */}
+        <polyline
+          className="text-gray-600"
+          stroke="currentColor"
+          strokeWidth="2"
+          fill="none"
+          points="5,70 15,60 25,75 35,50 45,80 55,40 65,70 75,45 85,75 95,60"
+        />
+        {/* Deep sleep line */}
+        <polyline
+          className="text-gray-500"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          fill="none"
+          strokeDasharray="3,3"
+          points="5,85 25,85 45,85 65,85 85,85"
+        />
+      </svg>
+    </div>
+  </div>
+);
+
+const HeartRateBackground = () => (
+  <div className="absolute inset-0 opacity-25">
+    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
+    {/* Heart rate pattern */}
+    <div className="absolute inset-6">
+      <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        {/* Heart rate spikes */}
+        <polyline
+          className="text-gray-600"
+          stroke="currentColor"
+          strokeWidth="2"
+          fill="none"
+          points="5,60 10,40 15,60 20,30 25,60 30,35 35,60 40,45 45,60 50,25 55,60 60,40 65,60 70,50 75,60 80,35 85,60 90,45 95,60"
+        />
+        {/* Resting heart rate line */}
+        <polyline
+          className="text-gray-500"
+          stroke="currentColor"
+          strokeWidth="1"
+          fill="none"
+          strokeDasharray="2,2"
+          points="5,75 95,75"
+        />
+      </svg>
+    </div>
+  </div>
+);
+
 interface HealthStatCardProps {
   title: string;
   value: string;
@@ -256,7 +312,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           icon={Heart}
           color="bg-gradient-to-br from-gray-500 to-gray-600"
           size="small"
-          chart={BMIBackground}
+          chart={SleepBackground}
         />
         <HealthStatCard
           title="Heart Rate"
@@ -265,7 +321,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           icon={Zap}
           color="bg-gradient-to-br from-gray-700 to-gray-800"
           size="small"
-          chart={StepsBackground}
+          chart={HeartRateBackground}
         />
       </div>
     </div>
