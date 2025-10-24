@@ -110,26 +110,37 @@ interface UserProfileProps {
     isCollapsed?: boolean;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ name, role, avatar, isCollapsed = false }) => (
-    <div className={`flex items-center gap-1 p-5 border-t border-gray-100 bg-gray-50/50 hover:bg-gray-100/50 transition-colors duration-200 cursor-pointer group ${isCollapsed ? 'justify-center px-2' : ''
-        }`}>
-        <Avatar src={avatar} alt={name} size="w-9 h-9" />
+const UserProfile: React.FC<UserProfileProps> = ({ name, role, avatar, isCollapsed = false }) => {
+    const navigate = useNavigate();
 
-        <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ease-out ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto'
-            }`}>
-            <p className="text-sm ml-2 font-semibold text-gray-900 truncate group-hover:text-gray-800 transition-colors duration-200">
-                {name}
-            </p>
-            <p className="text-xs ml-2 text-gray-500 truncate">{role}</p>
-        </div>
+    const handleProfileClick = () => {
+        navigate('/profile');
+    };
 
-        <ChevronDown
-            size={16}
-            className={`text-gray-400 group-hover:text-gray-600 transition-opacity duration-200 flex-shrink-0 ${isCollapsed ? 'opacity-0' : 'opacity-100'
+    return (
+        <div
+            className={`flex items-center gap-1 p-5 border-t border-gray-100 bg-gray-50/50 hover:bg-gray-100/50 transition-colors duration-200 cursor-pointer group ${isCollapsed ? 'justify-center px-2' : ''
                 }`}
-        />
-    </div>
-);
+            onClick={handleProfileClick}
+        >
+            <Avatar src={avatar} alt={name} size="w-9 h-9" />
+
+            <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ease-out ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto'
+                }`}>
+                <p className="text-sm ml-2 font-semibold text-gray-900 truncate group-hover:text-gray-800 transition-colors duration-200">
+                    {name}
+                </p>
+                <p className="text-xs ml-2 text-gray-500 truncate">{role}</p>
+            </div>
+
+            <ChevronDown
+                size={16}
+                className={`text-gray-400 group-hover:text-gray-600 transition-opacity duration-200 flex-shrink-0 ${isCollapsed ? 'opacity-0' : 'opacity-100'
+                    }`}
+            />
+        </div>
+    );
+};
 
 /**
  * Sidebar - Main navigation sidebar with collapsible design, navigation items, recent items, and user profile
@@ -153,6 +164,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         if (path === '/diet') return 'diet';
         if (path === '/tracker') return 'tracker';
         if (path === '/chats') return 'chats';
+        if (path === '/profile') return 'profile';
         return 'home';
     };
 
