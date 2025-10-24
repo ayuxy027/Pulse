@@ -13,6 +13,8 @@
     "directoryclean": "find ./src -type d -empty -delete"
   },
   "dependencies": {
+    "@supabase/auth-helpers-react": "^0.5.0",
+    "@supabase/supabase-js": "^2.76.1",
     "@tailwindcss/vite": "^4.1.12",
     "@vercel/analytics": "^1.5.0",
     "axios": "^1.12.2",

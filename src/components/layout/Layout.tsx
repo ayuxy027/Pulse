@@ -1,14 +1,13 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { DashboardPage, ChatPage } from '../../pages';
 import ScannerPage from '../../pages/ScannerPage';
 import LandingPage from '../Landing';
 
 /**
- * Layout - Main layout component with navbar navigation and page routing
+ * Layout - Main layout component with navbar
  */
-const Layout: React.FC = () => {
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <Router>
       <div className="min-h-screen w-full bg-[#f8f6f1] antialiased">
@@ -30,4 +29,4 @@ const Layout: React.FC = () => {
   );
 };
 
-export default Layout; 
+export default Layout;
