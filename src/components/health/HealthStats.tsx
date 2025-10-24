@@ -115,14 +115,14 @@ const HealthStatCard: React.FC<HealthStatCardProps> = ({
         </div>
       )}
 
-      <div className="p-4 h-full flex flex-col relative z-10">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300 ${color}`}>
-              <Icon size={16} className="text-white" />
+      <div className="p-3 h-full flex flex-col relative z-10">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className={`p-1.5 rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300 ${color}`}>
+              <Icon size={14} className="text-white" />
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 text-sm leading-tight">
+              <h4 className="font-semibold text-gray-900 text-xs leading-tight">
                 {title}
               </h4>
             </div>
@@ -131,7 +131,7 @@ const HealthStatCard: React.FC<HealthStatCardProps> = ({
 
         <div className="flex-1 flex flex-col justify-center">
           <div className="space-y-1">
-            <div className="text-2xl font-bold text-gray-900 tracking-tight">
+            <div className="text-lg font-bold text-gray-900 tracking-tight">
               {value}
             </div>
             {subtitle && (
@@ -164,8 +164,8 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
         </div>
 
         {/* Loading Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
@@ -212,7 +212,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
       </div>
 
       {/* Health Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         <HealthStatCard
           title="BMI"
           value="22.5"
@@ -246,6 +246,24 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           subtitle="Goal: 10,000"
           icon={Target}
           color="bg-gradient-to-br from-gray-600 to-gray-700"
+          size="small"
+          chart={StepsBackground}
+        />
+        <HealthStatCard
+          title="Sleep"
+          value="7.5h"
+          subtitle="Goal: 8h"
+          icon={Heart}
+          color="bg-gradient-to-br from-gray-500 to-gray-600"
+          size="small"
+          chart={BMIBackground}
+        />
+        <HealthStatCard
+          title="Heart Rate"
+          value="72"
+          subtitle="BPM"
+          icon={Zap}
+          color="bg-gradient-to-br from-gray-700 to-gray-800"
           size="small"
           chart={StepsBackground}
         />

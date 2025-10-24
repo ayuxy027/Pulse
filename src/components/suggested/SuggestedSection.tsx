@@ -120,9 +120,9 @@ const SuggestedSection: React.FC = () => {
                 </div>
             </div>
 
-            {/* Features List - Infinite Marquee */}
-            <div className="overflow-hidden">
-                <div className="marquee-container">
+            {/* Features List - Infinite Marquee with compatible height */}
+            <div className="overflow-hidden" style={{ height: '270px' }}>
+                <div className="marquee-container h-full">
                     <div className="marquee-content space-y-3">
                         {features.map((feature) => (
                             <SuggestedItem

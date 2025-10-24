@@ -28,8 +28,10 @@ body {
 }
 
 .marquee-content {
-  animation: marquee 20s linear infinite;
+  animation: marquee 30s linear infinite;
   animation-play-state: running;
+  display: flex;
+  flex-direction: column;
 }
 
 .marquee-content:hover {
