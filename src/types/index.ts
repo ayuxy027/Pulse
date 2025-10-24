@@ -1,5 +1,5 @@
 /**
- * Shared types and interfaces for the Knowlia application
+ * Shared types and interfaces for the Pulse.ai application
  */
 
 // Priority levels for cases and tasks

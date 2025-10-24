@@ -70,7 +70,7 @@ const Navbar: React.FC = () => {
                             onClick={() => navigate('/')}
                             className="text-xl font-semibold text-gray-900 hover:text-gray-700 transition-colors duration-200"
                         >
-                            Knowlia
+                            Pulse.ai
                         </button>
                     </div>
 

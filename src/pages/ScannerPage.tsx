@@ -1,18 +1,32 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Camera, Sparkles, Zap, Shield, TrendingUp, CheckCircle, AlertCircle, XCircle, Image } from 'lucide-react';
+import { Upload, Sparkles, Shield, TrendingUp, CheckCircle, BrainCircuit, Microscope, Leaf, XCircle, Activity, Target, Image as ImageIcon } from 'lucide-react';
 import { analyzeFoodImage, FoodAnalysisResult } from '../services/foodAnalysisService';
-import Button from '../components/ui/Button';
+import { motion, AnimatePresence } from 'framer-motion';
+import { XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, BarChart, Bar } from 'recharts';
 
 /**
  * ScannerPage - AI-Based Food Scanner Interface
  * Purpose: Let users upload or snap a picture of their meal to get instant nutrition analysis
  */
+// Animation variants
+const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 },
+    transition: { duration: 0.5 },
+};
+
+
 const ScannerPage: React.FC = () => {
     const [dragActive, setDragActive] = useState(false);
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<FoodAnalysisResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isImageUploaded, setIsImageUploaded] = useState(false);
+    const [analysisProgress, setAnalysisProgress] = useState(0);
+    const [processingSteps, setProcessingSteps] = useState<string[]>([]);
+    const [currentStep, setCurrentStep] = useState<number>(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleDrag = (e: React.DragEvent) => {
@@ -57,15 +71,59 @@ const ScannerPage: React.FC = () => {
         fileInputRef.current?.click();
     };
 
+    const addProcessingStep = (step: string) => {
+        setProcessingSteps((prev) => [...prev, step]);
+    };
+
     const handleAnalyze = async () => {
         if (!uploadedImage) return;
 
         setIsAnalyzing(true);
         setError(null);
         setAnalysisResult(null);
+        setAnalysisProgress(0);
+        setProcessingSteps([]);
+        setCurrentStep(0);
 
         try {
+            // Simulate processing steps with progress
+            const steps = [
+                { message: "Initializing AI analysis pipeline...", duration: 1000 },
+                { message: "Uploading image to cloud...", duration: 1500 },
+                { message: "Performing cloud-based image analysis...", duration: 2000 },
+                { message: "Running AI model predictions...", duration: 2500 },
+                { message: "Analyzing nutrition patterns...", duration: 2000 },
+                { message: "Generating health recommendations...", duration: 1500 },
+                { message: "Finalizing analysis report...", duration: 1000 },
+            ];
+
+            let progress = 0;
+            const progressIncrement = 100 / steps.length;
+
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                setCurrentStep(i);
+                addProcessingStep(step.message);
+
+                const startProgress = progress;
+                const endProgress = progress + progressIncrement;
+                const duration = step.duration;
+                const startTime = Date.now();
+
+                while (progress < endProgress) {
+                    const elapsed = Date.now() - startTime;
+                    const percentage = Math.min(elapsed / duration, 1);
+                    progress = startProgress + progressIncrement * percentage;
+                    setAnalysisProgress(Math.min(progress, 99));
+                    await new Promise((r) => setTimeout(r, 50));
+                }
+                await new Promise((r) => setTimeout(r, 200));
+            }
+
             const result = await analyzeFoodImage(uploadedImage);
+            setAnalysisProgress(100);
+            await new Promise((r) => setTimeout(r, 500));
+            addProcessingStep("Analysis complete!");
             setAnalysisResult(result);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Analysis failed');
@@ -75,341 +133,610 @@ const ScannerPage: React.FC = () => {
     };
 
     return (
-        <div className="w-full bg-[#f8f6f1] min-h-screen p-6">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
-                        Food Scanner
-                    </h1>
-                    <p className="text-gray-600 text-lg">
-                        Upload your food images for instant nutrition analysis
-                    </p>
-                </div>
+        <div className="relative min-h-screen bg-[#f8f6f1]">
+            <div className="px-4 py-8 mx-auto max-w-7xl md:py-12 sm:px-6 lg:px-8">
+                {/* Enhanced Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8 text-center md:mb-12"
+                >
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="inline-flex gap-2 items-center px-4 py-2 mb-4 rounded-full border shadow-lg backdrop-blur-md bg-white/80 border-gray-500/20"
+                    >
+                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
+                        <span className="text-sm font-semibold text-gray-600">
+                            AI-Powered Nutrition Analysis
+                        </span>
+                    </motion.div>
 
-                {/* Main Scanner Interface */}
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-800 md:text-4xl"
+                    >
+                        Smart Food Scanner
+                    </motion.h1>
 
-                    {/* Left Column: Image Upload & Preview */}
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-gray-100">
-                                <Upload size={20} className="text-gray-600" />
-                            </div>
-                            <h2 className="text-xl font-semibold text-gray-900">
-                                Upload Food Image
-                            </h2>
-                        </div>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="mt-3 text-sm text-gray-600 md:mt-4 md:text-base"
+                    >
+                        Advanced AI-powered food analysis with real-time nutrition insights and health recommendations
+                    </motion.p>
+                </motion.div>
 
-                        <div
-                            className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-300 min-h-[200px] flex flex-col items-center justify-center
-                                ${dragActive ? 'border-gray-400 bg-gray-50' : 'border-gray-300 bg-gray-25 hover:border-gray-400 hover:bg-gray-50'
-                                }`}
-                            onDragEnter={handleDrag}
-                            onDragLeave={handleDrag}
-                            onDragOver={handleDrag}
-                            onDrop={handleDrop}
+                {/* Upload Section */}
+                <AnimatePresence mode="wait">
+                    {!isImageUploaded && !analysisResult && (
+                        <motion.div
+                            key="upload-section"
+                            variants={fadeInUp}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            className="mb-8"
                         >
-                            {uploadedImage ? (
-                                <div className="relative w-full h-full flex items-center justify-center">
-                                    <img src={uploadedImage} alt="Uploaded Food" className="max-h-[300px] object-contain rounded-lg" />
-                                    <button
-                                        onClick={() => setUploadedImage(null)}
-                                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 text-xs"
-                                    >
-                                        X
-                                    </button>
+                            <div className="relative">
+                                <motion.div
+                                    whileHover={{
+                                        boxShadow: isAnalyzing
+                                            ? "none"
+                                            : "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+                                    }}
+                                    animate={
+                                        dragActive
+                                            ? {
+                                                borderColor: "#6B7280",
+                                                backgroundColor: "#F9FAFB",
+                                            }
+                                            : {
+                                                borderColor: "#D1D5DB",
+                                                backgroundColor: "#FFFFFF",
+                                            }
+                                    }
+                                    className="relative p-6 rounded-xl border-2 border-dashed transition-all duration-300 bg-gradient-to-r from-gray-50 to-white"
+                                    style={{ opacity: isAnalyzing ? 0.6 : 1 }}
+                                    onDragEnter={handleDrag}
+                                    onDragLeave={handleDrag}
+                                    onDragOver={handleDrag}
+                                    onDrop={handleDrop}
+                                >
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        className="hidden"
+                                        ref={fileInputRef}
+                                    />
+                                    <div className="flex flex-col items-center">
+                                        <motion.div
+                                            className={`p-4 mb-4 rounded-full transition-all duration-300 ${dragActive ? "bg-gray-100" : "bg-gray-100"
+                                                }`}
+                                            whileHover={{
+                                                backgroundColor: isAnalyzing ? "#F3F4F6" : "#E5E7EB",
+                                            }}
+                                        >
+                                            <Upload className="w-10 h-10 text-gray-600" />
+                                        </motion.div>
+                                        <motion.h3
+                                            className="mb-2 text-xl font-semibold text-gray-900"
+                                            animate={{ scale: dragActive ? 1.1 : 1 }}
+                                        >
+                                            Drag and drop your food image here
+                                        </motion.h3>
+                                        <motion.p
+                                            className="mb-4 text-sm text-gray-600"
+                                            animate={{ opacity: dragActive ? 0.7 : 1 }}
+                                        >
+                                            or click to select a file
+                                        </motion.p>
+                                        <motion.button
+                                            className="px-6 py-2 text-sm font-medium text-white rounded-full bg-gray-600"
+                                            whileHover={{
+                                                backgroundColor: isAnalyzing ? "#6B7280" : "#4B5563",
+                                            }}
+                                            disabled={isAnalyzing}
+                                            onClick={handleBrowseClick}
+                                        >
+                                            {isAnalyzing ? "Processing..." : "Select File"}
+                                        </motion.button>
+                                    </div>
+                                </motion.div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Image Preview and Analyze Button */}
+                <AnimatePresence mode="wait">
+                    {isImageUploaded && uploadedImage && !isAnalyzing && !analysisResult && (
+                        <motion.div
+                            key="preview-section"
+                            variants={fadeInUp}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            className="mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-200"
+                        >
+                            <div className="flex flex-col md:flex-row gap-6 items-center">
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                                        Image Preview
+                                    </h3>
+                                    <div className="relative h-64 w-full overflow-hidden rounded-lg shadow-md aspect-[4/3]">
+                                        <img
+                                            src={uploadedImage}
+                                            alt="Uploaded food"
+                                            className="absolute inset-0 w-full h-full object-contain"
+                                        />
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={() => { }}
+                                            className="absolute bottom-2 right-2 bg-gray-500 text-white p-2 rounded-full shadow-md hover:bg-gray-600 transition-colors duration-200"
+                                        >
+                                            <ImageIcon className="w-4 h-4" />
+                                        </motion.button>
+                                    </div>
                                 </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    <div className="flex justify-center">
-                                        <div className="p-4 rounded-full bg-gray-100">
-                                            <Image size={32} className="text-gray-500" />
+                                <div className="flex items-center justify-center">
+                                    <motion.button
+                                        className="px-6 py-3 text-white font-medium rounded-full flex items-center gap-2 bg-gray-600"
+                                        whileHover={{ backgroundColor: "#4B5563" }}
+                                        onClick={handleAnalyze}
+                                    >
+                                        <Sparkles className="w-5 h-5" /> Analyze Food
+                                    </motion.button>
+                                </div>
+                            </div>
+                            <motion.button
+                                className="mt-4 p-2 rounded-full bg-red-100 absolute top-2 right-2"
+                                whileHover={{ backgroundColor: "#FECACA" }}
+                                onClick={() => {
+                                    setUploadedImage(null);
+                                    setIsImageUploaded(false);
+                                }}
+                            >
+                                <XCircle className="w-5 h-5 text-red-700" />
+                            </motion.button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Analysis Component */}
+                <AnimatePresence mode="wait">
+                    {isAnalyzing && (
+                        <motion.div
+                            key="analysis-section"
+                            variants={fadeInUp}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            className="mb-8 p-8 flex flex-col items-center justify-center text-center bg-white rounded-xl shadow-lg border border-gray-200"
+                        >
+                            <h3 className="text-2xl font-bold text-gray-900">
+                                Analyzing Food Nutrition
+                            </h3>
+                            <p className="mt-2 mb-8 text-base text-gray-600">
+                                Please wait while our AI examines your food...
+                            </p>
+
+                            {/* Circular Progress Indicator */}
+                            <div className="relative w-40 h-40 mb-6">
+                                <svg
+                                    className="absolute top-0 left-0 w-full h-full"
+                                    viewBox="0 0 100 100"
+                                >
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="45"
+                                        stroke="#E5E7EB"
+                                        strokeWidth="10"
+                                        fill="transparent"
+                                    />
+                                    <motion.circle
+                                        cx="50"
+                                        cy="50"
+                                        r="45"
+                                        stroke="url(#progressGradient)"
+                                        strokeWidth="10"
+                                        fill="transparent"
+                                        strokeLinecap="round"
+                                        transform="rotate(-90 50 50)"
+                                        style={{
+                                            strokeDasharray: "282.74",
+                                            strokeDashoffset: "282.74",
+                                        }}
+                                        animate={{
+                                            strokeDashoffset:
+                                                282.74 - (analysisProgress / 100) * 282.74,
+                                        }}
+                                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                                    />
+                                    <defs>
+                                        <linearGradient
+                                            id="progressGradient"
+                                            x1="0%"
+                                            y1="0%"
+                                            x2="100%"
+                                            y2="100%"
+                                        >
+                                            <stop offset="0%" stopColor="#6B7280" />
+                                            <stop offset="100%" stopColor="#374151" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <AnimatePresence mode="wait">
+                                        <motion.div
+                                            key={currentStep}
+                                            initial={{ opacity: 0, scale: 0.5 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.5 }}
+                                            transition={{ duration: 0.3, ease: "backInOut" }}
+                                        >
+                                            <div className="w-20 h-20 rounded-full flex items-center justify-center bg-gray-50">
+                                                {[
+                                                    <Upload key="upload" className="w-10 h-10 text-gray-600" />,
+                                                    <ImageIcon key="image" className="w-10 h-10 text-gray-600" />,
+                                                    <BrainCircuit key="brain" className="w-10 h-10 text-gray-600" />,
+                                                    <Microscope key="microscope" className="w-10 h-10 text-gray-600" />,
+                                                    <Activity key="activity" className="w-10 h-10 text-gray-600" />,
+                                                    <Target key="target" className="w-10 h-10 text-gray-600" />,
+                                                    <CheckCircle key="check" className="w-10 h-10 text-gray-600" />,
+                                                ][currentStep] || (
+                                                        <CheckCircle key="default" className="w-10 h-10 text-gray-600" />
+                                                    )}
+                                            </div>
+                                        </motion.div>
+                                    </AnimatePresence>
+                                </div>
+                            </div>
+
+                            <div className="h-12 w-full max-w-xs mx-auto">
+                                <AnimatePresence mode="wait">
+                                    <motion.p
+                                        key={currentStep}
+                                        initial={{ opacity: 0, y: 15 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -15 }}
+                                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                                        className="text-lg font-medium text-gray-900"
+                                    >
+                                        {processingSteps[currentStep] || "Finalizing report..."}
+                                    </motion.p>
+                                </AnimatePresence>
+                            </div>
+                            <span className="text-xl font-bold mt-2 text-gray-600">
+                                {analysisProgress.toFixed(0)}%
+                            </span>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Enhanced Results Section */}
+                <AnimatePresence mode="wait">
+                    {analysisResult && analysisProgress === 100 && (
+                        <motion.div
+                            key="results-section"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="space-y-8"
+                        >
+                            {/* Success Banner */}
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="flex justify-center items-center p-4 bg-gray-50 rounded-xl border border-gray-100 shadow-sm"
+                            >
+                                <CheckCircle className="mr-2 w-5 h-5 text-gray-600" />
+                                <span className="font-medium text-gray-700">
+                                    Food Analysis completed successfully
+                                </span>
+                            </motion.div>
+
+                            {/* Top Row - Key Metrics */}
+                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 md:grid-cols-2">
+                                {/* Food Name Card */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 }}
+                                    className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-xl backdrop-blur-sm border-gray-100/50"
+                                >
+                                    <div className="flex gap-3 items-center mb-4">
+                                        <div className="p-3 bg-gray-100 rounded-xl">
+                                            <Leaf className="w-6 h-6 text-gray-600" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900">
+                                            Food Identified
+                                        </h3>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-2xl font-bold text-gray-600 mb-2">
+                                            {analysisResult.foodName}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            AI Confidence: {analysisResult.confidenceLevel}%
                                         </div>
                                     </div>
-                                    <div>
-                                        <p className="text-lg font-medium text-gray-700 mb-2">
-                                            Drag and Drop your food image here
-                                        </p>
-                                        <p className="text-gray-500 mb-4">or</p>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleFileChange}
-                                            className="hidden"
-                                            ref={fileInputRef}
-                                        />
-                                        <Button
-                                            variant="primary"
-                                            onClick={handleBrowseClick}
-                                            className="!w-auto !h-auto px-6 py-3 rounded-xl font-medium"
-                                        >
-                                            Browse Files
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                                </motion.div>
 
-                        <div className="flex items-center gap-4">
-                            <Button
-                                variant="secondary"
-                                className="!w-auto !h-auto flex items-center gap-2 px-4 py-2 rounded-lg"
+                                {/* Calories Card */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-xl backdrop-blur-sm border-gray-100/50"
+                                >
+                                    <div className="flex gap-3 items-center mb-4">
+                                        <div className="p-3 bg-gray-100 rounded-xl">
+                                            <TrendingUp className="w-6 h-6 text-gray-600" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900">
+                                            Calories
+                                        </h3>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-4xl font-bold text-gray-600 mb-2">
+                                            {analysisResult.calories}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            Energy Content
+                                        </div>
+                                    </div>
+                                </motion.div>
+
+                                {/* Health Verdict Card */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                    className={`p-6 rounded-2xl border shadow-xl backdrop-blur-sm ${analysisResult.healthVerdict.isHealthy
+                                        ? 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
+                                        : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
+                                        }`}
+                                >
+                                    <div className="flex gap-3 items-center mb-4">
+                                        <div className={`p-3 rounded-xl ${analysisResult.healthVerdict.isHealthy ? 'bg-gray-100' : 'bg-gray-100'
+                                            }`}>
+                                            {analysisResult.healthVerdict.isHealthy ? (
+                                                <CheckCircle className="w-6 h-6 text-gray-600" />
+                                            ) : (
+                                                <XCircle className="w-6 h-6 text-gray-600" />
+                                            )}
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900">
+                                            Health Verdict
+                                        </h3>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className={`text-2xl font-bold mb-2 ${analysisResult.healthVerdict.isHealthy ? 'text-gray-600' : 'text-gray-600'
+                                            }`}>
+                                            {analysisResult.healthVerdict.isHealthy ? 'HEALTHY' : 'NOT HEALTHY'}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            Rating: {analysisResult.healthVerdict.rating}/10
+                                        </div>
+                                    </div>
+                                </motion.div>
+
+                                {/* Immunity Impact Card */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.4 }}
+                                    className={`p-6 rounded-2xl border shadow-xl backdrop-blur-sm ${analysisResult.immunityImpact.overall === 'positive'
+                                        ? 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
+                                        : analysisResult.immunityImpact.overall === 'negative'
+                                            ? 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
+                                            : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
+                                        }`}
+                                >
+                                    <div className="flex gap-3 items-center mb-4">
+                                        <div className={`p-3 rounded-xl ${analysisResult.immunityImpact.overall === 'positive' ? 'bg-gray-100' :
+                                            analysisResult.immunityImpact.overall === 'negative' ? 'bg-gray-100' : 'bg-gray-100'
+                                            }`}>
+                                            <Shield className={`w-6 h-6 ${analysisResult.immunityImpact.overall === 'positive' ? 'text-gray-600' :
+                                                analysisResult.immunityImpact.overall === 'negative' ? 'text-gray-600' : 'text-gray-600'
+                                                }`} />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900">
+                                            Immunity Impact
+                                        </h3>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className={`text-2xl font-bold mb-2 ${analysisResult.immunityImpact.overall === 'positive' ? 'text-gray-600' :
+                                            analysisResult.immunityImpact.overall === 'negative' ? 'text-gray-600' : 'text-gray-600'
+                                            }`}>
+                                            {analysisResult.immunityImpact.overall.toUpperCase()}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            Immune System Effect
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </div>
+
+                            {/* Nutrition Breakdown Chart */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 }}
+                                className="p-6 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200"
                             >
-                                <Camera size={16} className="text-gray-600" />
-                                Take Photo
-                            </Button>
-                            <div className="flex-1 h-px bg-gray-200"></div>
-                        </div>
-
-                        <Button
-                            onClick={handleAnalyze}
-                            disabled={!uploadedImage || isAnalyzing}
-                            className={`w-full !h-auto flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold shadow-sm transition-colors duration-200
-                                ${uploadedImage && !isAnalyzing
-                                    ? 'bg-gray-900 text-white hover:bg-gray-800'
-                                    : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                                }`}
-                        >
-                            {isAnalyzing ? (
-                                <>
-                                    <Sparkles size={20} className="animate-spin" />
-                                    Analyzing...
-                                </>
-                            ) : (
-                                <>
-                                    <Sparkles size={20} />
-                                    Analyze Food
-                                </>
-                            )}
-                        </Button>
-                    </div>
-
-                    {/* Right Column: What You'll Get */}
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-gray-100">
-                                <CheckCircle size={20} className="text-gray-600" />
-                            </div>
-                            <h2 className="text-xl font-semibold text-gray-900">
-                                What You'll Get
-                            </h2>
-                        </div>
-                        <ul className="space-y-3 text-gray-700 text-base">
-                            <li className="flex items-center gap-3">
-                                <CheckCircle size={18} className="text-green-500 flex-shrink-0" />
-                                <span>Precise <strong>Calories</strong> count</span>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <CheckCircle size={18} className="text-green-500 flex-shrink-0" />
-                                <span>Detailed <strong>Nutrient Breakdown</strong> (macros & micros)</span>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <CheckCircle size={18} className="text-green-500 flex-shrink-0" />
-                                <span><strong>Health Verdict</strong> (e.g., Healthy / Not)</span>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <CheckCircle size={18} className="text-green-500 flex-shrink-0" />
-                                <span><strong>Immunity Impact</strong> (boosting/suppressing foods)</span>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <CheckCircle size={18} className="text-green-500 flex-shrink-0" />
-                                <span>Personalized recommendations based on your profile</span>
-                            </li>
-                        </ul>
-                        <p className="text-sm text-gray-500 mt-4">
-                            *Analysis is powered by advanced AI image recognition and your dietary context.
-                        </p>
-                    </div>
-                </div>
-
-                {/* Analysis Results */}
-                {analysisResult && (
-                    <div className="mt-12 pt-8 border-t border-gray-200">
-                        <h3 className="text-2xl font-semibold text-gray-900 text-center mb-8">
-                            Analysis Results
-                        </h3>
-
-                        {/* Food Name and Summary */}
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 mb-8">
-                            <h4 className="text-xl font-bold text-gray-900 mb-2">{analysisResult.foodName}</h4>
-                            <p className="text-gray-600">{analysisResult.analysisSummary}</p>
-                            <div className="mt-3 flex items-center gap-2">
-                                <span className="text-sm text-gray-500">Confidence:</span>
-                                <div className="flex-1 bg-gray-200 rounded-full h-2">
-                                    <div
-                                        className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                                        style={{ width: `${analysisResult.confidenceLevel}%` }}
-                                    ></div>
-                                </div>
-                                <span className="text-sm font-medium text-gray-700">{analysisResult.confidenceLevel}%</span>
-                            </div>
-                        </div>
-
-                        {/* Nutrition Overview */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                            <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-                                <div className="p-3 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 mx-auto mb-4 w-fit">
-                                    <TrendingUp size={24} className="text-orange-600" />
-                                </div>
-                                <h4 className="font-semibold text-gray-900 mb-2">Calories</h4>
-                                <p className="text-2xl font-bold text-orange-600">{analysisResult.calories}</p>
-                            </div>
-
-                            <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-                                <div className="p-3 rounded-full bg-gradient-to-br from-green-100 to-green-200 mx-auto mb-4 w-fit">
-                                    <Zap size={24} className="text-green-600" />
-                                </div>
-                                <h4 className="font-semibold text-gray-900 mb-2">Protein</h4>
-                                <p className="text-2xl font-bold text-green-600">{analysisResult.nutrientBreakdown.protein}g</p>
-                            </div>
-
-                            <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-                                <div className="p-3 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 mx-auto mb-4 w-fit">
-                                    <Shield size={24} className="text-blue-600" />
-                                </div>
-                                <h4 className="font-semibold text-gray-900 mb-2">Carbs</h4>
-                                <p className="text-2xl font-bold text-blue-600">{analysisResult.nutrientBreakdown.carbs}g</p>
-                            </div>
-
-                            <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
-                                <div className="p-3 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 mx-auto mb-4 w-fit">
-                                    <Sparkles size={24} className="text-purple-600" />
-                                </div>
-                                <h4 className="font-semibold text-gray-900 mb-2">Fat</h4>
-                                <p className="text-2xl font-bold text-purple-600">{analysisResult.nutrientBreakdown.fat}g</p>
-                            </div>
-                        </div>
-
-                        {/* Health Verdict */}
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
-                            <div className="flex items-center gap-3 mb-4">
-                                {analysisResult.healthVerdict.isHealthy ? (
-                                    <CheckCircle size={24} className="text-green-600" />
-                                ) : (
-                                    <XCircle size={24} className="text-red-600" />
-                                )}
-                                <h4 className="text-lg font-semibold text-gray-900">Health Verdict</h4>
-                                <div className="ml-auto flex items-center gap-2">
-                                    <span className="text-sm text-gray-500">Rating:</span>
-                                    <div className="flex items-center gap-1">
-                                        {[...Array(10)].map((_, i) => (
-                                            <div
-                                                key={i}
-                                                className={`w-3 h-3 rounded-full ${i < analysisResult.healthVerdict.rating
-                                                    ? 'bg-green-500'
-                                                    : 'bg-gray-200'
-                                                    }`}
-                                            />
-                                        ))}
+                                <div className="flex gap-3 items-center mb-6">
+                                    <div className="p-2 bg-gray-100 rounded-lg">
+                                        <Activity className="w-5 h-5 text-gray-600" />
                                     </div>
-                                    <span className="text-sm font-medium text-gray-700">{analysisResult.healthVerdict.rating}/10</span>
+                                    <h3 className="text-lg font-semibold text-gray-900">
+                                        Nutrition Breakdown
+                                    </h3>
                                 </div>
-                            </div>
-                            <p className="text-gray-600">{analysisResult.healthVerdict.reason}</p>
-                        </div>
+                                <div className="h-80">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={[
+                                            { name: 'Protein', value: analysisResult.nutrientBreakdown.protein, color: '#10B981' },
+                                            { name: 'Carbs', value: analysisResult.nutrientBreakdown.carbs, color: '#3B82F6' },
+                                            { name: 'Fat', value: analysisResult.nutrientBreakdown.fat, color: '#F59E0B' },
+                                            { name: 'Fiber', value: analysisResult.nutrientBreakdown.fiber, color: '#8B5CF6' },
+                                            { name: 'Sugar', value: analysisResult.nutrientBreakdown.sugar, color: '#EF4444' },
+                                            { name: 'Sodium', value: analysisResult.nutrientBreakdown.sodium, color: '#6B7280' },
+                                        ]}>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                            <XAxis dataKey="name" stroke="#666" fontSize={12} />
+                                            <YAxis stroke="#666" fontSize={12} />
+                                            <Tooltip />
+                                            <Bar dataKey="value" fill="#6B7280" />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </motion.div>
 
-                        {/* Immunity Impact */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            {/* Detailed Analysis Summary */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 }}
+                                className="p-6 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200"
+                            >
+                                <div className="flex gap-3 items-center mb-6">
+                                    <div className="p-2 bg-gray-100 rounded-lg">
+                                        <BrainCircuit className="w-5 h-5 text-gray-600" />
+                                    </div>
+                                    <h3 className="text-lg font-semibold text-gray-900">
+                                        AI Analysis Summary
+                                    </h3>
+                                </div>
+                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6">
+                                    <h4 className="text-xl font-bold text-gray-900 mb-2">{analysisResult.foodName}</h4>
+                                    <p className="text-gray-600 mb-4">{analysisResult.analysisSummary}</p>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-gray-500">AI Confidence:</span>
+                                        <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                            <motion.div
+                                                className="bg-gray-600 h-2 rounded-full transition-all duration-500"
+                                                initial={{ width: "0%" }}
+                                                animate={{ width: `${analysisResult.confidenceLevel}%` }}
+                                                transition={{ duration: 1, delay: 0.8 }}
+                                            ></motion.div>
+                                        </div>
+                                        <span className="text-sm font-medium text-gray-700">{analysisResult.confidenceLevel}%</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            {/* Pros and Cons */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.7 }}
+                                className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                            >
+                                <div className="p-6 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200">
+                                    <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                        <CheckCircle size={20} className="text-gray-600" />
+                                        Health Benefits
+                                    </h4>
+                                    <ul className="space-y-2">
+                                        {analysisResult.prosAndCons.pros.map((item, index) => (
+                                            <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
+                                                <span className="text-gray-500 mt-1">•</span>
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="p-6 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200">
+                                    <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                        <XCircle size={20} className="text-gray-600" />
+                                        Health Concerns
+                                    </h4>
+                                    <ul className="space-y-2">
+                                        {analysisResult.prosAndCons.cons.length > 0 ? (
+                                            analysisResult.prosAndCons.cons.map((item, index) => (
+                                                <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
+                                                    <span className="text-gray-500 mt-1">•</span>
+                                                    {item}
+                                                </li>
+                                            ))
+                                        ) : (
+                                            <li className="text-sm text-gray-500">No significant health concerns identified</li>
+                                        )}
+                                    </ul>
+                                </div>
+                            </motion.div>
+
+                            {/* Recommendations */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.8 }}
+                                className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 p-6"
+                            >
                                 <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                    <CheckCircle size={20} className="text-green-600" />
-                                    Immunity Boosting
+                                    <Sparkles size={20} className="text-gray-600" />
+                                    AI Recommendations
                                 </h4>
                                 <ul className="space-y-2">
-                                    {analysisResult.immunityImpact.boosting.map((item, index) => (
-                                        <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
-                                            <span className="text-green-500 mt-1">•</span>
+                                    {analysisResult.recommendations.map((item, index) => (
+                                        <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
+                                            <span className="text-gray-500 mt-1">•</span>
                                             {item}
                                         </li>
                                     ))}
                                 </ul>
-                            </div>
+                            </motion.div>
 
-                            <div className="bg-white rounded-xl border border-gray-200 p-6">
-                                <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                    <AlertCircle size={20} className="text-orange-600" />
-                                    Immunity Suppressing
-                                </h4>
-                                <ul className="space-y-2">
-                                    {analysisResult.immunityImpact.suppressing.length > 0 ? (
-                                        analysisResult.immunityImpact.suppressing.map((item, index) => (
-                                            <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
-                                                <span className="text-orange-500 mt-1">•</span>
-                                                {item}
-                                            </li>
-                                        ))
-                                    ) : (
-                                        <li className="text-sm text-gray-500">No significant immunity suppression detected</li>
-                                    )}
-                                </ul>
-                            </div>
-                        </div>
-
-                        {/* Pros and Cons */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            <div className="bg-white rounded-xl border border-gray-200 p-6">
-                                <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                    <CheckCircle size={20} className="text-green-600" />
-                                    Pros
-                                </h4>
-                                <ul className="space-y-2">
-                                    {analysisResult.prosAndCons.pros.map((item, index) => (
-                                        <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
-                                            <span className="text-green-500 mt-1">•</span>
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            <div className="bg-white rounded-xl border border-gray-200 p-6">
-                                <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                    <XCircle size={20} className="text-red-600" />
-                                    Cons
-                                </h4>
-                                <ul className="space-y-2">
-                                    {analysisResult.prosAndCons.cons.length > 0 ? (
-                                        analysisResult.prosAndCons.cons.map((item, index) => (
-                                            <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
-                                                <span className="text-red-500 mt-1">•</span>
-                                                {item}
-                                            </li>
-                                        ))
-                                    ) : (
-                                        <li className="text-sm text-gray-500">No significant cons identified</li>
-                                    )}
-                                </ul>
-                            </div>
-                        </div>
-
-                        {/* Recommendations */}
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6">
-                            <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <Sparkles size={20} className="text-blue-600" />
-                                Recommendations
-                            </h4>
-                            <ul className="space-y-2">
-                                {analysisResult.recommendations.map((item, index) => (
-                                    <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
-                                        <span className="text-blue-500 mt-1">•</span>
-                                        {item}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                )}
+                            {/* Restart Analysis Button */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.9 }}
+                                className="flex justify-center"
+                            >
+                                <motion.button
+                                    className="px-8 py-3 text-white font-medium rounded-full flex items-center gap-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 transition-all"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => {
+                                        setUploadedImage(null);
+                                        setIsImageUploaded(false);
+                                        setAnalysisResult(null);
+                                        setAnalysisProgress(0);
+                                        setProcessingSteps([]);
+                                        setCurrentStep(0);
+                                        setError(null);
+                                    }}
+                                >
+                                    <Sparkles className="w-5 h-5" />
+                                    New Analysis
+                                </motion.button>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 {/* Error Display */}
                 {error && (
-                    <div className="mt-8 bg-red-50 border border-red-200 rounded-xl p-6">
-                        <div className="flex items-center gap-3">
-                            <XCircle size={24} className="text-red-600" />
-                            <h4 className="font-semibold text-red-900">Analysis Error</h4>
-                        </div>
-                        <p className="text-red-700 mt-2">{error}</p>
-                    </div>
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        className="p-4 mb-4 text-red-700 bg-red-100 rounded-lg"
+                    >
+                        {error}
+                    </motion.div>
                 )}
             </div>
         </div>
