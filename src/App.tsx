@@ -34,6 +34,10 @@ const KnowliaInterface: React.FC = () => {
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/scanner"/>
+              <Route path="/diet"/>
+              <Route path="/dairy"/>
+              <Route path="/chats"/>
             </Route>
           </Routes>
         </Layout>
