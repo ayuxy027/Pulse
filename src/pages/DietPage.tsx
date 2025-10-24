@@ -21,46 +21,43 @@ const DietPage: React.FC<DietPageProps> = ({ sidebarOpen = true }) => {
     const [activeTab, setActiveTab] = useState<TabType>('overview');
 
     return (
-        <div className={`flex-1 flex flex-col h-screen bg-gradient-to-br from-slate-50 to-gray-50 transition-all duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
+        <div className={`flex-1 flex flex-col h-screen bg-[#f8f6f1] transition-all duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
             {/* Header Section */}
-            <div className="px-8 pt-6 pb-4">
+            <div className="p-[30px]">
                 <div className="max-w-7xl mx-auto">
                     <div className="space-y-1 mb-6">
-                        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                        <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">
                             Diet & Nutrition
                         </h1>
-                        <div className="w-12 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full"></div>
+                        <div className="w-12 h-0.5 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full"></div>
                     </div>
 
                     {/* Tab Navigation */}
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-1 inline-flex gap-2">
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-1 inline-flex gap-2">
                         <button
                             onClick={() => setActiveTab('overview')}
-                            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
-                                activeTab === 'overview'
-                                    ? 'bg-gray-900 text-white shadow-md'
+                            className={`px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${activeTab === 'overview'
+                                    ? 'bg-gray-600 text-white shadow-md'
                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
+                                }`}
                         >
                             Overview
                         </button>
                         <button
                             onClick={() => setActiveTab('calendar')}
-                            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
-                                activeTab === 'calendar'
-                                    ? 'bg-gray-900 text-white shadow-md'
+                            className={`px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${activeTab === 'calendar'
+                                    ? 'bg-gray-600 text-white shadow-md'
                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
+                                }`}
                         >
                             Calendar
                         </button>
                         <button
                             onClick={() => setActiveTab('reminders')}
-                            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
-                                activeTab === 'reminders'
-                                    ? 'bg-gray-900 text-white shadow-md'
+                            className={`px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${activeTab === 'reminders'
+                                    ? 'bg-gray-600 text-white shadow-md'
                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
+                                }`}
                         >
                             Reminders
                         </button>
@@ -69,7 +66,7 @@ const DietPage: React.FC<DietPageProps> = ({ sidebarOpen = true }) => {
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 px-8 pb-6 overflow-auto">
+            <div className="flex-1 p-[30px] overflow-auto">
                 <div className="max-w-7xl mx-auto">
                     {activeTab === 'overview' && (
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
