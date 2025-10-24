@@ -8,6 +8,9 @@ import {
 import { LuBookText } from 'react-icons/lu';
 import { TbZoomScan, TbCookieMan } from 'react-icons/tb';
 import knowliaLogo from '../../assets/Icon/KnowliaLogo.svg';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import Button from '../ui/Button';
+import Avatar from '../ui/Avatar';
 
 /**
  * NavItem - Individual navigation item component for navbar
@@ -47,11 +50,18 @@ const NavItem: React.FC<NavItemProps> = ({
 const Navbar: React.FC = () => {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const session = useSession();
+    const supabase = useSupabaseClient();
 
     const handleNavigation = (path: string) => {
         navigate(path);
         setIsMenuOpen(false);
     };
+
+    async function signOut() {
+        await supabase.auth.signOut();
+        navigate('/');
+    }
 
     return (
         <div className="w-full bg-[#f8f6f1] border-b border-gray-200 shadow-sm">
@@ -102,68 +112,26 @@ const Navbar: React.FC = () => {
                         />
                     </div>
 
-                    {/* Desktop CTA Button */}
-                    <button
-                        className="hidden md:block bg-black text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-800 transition"
-                        onClick={() => handleNavigation('/dashboard')}
-                    >
-                        Get Started
-                    </button>
-
-                    {/* Mobile Menu Button */}
-                    <button
-                        className="md:hidden text-gray-700 focus:outline-none"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            {isMenuOpen ? (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            ) : (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            )}
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            {/* Mobile Menu */}
-            {isMenuOpen && (
-                <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
-                    <div className="px-6 py-4 space-y-3">
-                        <NavItem
-                            icon={Home}
-                            label="Dashboard"
-                            onClick={() => handleNavigation('/dashboard')}
-                        />
-                        <NavItem
-                            icon={TbZoomScan}
-                            label="Food Scanner"
-                            onClick={() => handleNavigation('/scanner')}
-                        />
-                        <NavItem
-                            icon={Utensils}
-                            label="Diet"
-                            onClick={() => handleNavigation('/diet')}
-                        />
-                        <NavItem
-                            icon={LuBookText}
-                            label="Dairy"
-                            onClick={() => handleNavigation('/dairy')}
-                        />
-                        <NavItem
-                            icon={TbCookieMan}
-                            label="Coach"
-                            onClick={() => handleNavigation('/chats')}
-                        />
-                        <button
-                            className="w-full bg-black text-white px-6 py-3 rounded-xl font-semibold mt-4 hover:bg-gray-800 transition"
-                            onClick={() => handleNavigation('/dashboard')}
-                        >
-                            Get Started
-                        </button>
+                    {/* Auth buttons */}
+                    <div className="flex items-center gap-4">
+                        {session ? (
+                            <button onClick={() => navigate('/profile')}>
+                                <Avatar
+                                    src={session.user.user_metadata.avatar_url}
+                                    alt="User Avatar"
+                                />
+                            </button>
+                        ) : (
+                            <Button
+                                onClick={() => navigate('/login')}
+                                className="!w-auto !h-auto !px-4 !py-2 text-sm"
+                            >
+                                Sign In
+                            </Button>
+                        )}
                     </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 };
