@@ -26,7 +26,7 @@ const Layout: React.FC = () => {
             <Route path="/" element={<HomePage sidebarOpen={sidebarOpen} />} />
             <Route path="/scanner" element={<div className="p-8"><h1 className="text-2xl font-bold">Food Scanner</h1><p>Coming soon...</p></div>} />
             <Route path="/diet" element={<div className="p-8"><h1 className="text-2xl font-bold">Diet Plan</h1><p>Coming soon...</p></div>} />
-            <Route path="/tracker" element={<div className="p-8"><h1 className="text-2xl font-bold">Health Tracker</h1><p>Coming soon...</p></div>} />
+            <Route path="/dairy" element={<div className="p-8"><h1 className="text-2xl font-bold">Dairy</h1><p>Coming soon...</p></div>} />
             <Route path="/chats" element={<ChatPage sidebarOpen={sidebarOpen} />} />
             <Route path="/profile" element={<div className="p-8"><h1 className="text-2xl font-bold">Profile</h1><p>Coming soon...</p></div>} />
             <Route path="*" element={<Navigate to="/" replace />} />

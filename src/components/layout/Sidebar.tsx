@@ -10,9 +10,9 @@ import {
     LucideIcon,
     PanelLeftClose,
     PanelLeft,
-    Activity,
     Utensils
 } from 'lucide-react';
+import { LuBookText } from 'react-icons/lu';
 import Avatar from '../ui/Avatar';
 import avatar from '../../assets/Icon/Avatar.svg';
 import knowliaLogo from '../../assets/Icon/KnowliaLogo.svg';
@@ -22,7 +22,7 @@ import { fetchChatConversations, ChatConversation } from '../../services/mockDat
  * NavItem - Individual navigation item component for sidebar with active states and shortcuts
  */
 interface NavItemProps {
-    icon: LucideIcon;
+    icon: LucideIcon | React.ComponentType<{ size?: number; className?: string }>;
     label: string;
     isActive?: boolean;
     badge?: ReactNode;
@@ -162,7 +162,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         if (path === '/') return 'home';
         if (path === '/scanner') return 'scanner';
         if (path === '/diet') return 'diet';
-        if (path === '/tracker') return 'tracker';
+        if (path === '/dairy') return 'dairy';
         if (path === '/chats') return 'chats';
         if (path === '/profile') return 'profile';
         return 'home';
@@ -323,11 +323,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                             onClick={() => navigate('/diet')}
                         />
                         <NavItem
-                            icon={Activity}
-                            label="Tracker"
-                            isActive={currentView === 'tracker'}
+                            icon={LuBookText}
+                            label="Dairy"
+                            isActive={currentView === 'dairy'}
                             isCollapsed={!isSidebarOpen}
-                            onClick={() => navigate('/tracker')}
+                            onClick={() => navigate('/dairy')}
                         />
                         <NavItem
                             icon={MessageCircle}
