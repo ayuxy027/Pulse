@@ -95,7 +95,7 @@ export class AgentService {
   }
 
   private async getDualAgentResponse(userQuery: string, context: string) {
-    // Analyzer Agent (Groq - Llama 3.1 distill): Think and analyze
+    // Analyzer Agent (Groq - gpt-oss-20b): Think and analyze
     const analyzerPrompt = `You are an AI health analyzer. Analyze the user's health data and question to provide thoughtful insights.
 
 USER HEALTH DATA:
@@ -112,7 +112,7 @@ Provide a concise analysis (2-3 sentences maximum).`;
 
     const groqResponse = await getGroqResponse(analyzerPrompt);
     
-    // Coach Agent (DeepSeek - Llama distill): Generate personalized response
+    // Coach Agent (Groq - gpt-oss-20b): Generate personalized response
     const coachPrompt = `You are a friendly, knowledgeable health coach. Provide personalized health and nutrition advice.
 
 CONTEXT ANALYSIS:
@@ -130,6 +130,11 @@ INSTRUCTIONS:
 - Keep response concise but helpful (3-4 sentences)
 - Use emojis sparingly for friendliness
 - If health data is limited, still provide general helpful advice
+- If the user's health data indicates protein deficiency or lack of protein intake, suggest these protein supplement referral links:
+  - https://www.fuelone.in/
+  - https://www.muscleblaze.com/
+  - https://www.gnc.com/protein/
+  - https://nutrabay.com/
 
 Respond as a caring health coach:`;
 

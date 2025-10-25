@@ -6,15 +6,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
 
 /**
- * DietPage - Comprehensive nutrition and diet management interface
+ * TrackerPage - Comprehensive nutrition and diet tracking interface
  */
-interface DietPageProps {
+interface TrackerPageProps {
     sidebarOpen?: boolean;
 }
 
 type TabType = 'overview' | 'calendar' | 'reminders';
 
-const DietPage: React.FC<DietPageProps> = () => {
+const TrackerPage: React.FC<TrackerPageProps> = () => {
     const [activeTab, setActiveTab] = useState<TabType>('overview');
     const [isAddFormOpen, setIsAddFormOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -71,7 +71,7 @@ const DietPage: React.FC<DietPageProps> = () => {
                                 transition={{ delay: 0.1 }}
                                 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tighter text-gray-900 leading-tight"
                             >
-                                Diet & Nutrition
+                                Tracker
                             </motion.h1>
                             <motion.div
                                 initial={{ width: 0 }}
@@ -137,7 +137,7 @@ const DietPage: React.FC<DietPageProps> = () => {
                         transition={{ delay: 0.2 }}
                         className="bg-white rounded-2xl text-grey-700 border border-gray-200 shadow-lg p-1 inline-flex gap-2"
                         role="tablist"
-                        aria-label="Diet page navigation tabs"
+                        aria-label="Tracker page navigation tabs"
                     >
                         {tabConfig.map((tab, index) => (
                             <motion.div
@@ -235,4 +235,5 @@ const DietPage: React.FC<DietPageProps> = () => {
     );
 };
 
-export default DietPage;
+export default TrackerPage;
+

@@ -77,9 +77,9 @@ const Navbar: React.FC = () => {
                     <div className="hidden md:flex items-center gap-2">
                         <NavItem icon={Home} label="Dashboard" onClick={() => handleNavigation('/dashboard')} />
                         <NavItem icon={TbZoomScan} label="Food Scanner" onClick={() => handleNavigation('/scanner')} />
-                        <NavItem icon={Utensils} label="Diet" onClick={() => handleNavigation('/diet')} />
-                        <NavItem icon={LuBookText} label="Dairy" onClick={() => handleNavigation('/dairy')} />
-                        <NavItem icon={TbCookieMan} label="Coach" onClick={() => handleNavigation('/chats')} />
+                        <NavItem icon={Utensils} label="Tracker" onClick={() => handleNavigation('/tracker')} />
+                        <NavItem icon={LuBookText} label="Planner" onClick={() => handleNavigation('/planner')} />
+                        <NavItem icon={TbCookieMan} label="Coach" onClick={() => handleNavigation('/coach')} />
                     </div>
 
                     {/* Auth / CTA Section */}
@@ -123,9 +123,9 @@ const Navbar: React.FC = () => {
                     <div className="px-6 py-4 space-y-3">
                         <NavItem icon={Home} label="Dashboard" onClick={() => handleNavigation('/dashboard')} />
                         <NavItem icon={TbZoomScan} label="Food Scanner" onClick={() => handleNavigation('/scanner')} />
-                        <NavItem icon={Utensils} label="Diet" onClick={() => handleNavigation('/diet')} />
-                        <NavItem icon={LuBookText} label="Dairy" onClick={() => handleNavigation('/dairy')} />
-                        <NavItem icon={TbCookieMan} label="Coach" onClick={() => handleNavigation('/chats')} />
+                        <NavItem icon={Utensils} label="Tracker" onClick={() => handleNavigation('/tracker')} />
+                        <NavItem icon={LuBookText} label="Planner" onClick={() => handleNavigation('/planner')} />
+                        <NavItem icon={TbCookieMan} label="Coach" onClick={() => handleNavigation('/coach')} />
 
                         {session ? (
                             <Button
