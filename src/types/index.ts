@@ -16,6 +16,18 @@ export type {
   ProfileListResponse,
 } from './profile';
 
+// Re-export diet entry types
+export type {
+  MealType,
+  EntryType,
+  NutritionInfo,
+  DietEntry,
+  CreateWaterEntry,
+  CreateMealEntry,
+  CreateDietEntry,
+  NutritionAnalysisResponse,
+} from './dietEntry';
+
 // Priority levels for cases and tasks
 export type Priority = 'High' | 'Medium' | 'Low';
 
