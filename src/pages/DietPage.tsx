@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { CalendarView, RemindersView } from '../components/diet';
+import { CalendarView, RemindersView, DietOverview } from '../components/diet';
 import { AddDietEntryForm } from '../components/diet/AddDietEntryForm';
-import { DietDashboard } from '../components/diet/DietDashboard';
-import { DietSummary } from '../components/diet/DietSummary';
 import { Plus } from 'lucide-react';
 
 /**
@@ -24,11 +22,12 @@ type TabType = 'overview' | 'calendar' | 'reminders';
 const DietPage: React.FC<DietPageProps> = ({ sidebarOpen = true }) => {
     const [activeTab, setActiveTab] = useState<TabType>('overview');
     const [isAddFormOpen, setIsAddFormOpen] = useState(false);
-    const [, setRefreshKey] = useState(0);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const handleAddSuccess = () => {
         // Refresh the data after successful addition
         setRefreshKey(prev => prev + 1);
+        setIsAddFormOpen(false);
     };
 
     return (
@@ -92,19 +91,7 @@ const DietPage: React.FC<DietPageProps> = ({ sidebarOpen = true }) => {
             <div className="flex-1 p-[30px] overflow-auto">
                 <div className="max-w-7xl mx-auto">
                     {activeTab === 'overview' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                            {/* Left Column - Dashboard */}
-                            <div className="lg:col-span-7 space-y-6">
-                                {/* Daily Dashboard */}
-                                <DietDashboard />
-                            </div>
-
-                            {/* Right Column - Summary */}
-                            <div className="lg:col-span-5 space-y-6">
-                                {/* Weekly Summary */}
-                                <DietSummary />
-                            </div>
-                        </div>
+                        <DietOverview refreshTrigger={refreshKey} />
                     )}
 
                     {activeTab === 'calendar' && (
