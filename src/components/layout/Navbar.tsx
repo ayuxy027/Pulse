@@ -33,7 +33,7 @@ const NavItem: React.FC<NavItemProps> = ({
     >
         <Icon
             size={18}
-            className={`transition-colors duration-200 ease-out flex-shrink-0 ${isActive ? 'text-gray-700' : 'text-gray-500'
+            className={`transition-colors duration-200 ease-out shrink-0 ${isActive ? 'text-gray-700' : 'text-gray-500'
                 }`}
         />
         <span className="text-sm font-medium whitespace-nowrap">{label}</span>
@@ -62,7 +62,7 @@ const Navbar: React.FC = () => {
                         <img
                             src={logo}
                             alt="Pulse Logo"
-                            className="w-8 h-8 flex-shrink-0"
+                            className="w-10 h-10 shrink-0"
                         />
                         <button
                             type="button"

@@ -195,13 +195,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 }
             }
 
+            // Create tool calls for auto-detected tools if they exist
+            const autoDetectedToolCalls: ToolCall[] = result.autoDetectedTools?.map((tool, idx) => ({
+                id: `auto-tool-${Date.now()}-${idx}`,
+                tool: tool,
+                status: 'completed' as const
+            })) || [];
+
             const assistantMessage: ChatMessage = {
                 id: `ai-${Date.now()}`,
                 content: result.response,
                 role: 'assistant',
                 timestamp: new Date(),
                 thinking: result.thinking,
-                context_data: result.contextUsed
+                context_data: result.contextUsed,
+                toolCalls: autoDetectedToolCalls.length > 0 ? autoDetectedToolCalls : undefined
             };
 
             setMessages(prev => [...prev, assistantMessage]);
@@ -277,7 +285,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                         >
                                             <div className="flex items-center gap-2 mb-3">
                                                 <Sparkles className="w-4 h-4 text-gray-600" />
-                                                <span className="text-sm font-medium tracking-tight text-gray-700">Fetching your data...</span>
+                                                <span className="text-sm font-medium tracking-tight text-gray-700">
+                                                    {message.toolCalls.some(tc => tc.status === 'completed' && tc.id.startsWith('auto-tool-')) 
+                                                        ? 'Auto-detected and fetched your data' 
+                                                        : 'Fetching your data...'
+                                                    }
+                                                </span>
                                             </div>
                                             {message.toolCalls.map((toolCall, idx) => (
                                                 <motion.div
@@ -285,7 +298,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                                     initial={{ opacity: 0, x: -10 }}
                                                     animate={{ opacity: 1, x: 0 }}
                                                     transition={{ delay: idx * 0.1 }}
-                                                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
+                                                    className={`flex items-center gap-3 p-3 rounded-lg border ${
+                                                        toolCall.id.startsWith('auto-tool-') 
+                                                            ? 'bg-blue-50 border-blue-200' 
+                                                            : 'bg-gray-50 border-gray-200'
+                                                    }`}
                                                 >
                                                     <div className="flex items-center gap-2">
                                                         {toolCall.status === 'initiated' && (
@@ -312,12 +329,30 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                                         )}
                                                         {toolCall.status === 'completed' && (
                                                             <>
-                                                                <div className="p-1.5 bg-gray-200 rounded-lg">
-                                                                    <CheckCircle className="w-3 h-3 text-gray-700" />
+                                                                <div className={`p-1.5 rounded-lg ${
+                                                                    toolCall.id.startsWith('auto-tool-') 
+                                                                        ? 'bg-blue-200' 
+                                                                        : 'bg-gray-200'
+                                                                }`}>
+                                                                    <CheckCircle className={`w-3 h-3 ${
+                                                                        toolCall.id.startsWith('auto-tool-') 
+                                                                            ? 'text-blue-700' 
+                                                                            : 'text-gray-700'
+                                                                    }`} />
                                                                 </div>
-                                                                <span className="text-sm font-medium tracking-tight text-gray-700">Completed</span>
+                                                                <span className={`text-sm font-medium tracking-tight ${
+                                                                    toolCall.id.startsWith('auto-tool-') 
+                                                                        ? 'text-blue-700' 
+                                                                        : 'text-gray-700'
+                                                                }`}>
+                                                                    {toolCall.id.startsWith('auto-tool-') ? 'Auto-fetched' : 'Completed'}
+                                                                </span>
                                                                 <span className="text-gray-400">@{toolCall.tool}</span>
-                                                                <span className="text-gray-600 ml-1">✓</span>
+                                                                <span className={`ml-1 ${
+                                                                    toolCall.id.startsWith('auto-tool-') 
+                                                                        ? 'text-blue-600' 
+                                                                        : 'text-gray-600'
+                                                                }`}>✓</span>
                                                             </>
                                                         )}
                                                     </div>

@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import ChatInterface from '../components/coach/ChatInterface';
-import { MessageSquare, History, Bot, User } from 'lucide-react';
+import { MessageSquare, History, Bot, User, Trash2, MoreVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchRecentChats, fetchChatMessages, RecentChat } from '../services/chatService';
+import { fetchRecentChats, fetchChatMessages, deleteChat, RecentChat } from '../services/chatService';
 import { getSupabaseUser } from '../services/authService';
 
 interface Conversation {
@@ -20,6 +20,7 @@ const CoachPage: React.FC = () => {
     const [selectedChat, setSelectedChat] = useState<string | null>(null);
     const [recentChats, setRecentChats] = useState<RecentChat[]>([]);
     const [isLoadingChats, setIsLoadingChats] = useState(true);
+    const [hoveredChat, setHoveredChat] = useState<string | null>(null);
 
     // Load recent chats on mount
     useEffect(() => {
@@ -61,6 +62,45 @@ const CoachPage: React.FC = () => {
         }
     }, [handleChatSelect]);
 
+    const handleDeleteChat = useCallback(async (chatId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        if (window.confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
+            try {
+                const user = await getSupabaseUser();
+                if (user) {
+                    const success = await deleteChat(user.id, chatId);
+                    if (success) {
+                        // Remove from local state
+                        setRecentChats(prev => prev.filter(chat => chat.chat_id !== chatId));
+
+                        // If this was the selected chat, clear selection
+                        if (selectedChat === chatId) {
+                            setSelectedChat(null);
+                        }
+                    } else {
+                        alert('Failed to delete chat. Please try again.');
+                    }
+                }
+            } catch (error) {
+                console.error('Error deleting chat:', error);
+                alert('Failed to delete chat. Please try again.');
+            }
+        }
+    }, [selectedChat]);
+
+    const refreshChats = useCallback(async () => {
+        try {
+            const user = await getSupabaseUser();
+            if (user) {
+                const chats = await fetchRecentChats(user.id, 20);
+                setRecentChats(chats);
+            }
+        } catch (error) {
+            console.error('Error refreshing chats:', error);
+        }
+    }, []);
+
     return (
         <div className="h-[calc(100vh-100px)] bg-[#f8f6f1] flex">
             {/* Left Column - Full Chat Interface */}
@@ -73,7 +113,7 @@ const CoachPage: React.FC = () => {
                 {/* Enhanced Header */}
                 <div className="p-6 bg-white border-b border-gray-200">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl">
+                        <div className="p-3 bg-gray-100 rounded-2xl">
                             <Bot className="w-6 h-6 text-gray-700" />
                         </div>
                         <div>
@@ -92,14 +132,6 @@ const CoachPage: React.FC = () => {
                     selectedChatId={selectedChat}
                     onChatCreated={(chatId) => {
                         setSelectedChat(chatId);
-                        // Refresh the chat list to include the new chat
-                        const refreshChats = async () => {
-                            const user = await getSupabaseUser();
-                            if (user) {
-                                const chats = await fetchRecentChats(user.id, 20);
-                                setRecentChats(chats);
-                            }
-                        };
                         refreshChats();
                     }}
                 />
@@ -145,6 +177,8 @@ const CoachPage: React.FC = () => {
                                     role="button"
                                     tabIndex={0}
                                     onKeyDown={(e) => handleKeyDown(e, conversation.id)}
+                                    onMouseEnter={() => setHoveredChat(conversation.id)}
+                                    onMouseLeave={() => setHoveredChat(null)}
                                     className={`group p-4 rounded-xl border cursor-pointer transition-all duration-200 ${selectedChat === conversation.id
                                         ? 'bg-gray-50 border-gray-300 shadow-sm'
                                         : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm hover:bg-gray-50'
@@ -168,6 +202,21 @@ const CoachPage: React.FC = () => {
                                                 {conversation.title}
                                             </h4>
                                         </div>
+                                        {/* Delete Button - Only show on hover */}
+                                        <AnimatePresence>
+                                            {hoveredChat === conversation.id && (
+                                                <motion.button
+                                                    initial={{ opacity: 0, scale: 0.8 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    exit={{ opacity: 0, scale: 0.8 }}
+                                                    onClick={(e) => handleDeleteChat(conversation.id, e)}
+                                                    className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-colors duration-200"
+                                                    title="Delete chat"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </motion.button>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
                                     <p className="text-sm text-gray-600 line-clamp-2 ml-8">
                                         {conversation.preview}
