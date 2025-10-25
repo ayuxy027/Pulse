@@ -311,7 +311,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className="flex flex-col h-full bg-[#f8f6f1]">
             {/* Messages Area - No header here since it's in CoachPage */}
             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 bg-[#f8f6f1]">
-                {messages.map((message, index) => (
+                {messages.filter((message, index, array) => {
+                    if (message.role === 'user') return true;
+                    // For assistant messages, only show if it's not immediately followed by another assistant message
+                    return !array[index + 1] || array[index + 1].role === 'user';
+                }).map((message) => (
                     <div
                         key={message.id}
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}

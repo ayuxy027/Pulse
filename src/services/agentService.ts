@@ -178,9 +178,12 @@ Respond as a professional health coach with direct, actionable advice:`;
 
     const deepSeekResponse = await getGroqResponse(coachPrompt, 'llama-3.3-70b-versatile');
 
+    // Combine analyzer insights with coach response
+    const combinedResponse = `${deepSeekResponse}\n\nData sources analyzed: ${context}`;
+
     return {
-      thinking: groqResponse, // What the analyzer thought
-      response: deepSeekResponse, // Final coach response
+      thinking: null, // No longer needed since we're combining responses
+      response: combinedResponse,
       contextUsed: context
     };
   }
