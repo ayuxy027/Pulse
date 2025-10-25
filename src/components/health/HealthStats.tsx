@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Activity, Droplets, Utensils, Target, Heart, Zap } from 'lucide-react';
+import { getTodayHealthStats, HealthStats as HealthStatsData } from '../../services/healthStatsService';
 
 // BMI Background with Shorter Bars
 const BMIBackground = () => (
@@ -205,8 +206,39 @@ interface HealthStatsProps {
   error?: string | null;
 }
 
-const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
-  if (loading) {
+const HealthStats: React.FC<HealthStatsProps> = ({ loading: externalLoading, error: externalError }) => {
+  const [healthData, setHealthData] = useState<HealthStatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHealthStats = async () => {
+      try {
+        setLoading(true);
+        const result = await getTodayHealthStats();
+        
+        if (result.success && result.data) {
+          setHealthData(result.data);
+          setError(null);
+        } else {
+          setError(result.error || 'Failed to load health stats');
+        }
+      } catch (err) {
+        console.error('Error fetching health stats:', err);
+        setError('Failed to load health stats');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHealthStats();
+  }, []);
+
+  // Use external loading/error if provided, otherwise use internal state
+  const isLoading = externalLoading !== undefined ? externalLoading : loading;
+  const displayError = externalError !== undefined ? externalError : error;
+
+  if (isLoading) {
     return (
       <div className="flex flex-col space-y-4">
         {/* Section Header */}
@@ -237,7 +269,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
     );
   }
 
-  if (error) {
+  if (displayError) {
     return (
       <div className="flex flex-col space-y-4">
         {/* Section Header */}
@@ -249,7 +281,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center flex items-center justify-center min-h-[200px]">
-          <p className="text-red-500 text-sm">Error: {error}</p>
+          <p className="text-red-500 text-sm">Error: {displayError}</p>
         </div>
       </div>
     );
@@ -269,24 +301,24 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         <HealthStatCard
           title="BMI"
-          value="22.5"
-          subtitle="Normal"
+          value={healthData?.bmi?.value ? healthData.bmi.value.toString() : "N/A"}
+          subtitle={healthData?.bmi?.category || "No data"}
           icon={Activity}
           color="bg-gradient-to-br from-gray-600 to-gray-700"
           chart={BMIBackground}
         />
         <HealthStatCard
           title="Water Intake"
-          value="2.5L"
-          subtitle="Goal: 2.5L"
+          value={healthData?.waterIntake ? `${healthData.waterIntake.current}L` : "0L"}
+          subtitle={healthData?.waterIntake ? `Goal: ${healthData.waterIntake.goal}L` : "Goal: 2.5L"}
           icon={Droplets}
           color="bg-gradient-to-br from-gray-500 to-gray-600"
           chart={WaterBackground}
         />
         <HealthStatCard
           title="Calories"
-          value="2,200"
-          subtitle="Goal: 2,000"
+          value={healthData?.calories ? healthData.calories.current.toLocaleString() : "0"}
+          subtitle={healthData?.calories ? `Goal: ${healthData.calories.goal.toLocaleString()}` : "Goal: 2,000"}
           icon={Utensils}
           color="bg-gradient-to-br from-gray-700 to-gray-800"
           chart={CaloriesBackground}
@@ -305,7 +337,6 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           subtitle="Goal: 8h"
           icon={Heart}
           color="bg-gradient-to-br from-gray-500 to-gray-600"
-          size="small"
           chart={SleepBackground}
         />
         <HealthStatCard
@@ -314,7 +345,6 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           subtitle="BPM"
           icon={Zap}
           color="bg-gradient-to-br from-gray-700 to-gray-800"
-          size="small"
           chart={HeartRateBackground}
         />
       </div>

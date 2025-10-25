@@ -8,4 +8,6 @@ export * from './foodAnalysisService';
 // export * from './daySummaryService'; // Disabled - requires database migration
 export * from './aiSummaryService';
 export { profileService } from './profileService';
+export * from './healthStatsService';
+
 
