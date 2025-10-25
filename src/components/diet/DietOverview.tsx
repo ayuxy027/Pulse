@@ -2,9 +2,10 @@
  * DietOverview Component
  * Real-time display of today's nutrition data with earned macros, burned calories, and entry history
  */
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import React, { useState, useEffect } from 'react';
-import { Flame, TrendingUp, Droplet, Apple, Clock, Trash2, Loader2 } from 'lucide-react';
+import { Flame, TrendingUp, Droplet, Apple, Clock, Trash2, Loader2, Sun, Moon, Coffee } from 'lucide-react';
 import { getDietEntriesByDate, deleteDietEntry } from '../../services/dietEntryService';
 import { getUserHabits } from '../../services/habitsService';
 import { DietEntry, MealType } from '../../types/dietEntry';
@@ -17,10 +18,10 @@ interface TodayStats {
   carbs: number;
   fat: number;
   water: number; // in cups
-  
+
   // Burned
   caloriesBurned: number;
-  
+
   // Goals (hardcoded for now, can be made dynamic later)
   calorieGoal: number;
   proteinGoal: number;
@@ -47,14 +48,10 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
     fatGoal: 65,
     waterGoal: 8,
   });
-  
+
   const [todayEntries, setTodayEntries] = useState<DietEntry[]>([]);
   const [todayHabits, setTodayHabits] = useState<Habit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetchTodayData();
-  }, [refreshTrigger]);
 
   const fetchTodayData = async () => {
     setIsLoading(true);
@@ -62,16 +59,16 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
 
     // Fetch diet entries
     const entriesResult = await getDietEntriesByDate(today);
-    
+
     // Fetch habits
     const habitsResult = await getUserHabits();
 
     if (entriesResult.success && entriesResult.data) {
       setTodayEntries(entriesResult.data);
-      
+
       // Calculate totals
       let calories = 0, protein = 0, carbs = 0, fat = 0, water = 0;
-      
+
       entriesResult.data.forEach(entry => {
         if (entry.entry_type === 'water' && entry.water_amount) {
           water += entry.water_amount;
@@ -91,11 +88,11 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
           const completedDate = new Date(habit.completed_at).toISOString().split('T')[0];
           return completedDate === today && habit.calories_burned;
         });
-        
+
         completedToday.forEach(habit => {
           caloriesBurned += habit.calories_burned || 0;
         });
-        
+
         setTodayHabits(completedToday);
       }
 
@@ -113,6 +110,11 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    fetchTodayData();
+
+  }, [refreshTrigger]);
+
   const handleDeleteEntry = async (entryId: string) => {
     if (confirm('Are you sure you want to delete this entry?')) {
       const result = await deleteDietEntry(entryId);
@@ -126,8 +128,14 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
     return Math.min((value / goal) * 100, 100);
   };
 
-  const getMealTypeIcon = (_mealType?: MealType) => {
-    return <Apple className="w-4 h-4" />;
+  const getMealTypeIcon = (mealType?: MealType) => {
+    switch (mealType) {
+      case 'breakfast': return <Sun className="w-4 h-4" />;
+      case 'lunch': return <Apple className="w-4 h-4" />;
+      case 'snacks': return <Coffee className="w-4 h-4" />;
+      case 'dinner': return <Moon className="w-4 h-4" />;
+      default: return <Apple className="w-4 h-4" />;
+    }
   };
 
   const getMealTypeColor = (mealType?: MealType) => {
@@ -319,11 +327,10 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
                 className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-gray-300 transition-all"
               >
                 {/* Icon & Type */}
-                <div className={`flex-shrink-0 p-2 rounded-lg ${
-                  entry.entry_type === 'water' 
-                    ? 'bg-blue-100' 
-                    : getMealTypeColor(entry.meal_type)
-                }`}>
+                <div className={`flex-shrink-0 p-2 rounded-lg ${entry.entry_type === 'water'
+                  ? 'bg-blue-100'
+                  : getMealTypeColor(entry.meal_type)
+                  }`}>
                   {entry.entry_type === 'water' ? (
                     <Droplet className="w-5 h-5 text-blue-600" />
                   ) : (

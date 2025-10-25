@@ -28,20 +28,21 @@ const CalendarView: React.FC = () => {
 
   useEffect(() => {
     loadMonthData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDate]);
 
   const loadMonthData = async () => {
     setLoading(true);
-    
+
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    
+
     // Calculate first and last day of month
     const firstDay = new Date(year, month, 1).toISOString().split('T')[0];
     const lastDay = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
-    
+
     const datesSet = new Set<string>();
-    
+
     // Get all entries for the month to check which dates have data
     const entriesResult = await getUserDietEntries(firstDay + 'T00:00:00', lastDay);
     if (entriesResult.success && entriesResult.data) {
@@ -56,7 +57,7 @@ const CalendarView: React.FC = () => {
         datesSet.add(entryDate);
       });
     }
-    
+
     setDatesWithData(datesSet);
     setLoading(false);
   };
@@ -66,7 +67,7 @@ const CalendarView: React.FC = () => {
     if (!datesWithData.has(dateStr)) {
       return;
     }
-    
+
     setSelectedDay(dateStr);
     setLoadingDetails(true);
     setDayDetails(null);
@@ -79,7 +80,7 @@ const CalendarView: React.FC = () => {
 
     const entries = entriesResult.success ? entriesResult.data || [] : [];
     const allHabits = habitsResult.success ? habitsResult.data || [] : [];
-    
+
     // Filter habits completed on this day
     const habits = allHabits.filter(habit => {
       if (!habit.is_completed || !habit.completed_at) return false;
@@ -89,7 +90,7 @@ const CalendarView: React.FC = () => {
 
     // Calculate totals from entries
     let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, waterIntake = 0, mealCount = 0;
-    
+
     entries.forEach(entry => {
       if (entry.entry_type === 'water' && entry.water_amount) {
         waterIntake += entry.water_amount;
@@ -147,7 +148,7 @@ const CalendarView: React.FC = () => {
     };
 
     const aiResult = await generateDaySummary(summaryData);
-    
+
     // Use fallback if AI fails
     if (!aiResult.success) {
       const fallback = generateFallbackSummary(summaryData);
@@ -227,15 +228,15 @@ const CalendarView: React.FC = () => {
               ${today
                 ? 'border-2 border-blue-500 bg-blue-50 font-semibold cursor-pointer'
                 : hasData
-                ? 'bg-green-50 hover:bg-green-100 border border-green-200 cursor-pointer hover:shadow-md'
-                : 'border border-gray-100 cursor-not-allowed opacity-40'
+                  ? 'bg-green-50 hover:bg-green-100 border border-green-200 cursor-pointer hover:shadow-md'
+                  : 'border border-gray-100 cursor-not-allowed opacity-40'
               }
             `}
           >
             <span className={`text-sm ${today ? 'text-blue-600 font-bold' : hasData ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
               {day}
             </span>
-            
+
             {hasData && (
               <div className="mt-1 text-xs text-green-600">
                 <span>•</span>
@@ -323,11 +324,11 @@ const CalendarView: React.FC = () => {
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
               <div>
                 <h3 className="text-2xl font-semibold text-gray-900">
-                  {new Date(selectedDay).toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    month: 'long', 
-                    day: 'numeric', 
-                    year: 'numeric' 
+                  {new Date(selectedDay).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
                   })}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">Detailed nutrition and activity summary</p>

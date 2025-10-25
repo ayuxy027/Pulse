@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Edit2, Save, X, FileText, Leaf, Scale, Heart, Lungs, Stethoscope, Check } from 'lucide-react';
+import { Edit2, Save, X, FileText } from 'lucide-react';
 import RadioGroup, { RadioOption } from '../../ui/RadioGroup';
 import MultiSelect, { MultiSelectOption } from '../../ui/MultiSelect';
 import { StaticProfile, StaticInfoSectionProps } from '../../../types/profile';

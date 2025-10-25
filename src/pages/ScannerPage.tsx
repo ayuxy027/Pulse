@@ -46,7 +46,7 @@ const ScannerPage: React.FC = () => {
                 if (savedImage) {
                     setUploadedImage(savedImage);
                 }
-            } catch (e) {
+            } catch {
                 console.error('Failed to load saved analysis');
             }
         }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Edit2, Save, X, Heart, TrendingDown, TrendingUp, ArrowRight, Dumbbell, Activity, AlertTriangle, Ban, Wine, Beer } from 'lucide-react';
+import { Edit2, Save, X, Target } from 'lucide-react';
+import { FaHeart, FaRulerVertical, FaWeight, FaRunning, FaSmoking, FaWineGlass } from 'react-icons/fa';
 import RadioGroup, { RadioOption } from '../../ui/RadioGroup';
 import { HealthMetrics, HealthMetricsSectionProps } from '../../../types/profile';
 
@@ -89,8 +90,37 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
       setError(undefined);
       setIsSaving(true);
 
-      if (!formData.height_cm || !formData.current_weight_kg || !formData.goal || !formData.physical_activity_level || !formData.smoking_habits || !formData.alcohol_consumption) {
-        setError('Please fill in all required fields');
+      // Validation
+      if (!formData.height_cm || formData.height_cm <= 0) {
+        setError('Please enter a valid height');
+        return;
+      }
+      if (formData.height_cm < 50 || formData.height_cm > 250) {
+        setError('Height must be between 50cm and 250cm');
+        return;
+      }
+      if (!formData.current_weight_kg || formData.current_weight_kg <= 0) {
+        setError('Please enter a valid weight');
+        return;
+      }
+      if (formData.current_weight_kg < 20 || formData.current_weight_kg > 500) {
+        setError('Weight must be between 20kg and 500kg');
+        return;
+      }
+      if (!formData.goal) {
+        setError('Please select a goal');
+        return;
+      }
+      if (!formData.physical_activity_level) {
+        setError('Please select activity level');
+        return;
+      }
+      if (!formData.smoking_habits) {
+        setError('Please select smoking habits');
+        return;
+      }
+      if (!formData.alcohol_consumption) {
+        setError('Please select alcohol consumption');
         return;
       }
 
@@ -118,7 +148,7 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Heart className="w-6 h-6 text-red-600" />
+          <FaHeart className="w-6 h-6 text-red-600" />
           Health Metrics
         </h2>
         {!isEditing && (
@@ -143,24 +173,25 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
         <div className="space-y-6">
           {/* Height */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-3">
+            <label className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+              <FaRulerVertical className="w-4 h-4 text-gray-600" />
               Height *
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 mb-3">
               <button
                 onClick={() => setHeightUnit('cm')}
-                className={`px-4 py-2 rounded-lg border-2 transition-colors ${heightUnit === 'cm'
-                    ? 'border-[#2D3643] bg-blue-50 text-gray-900'
-                    : 'border-gray-200 bg-white text-gray-600'
+                className={`flex-1 px-4 py-2 rounded-lg border-2 transition-colors font-medium ${heightUnit === 'cm'
+                  ? 'border-[#2D3643] bg-blue-50 text-gray-900'
+                  : 'border-gray-200 bg-white text-gray-600'
                   }`}
               >
                 CM
               </button>
               <button
                 onClick={() => setHeightUnit('ft')}
-                className={`px-4 py-2 rounded-lg border-2 transition-colors ${heightUnit === 'ft'
-                    ? 'border-[#2D3643] bg-blue-50 text-gray-900'
-                    : 'border-gray-200 bg-white text-gray-600'
+                className={`flex-1 px-4 py-2 rounded-lg border-2 transition-colors font-medium ${heightUnit === 'ft'
+                  ? 'border-[#2D3643] bg-blue-50 text-gray-900'
+                  : 'border-gray-200 bg-white text-gray-600'
                   }`}
               >
                 FT+IN
@@ -168,46 +199,64 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
             </div>
 
             {heightUnit === 'cm' ? (
-              <input
-                type="number"
-                value={formData.height_cm || 0}
-                onChange={(e) =>
-                  setFormData({ ...formData, height_cm: Number(e.target.value) })
-                }
-                placeholder="Height in cm"
-                className="w-full mt-3 px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#2D3643] transition-colors"
-              />
+              <div className="relative">
+                <input
+                  type="number"
+                  min="50"
+                  max="250"
+                  value={formData.height_cm || ''}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    if (value >= 0) {
+                      setFormData({ ...formData, height_cm: value });
+                    }
+                  }}
+                  placeholder="Enter height in cm"
+                  className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#2D3643] transition-colors"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">cm</span>
+              </div>
             ) : (
-              <div className="flex gap-2 mt-3">
+              <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="text-xs text-gray-600">Feet</label>
+                  <label className="text-xs text-gray-600 mb-1 block">Feet</label>
                   <input
                     type="number"
+                    min="0"
+                    max="8"
                     value={feet}
                     onChange={(e) => {
-                      setFeet(Number(e.target.value));
-                      setFormData({
-                        ...formData,
-                        height_cm: feetInchesToCm(Number(e.target.value), inches),
-                      });
+                      const value = Number(e.target.value);
+                      if (value >= 0) {
+                        setFeet(value);
+                        setFormData({
+                          ...formData,
+                          height_cm: feetInchesToCm(value, inches),
+                        });
+                      }
                     }}
-                    placeholder="Feet"
+                    placeholder="0"
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#2D3643] transition-colors"
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="text-xs text-gray-600">Inches</label>
+                  <label className="text-xs text-gray-600 mb-1 block">Inches</label>
                   <input
                     type="number"
+                    min="0"
+                    max="11"
                     value={inches}
                     onChange={(e) => {
-                      setInches(Number(e.target.value));
-                      setFormData({
-                        ...formData,
-                        height_cm: feetInchesToCm(feet, Number(e.target.value)),
-                      });
+                      const value = Number(e.target.value);
+                      if (value >= 0 && value < 12) {
+                        setInches(value);
+                        setFormData({
+                          ...formData,
+                          height_cm: feetInchesToCm(feet, value),
+                        });
+                      }
                     }}
-                    placeholder="Inches"
+                    placeholder="0"
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#2D3643] transition-colors"
                   />
                 </div>
@@ -217,24 +266,34 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
 
           {/* Weight */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Current Weight (kg) *
+            <label className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+              <FaWeight className="w-4 h-4 text-gray-600" />
+              Current Weight *
             </label>
-            <input
-              type="number"
-              step="0.1"
-              value={formData.current_weight_kg || 0}
-              onChange={(e) =>
-                setFormData({ ...formData, current_weight_kg: Number(e.target.value) })
-              }
-              placeholder="Weight in kg"
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#2D3643] transition-colors"
-            />
+            <div className="relative">
+              <input
+                type="number"
+                step="0.1"
+                min="20"
+                max="500"
+                value={formData.current_weight_kg || ''}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (value >= 0) {
+                    setFormData({ ...formData, current_weight_kg: value });
+                  }
+                }}
+                placeholder="Enter weight"
+                className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#2D3643] transition-colors"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">kg</span>
+            </div>
           </div>
 
           {/* Goal */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-3">
+            <label className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <Target className="w-4 h-4 text-gray-600" />
               Goal *
             </label>
             <RadioGroup
@@ -247,7 +306,8 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
 
           {/* Activity Level */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-3">
+            <label className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <FaRunning className="w-4 h-4 text-gray-600" />
               Physical Activity Level *
             </label>
             <RadioGroup
@@ -260,7 +320,8 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
 
           {/* Smoking */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-3">
+            <label className="text-sm font-medium text-gray-900 mb-3 items-center gap-2">
+              <FaSmoking className="w-4 h-4 text-gray-600" />
               Smoking Habits *
             </label>
             <RadioGroup
@@ -274,7 +335,8 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
 
           {/* Alcohol */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-3">
+            <label className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <FaWineGlass className="w-4 h-4 text-gray-600" />
               Alcohol Consumption *
             </label>
             <RadioGroup

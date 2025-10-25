@@ -105,16 +105,11 @@ export async function toggleHabitCompletion(
   isCompleted: boolean
 ): Promise<{ success: boolean; data?: Habit; error?: string }> {
   try {
-    const updateData: any = {
+    const updateData: { is_completed: boolean; completed_at: string | null; updated_at: string } = {
       is_completed: isCompleted,
+      completed_at: isCompleted ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     };
-
-    if (isCompleted) {
-      updateData.completed_at = new Date().toISOString();
-    } else {
-      updateData.completed_at = null;
-    }
 
     const { data, error } = await supabase
       .from('habits')
