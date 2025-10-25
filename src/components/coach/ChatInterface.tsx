@@ -4,7 +4,8 @@ import { getSupabaseUser } from '../../services/authService';
 import { fetchChatMessages } from '../../services/chatService';
 import ChatInput from './ChatInput';
 import MarkdownRenderer from '../ui/MarkdownRenderer';
-import { Bot, Loader2, Zap, Database, Sparkles, Brain, CheckCircle, Clock, User } from 'lucide-react';
+import ToolCallNotification from './ToolCallNotification';
+import { Bot, Loader2, Zap, Database, Sparkles, Brain, CheckCircle, Clock, User, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ChatMessage {
@@ -202,6 +203,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 status: 'completed' as const
             })) || [];
 
+            // Add tool usage notification message if tools were used
+            if (autoDetectedToolCalls.length > 0) {
+                const toolNames = autoDetectedToolCalls.map(tc => tc.tool).join(', ');
+                const toolNotificationMessage: ChatMessage = {
+                    id: `tool-notification-${Date.now()}`,
+                    content: `🔍 **I automatically analyzed your data:**\n\nI used these tools to give you the best personalized advice:\n• **${toolNames}**\n\nThis helps me provide accurate, personalized recommendations based on your current health status!`,
+                    role: 'assistant',
+                    timestamp: new Date(),
+                };
+                setMessages(prev => [...prev, toolNotificationMessage]);
+            }
+
             const assistantMessage: ChatMessage = {
                 id: `ai-${Date.now()}`,
                 content: result.response,
@@ -256,11 +269,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
                                 {/* Message Content */}
                                 <motion.div
-                                    initial={{ scale: 0.95 }}
-                                    animate={{ scale: 1 }}
-                                    className={`rounded-xl px-5 py-4 max-w-2xl shadow-sm ${message.role === 'user'
-                                        ? 'bg-gray-700 text-white'
-                                        : 'bg-white text-gray-800 border border-gray-200'
+                                    initial={{ scale: 0.95, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    className={`rounded-2xl px-6 py-5 max-w-2xl shadow-lg border-2 ${message.role === 'user'
+                                        ? 'bg-gradient-to-br from-gray-700 to-gray-800 text-white border-gray-600'
+                                        : 'bg-white text-gray-800 border-gray-200 hover:border-gray-300'
                                         }`}
                                 >
                                     {/* Message Content */}
@@ -276,89 +289,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                         )}
                                     </div>
 
-                                    {/* Tool Calls - Beautiful Style */}
+                                    {/* Tool Calls - Beautiful Notification */}
                                     {message.toolCalls && message.toolCalls.length > 0 && (
-                                        <motion.div
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            className="mt-4 space-y-3 pt-4 border-t border-gray-200/50"
-                                        >
-                                            <div className="flex items-center gap-2 mb-3">
-                                                <Sparkles className="w-4 h-4 text-gray-600" />
-                                                <span className="text-sm font-medium tracking-tight text-gray-700">
-                                                    {message.toolCalls.some(tc => tc.status === 'completed' && tc.id.startsWith('auto-tool-')) 
-                                                        ? 'Auto-detected and fetched your data' 
-                                                        : 'Fetching your data...'
-                                                    }
-                                                </span>
-                                            </div>
-                                            {message.toolCalls.map((toolCall, idx) => (
-                                                <motion.div
-                                                    key={toolCall.id}
-                                                    initial={{ opacity: 0, x: -10 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: idx * 0.1 }}
-                                                    className={`flex items-center gap-3 p-3 rounded-lg border ${
-                                                        toolCall.id.startsWith('auto-tool-') 
-                                                            ? 'bg-blue-50 border-blue-200' 
-                                                            : 'bg-gray-50 border-gray-200'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        {toolCall.status === 'initiated' && (
-                                                            <>
-                                                                <div className="p-1.5 bg-gray-200 rounded-lg">
-                                                                    <Zap className="w-3 h-3 text-gray-600" />
-                                                                </div>
-                                                                <span className="text-sm font-medium tracking-tight text-gray-700">Initializing</span>
-                                                                <span className="text-gray-400">→</span>
-                                                                <span className="text-sm font-semibold tracking-tight text-gray-800">@{toolCall.tool}</span>
-                                                            </>
-                                                        )}
-                                                        {toolCall.status === 'fetching' && (
-                                                            <>
-                                                                <div className="p-1.5 bg-gray-200 rounded-lg">
-                                                                    <Database className="w-3 h-3 text-gray-600 animate-pulse" />
-                                                                </div>
-                                                                <span className="text-sm font-medium tracking-tight text-gray-700">Fetching</span>
-                                                                <span className="text-gray-400">from database</span>
-                                                                <span className="text-gray-400">→</span>
-                                                                <span className="text-sm font-semibold tracking-tight text-gray-800">@{toolCall.tool}</span>
-                                                                <div className="w-2 h-2 bg-gray-600 rounded-full animate-ping"></div>
-                                                            </>
-                                                        )}
-                                                        {toolCall.status === 'completed' && (
-                                                            <>
-                                                                <div className={`p-1.5 rounded-lg ${
-                                                                    toolCall.id.startsWith('auto-tool-') 
-                                                                        ? 'bg-blue-200' 
-                                                                        : 'bg-gray-200'
-                                                                }`}>
-                                                                    <CheckCircle className={`w-3 h-3 ${
-                                                                        toolCall.id.startsWith('auto-tool-') 
-                                                                            ? 'text-blue-700' 
-                                                                            : 'text-gray-700'
-                                                                    }`} />
-                                                                </div>
-                                                                <span className={`text-sm font-medium tracking-tight ${
-                                                                    toolCall.id.startsWith('auto-tool-') 
-                                                                        ? 'text-blue-700' 
-                                                                        : 'text-gray-700'
-                                                                }`}>
-                                                                    {toolCall.id.startsWith('auto-tool-') ? 'Auto-fetched' : 'Completed'}
-                                                                </span>
-                                                                <span className="text-gray-400">@{toolCall.tool}</span>
-                                                                <span className={`ml-1 ${
-                                                                    toolCall.id.startsWith('auto-tool-') 
-                                                                        ? 'text-blue-600' 
-                                                                        : 'text-gray-600'
-                                                                }`}>✓</span>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </motion.div>
-                                            ))}
-                                        </motion.div>
+                                        <ToolCallNotification
+                                            toolCalls={message.toolCalls}
+                                            isAutoDetected={message.toolCalls.some(tc => tc.id.startsWith('auto-tool-'))}
+                                        />
                                     )}
 
                                     {/* Timestamp */}
@@ -382,22 +318,44 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             className="flex justify-start"
                         >
                             <div className="flex gap-4 max-w-4xl">
-                                <div className="w-10 h-10 rounded-xl bg-gray-700 flex items-center justify-center shadow-sm shrink-0">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg shrink-0">
                                     <Bot className="w-5 h-5 text-white" />
                                 </div>
                                 <motion.div
-                                    initial={{ scale: 0.95 }}
-                                    animate={{ scale: 1 }}
-                                    className="bg-white text-gray-800 rounded-xl px-5 py-4 shadow-sm border border-gray-200 flex items-center gap-3"
+                                    initial={{ scale: 0.95, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    className="bg-white text-gray-800 rounded-2xl px-6 py-5 shadow-lg border-2 border-gray-200 hover:border-gray-300 flex items-center gap-4"
                                 >
-                                    <div className="flex items-center gap-2">
-                                        <div className="p-2 bg-gray-100 rounded-lg">
-                                            <Brain className="w-4 h-4 text-gray-700 animate-pulse" />
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl">
+                                            <Brain className="w-5 h-5 text-blue-600 animate-pulse" />
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Loader2 className="w-4 h-4 animate-spin text-gray-600" />
-                                            <span className="text-sm font-medium tracking-tight text-gray-700">AI is thinking...</span>
+                                        <div className="flex items-center gap-3">
+                                            <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-semibold text-gray-800">AI is thinking...</span>
+                                                <span className="text-xs text-gray-500">Analyzing your question and gathering insights</span>
+                                            </div>
                                         </div>
+                                    </div>
+
+                                    {/* Animated dots */}
+                                    <div className="flex gap-1 ml-2">
+                                        <motion.div
+                                            animate={{ opacity: [0.4, 1, 0.4] }}
+                                            transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+                                            className="w-2 h-2 bg-blue-500 rounded-full"
+                                        />
+                                        <motion.div
+                                            animate={{ opacity: [0.4, 1, 0.4] }}
+                                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+                                            className="w-2 h-2 bg-blue-500 rounded-full"
+                                        />
+                                        <motion.div
+                                            animate={{ opacity: [0.4, 1, 0.4] }}
+                                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
+                                            className="w-2 h-2 bg-blue-500 rounded-full"
+                                        />
                                     </div>
                                 </motion.div>
                             </div>

@@ -142,25 +142,28 @@ const CoachPage: React.FC = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="w-80 bg-white flex flex-col border-l border-gray-200 shadow-lg"
+                className="w-80 bg-gradient-to-b from-white to-gray-50 flex flex-col border-l border-gray-200 shadow-xl"
             >
                 {/* Header */}
-                <div className="p-6 border-b border-gray-200 bg-white">
+                <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gray-100 rounded-xl">
-                            <History className="w-5 h-5 text-gray-700" />
+                        <div className="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl">
+                            <History className="w-5 h-5 text-blue-700" />
                         </div>
-                        <h3 className="text-lg font-semibold tracking-tight text-gray-900">Chat History</h3>
+                        <div>
+                            <h3 className="text-lg font-semibold tracking-tight text-gray-900">Chat History</h3>
+                            <p className="text-xs text-gray-500">Previous conversations</p>
+                        </div>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Previous conversations</p>
                 </div>
 
                 {/* Chat List */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
                     {/* Loading State */}
                     {isLoadingChats && (
-                        <div className="flex items-center justify-center py-8">
-                            <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                        <div className="flex flex-col items-center justify-center py-12">
+                            <div className="w-8 h-8 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-3"></div>
+                            <p className="text-sm text-gray-500">Loading conversations...</p>
                         </div>
                     )}
 
@@ -179,19 +182,19 @@ const CoachPage: React.FC = () => {
                                     onKeyDown={(e) => handleKeyDown(e, conversation.id)}
                                     onMouseEnter={() => setHoveredChat(conversation.id)}
                                     onMouseLeave={() => setHoveredChat(null)}
-                                    className={`group p-4 rounded-xl border cursor-pointer transition-all duration-200 ${selectedChat === conversation.id
-                                        ? 'bg-gray-50 border-gray-300 shadow-sm'
-                                        : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm hover:bg-gray-50'
+                                    className={`group p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${selectedChat === conversation.id
+                                        ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300 shadow-lg'
+                                        : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow-lg hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50'
                                         }`}
                                 >
                                     <div className="flex items-start gap-3 mb-2">
-                                        <div className={`p-1.5 rounded-lg ${selectedChat === conversation.id
-                                            ? 'bg-gray-200'
-                                            : 'bg-gray-100 group-hover:bg-gray-200'
+                                        <div className={`p-2 rounded-xl ${selectedChat === conversation.id
+                                            ? 'bg-gradient-to-br from-blue-200 to-indigo-200'
+                                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-blue-100 group-hover:to-indigo-100'
                                             }`}>
                                             <MessageSquare className={`w-4 h-4 ${selectedChat === conversation.id
-                                                ? 'text-gray-700'
-                                                : 'text-gray-600'
+                                                ? 'text-blue-700'
+                                                : 'text-gray-600 group-hover:text-blue-600'
                                                 }`} />
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -210,7 +213,7 @@ const CoachPage: React.FC = () => {
                                                     animate={{ opacity: 1, scale: 1 }}
                                                     exit={{ opacity: 0, scale: 0.8 }}
                                                     onClick={(e) => handleDeleteChat(conversation.id, e)}
-                                                    className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-colors duration-200"
+                                                    className="p-2 rounded-xl bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm hover:shadow-md"
                                                     title="Delete chat"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
