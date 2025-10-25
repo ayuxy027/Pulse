@@ -5,13 +5,6 @@ import { Plus } from 'lucide-react';
 
 /**
  * DietPage - Comprehensive nutrition and diet management interface
- * 
- * Features:
- * - Tab navigation (Overview, Calendar, Reminders)
- * - Nutrition summary with daily stats
- * - Calorie burn tracking
- * - Task management for meal planning
- * - Form for adding diet-related tasks
  */
 interface DietPageProps {
     sidebarOpen?: boolean;
@@ -32,8 +25,8 @@ const DietPage: React.FC<DietPageProps> = ({ sidebarOpen = true }) => {
 
     return (
         <div className={`flex-1 flex flex-col h-screen bg-[#f8f6f1] transition-all duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
-            {/* Header Section */}
-            <div className="p-[30px]">
+            {/* Header Section - Fixed */}
+            <div className="shrink-0 p-[30px] pb-0">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-start justify-between mb-6">
                         <div className="space-y-1">
@@ -87,8 +80,8 @@ const DietPage: React.FC<DietPageProps> = ({ sidebarOpen = true }) => {
                 </div>
             </div>
 
-            {/* Main Content Area */}
-            <div className="flex-1 p-[30px] overflow-auto">
+            {/* Main Content Area - Scrollable */}
+            <div className="flex-1 overflow-y-auto px-[30px] py-[30px]">
                 <div className="max-w-7xl mx-auto">
                     {activeTab === 'overview' && (
                         <DietOverview refreshTrigger={refreshKey} />
