@@ -22,6 +22,18 @@ interface TodayStats {
   water: number;
   caloriesBurned: number;
   mealCount: number;
+  meals: Array<{
+    id: string;
+    meal_type: string;
+    meal_description: string;
+    nutrition?: {
+      calories?: number;
+      protein?: number;
+      carbs?: number;
+      fat?: number;
+    };
+    created_at: string;
+  }>;
   calorieGoal: number;
   proteinGoal: number;
   carbsGoal: number;
@@ -57,6 +69,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
     water: 0,
     caloriesBurned: 0,
     mealCount: 0,
+    meals: [],
     calorieGoal: 2000,
     proteinGoal: 100,
     carbsGoal: 250,
@@ -86,6 +99,18 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
 
         // Calculate nutrition totals
         let calories = 0, protein = 0, carbs = 0, fat = 0, water = 0, mealCount = 0;
+        const meals: Array<{
+          id: string;
+          meal_type: string;
+          meal_description: string;
+          nutrition?: {
+            calories?: number;
+            protein?: number;
+            carbs?: number;
+            fat?: number;
+          };
+          created_at: string;
+        }> = [];
 
         entriesResult.data.forEach(entry => {
           if (entry.entry_type === 'water' && entry.water_amount) {
@@ -96,6 +121,15 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
             carbs += entry.nutrition.carbs || 0;
             fat += entry.nutrition.fat || 0;
             mealCount++;
+
+            // Add meal to meals array
+            meals.push({
+              id: entry.id,
+              meal_type: entry.meal_type || 'meal',
+              meal_description: entry.meal_description || 'Meal',
+              nutrition: entry.nutrition,
+              created_at: entry.created_at
+            });
           }
         });
 
@@ -124,6 +158,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
           water,
           caloriesBurned,
           mealCount,
+          meals,
         }));
       } else {
         onError?.(entriesResult.error || 'Failed to fetch diet entries');
@@ -154,22 +189,22 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="space-y-6"
+      className="space-y-8"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
         {/* Left Column - Nutrition & Tasks */}
-        <div className="lg:col-span-7 space-y-6">
+        <div className="xl:col-span-7 space-y-8">
           {/* Streak Cards Row */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {/* Water Intake Streak Card */}
             <motion.div
               whileHover={{ scale: 1.02, y: -2 }}
-              className="group relative bg-white rounded-2xl border border-blue-200 shadow-lg p-5 hover:shadow-xl transition-all duration-300 cursor-pointer"
+              className="group relative bg-white rounded-2xl border border-blue-200 shadow-lg p-6 hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-xl bg-linear-to-br from-blue-50 to-blue-100">
@@ -218,7 +253,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
             {/* Calories Progress Card */}
             <motion.div
               whileHover={{ scale: 1.02, y: -2 }}
-              className="group relative bg-white rounded-2xl border border-purple-200 shadow-lg p-5 hover:shadow-xl transition-all duration-300 cursor-pointer"
+              className="group relative bg-white rounded-2xl border border-purple-200 shadow-lg p-6 hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-xl bg-purple-50">
@@ -267,7 +302,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
             {/* Net Calories Card */}
             <motion.div
               whileHover={{ scale: 1.02, y: -2 }}
-              className="group relative bg-white rounded-2xl border border-orange-200 shadow-lg p-5 hover:shadow-xl transition-all duration-300 cursor-pointer"
+              className="group relative bg-white rounded-2xl border border-orange-200 shadow-lg p-6 hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-xl bg-orange-50">
@@ -313,54 +348,6 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
               </div>
             </motion.div>
 
-            {/* Meals Consumed Card */}
-            <motion.div
-              whileHover={{ scale: 1.02, y: -2 }}
-              className="group relative bg-white rounded-2xl border border-green-200 shadow-lg p-5 hover:shadow-xl transition-all duration-300 cursor-pointer"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-xl bg-green-50">
-                  <Utensils size={20} className="text-green-500" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-gray-900">Meals</h4>
-                  <p className="text-[10px] text-gray-500">Consumed today</p>
-                </div>
-              </div>
-
-              <div className="mb-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-green-500">{todayStats.mealCount}</span>
-                  <span className="text-sm font-medium text-gray-500">meals</span>
-                </div>
-                <p className="text-[10px] text-gray-500 mt-0.5">Total logged</p>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="text-gray-600">Goal</span>
-                  <span className="font-semibold text-green-500">3-4 meals</span>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                  <div
-                    className="h-full bg-green-500 rounded-full transition-all duration-500 ease-out"
-                    style={{ width: `${Math.min((todayStats.mealCount / 4) * 100, 100)}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              <div className="absolute inset-0 bg-white rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                <div className="h-full flex flex-col justify-center items-center p-5 text-center">
-                  <Utensils size={32} className="text-green-500 mb-2" />
-                  <p className="text-xs font-semibold text-gray-900 mb-1">Keep Eating!</p>
-                  <p className="text-[10px] text-gray-500">
-                    {todayStats.mealCount >= 3
-                      ? 'Great meal tracking!'
-                      : `${3 - todayStats.mealCount} more meals to log`}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
           </motion.div>
 
           {/* Nutrition Summary Card */}
@@ -368,14 +355,14 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6"
+            className="bg-white rounded-2xl border border-gray-200 shadow-lg p-8"
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Nutrition Summary</h3>
               <span className="text-sm font-medium text-gray-500">Daily Stats</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               <div className="flex items-center justify-center">
                 <div className="relative">
                   <svg width={180} height={180} className="transform -rotate-90">
@@ -486,9 +473,9 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="lg:col-span-5"
+          className="xl:col-span-5 space-y-6"
         >
-          <div className="bg-linear-to-br from-orange-50 to-orange-100 rounded-2xl border border-orange-200 shadow-lg p-6 sticky top-6">
+          <div className="bg-linear-to-br from-orange-50 to-orange-100 rounded-2xl border border-orange-200 shadow-lg p-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Activity Summary</h3>
               <div className="p-2 rounded-lg bg-white shadow-sm">
@@ -497,7 +484,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
             </div>
 
             {/* Net Calories */}
-            <div className="bg-white rounded-xl p-4 mb-4">
+            <div className="bg-white rounded-xl p-6 mb-6">
               <p className="text-sm text-gray-600 mb-1">Net Calories</p>
               <p className="text-3xl font-bold text-gray-900">
                 {todayStats.calories - todayStats.caloriesBurned}
@@ -509,7 +496,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
             </div>
 
             {/* Calories Burned */}
-            <div className="bg-white rounded-xl p-4 mb-4">
+            <div className="bg-white rounded-xl p-6 mb-6">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-red-500 p-2 rounded-lg">
                   <Flame className="w-5 h-5 text-white" />
@@ -526,7 +513,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
 
             {/* Completed Habits List */}
             {todayHabits.length > 0 && (
-              <div className="bg-white rounded-xl p-4">
+              <div className="bg-white rounded-xl p-6">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">Completed Activities</h4>
                 <div className="space-y-2">
                   {todayHabits.map((habit) => (
@@ -547,8 +534,8 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
             )}
 
             {/* Quick Stats Footer */}
-            <div className="mt-4 pt-4 border-t border-orange-200">
-              <div className="grid grid-cols-2 gap-3">
+            <div className="mt-6 pt-6 border-t border-orange-200">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white rounded-lg p-3 text-center">
                   <p className="text-xs text-gray-500 mb-1">Water Intake</p>
                   <p className="text-lg font-bold text-blue-600">{todayStats.water}/{todayStats.waterGoal}</p>
@@ -562,6 +549,81 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
               </div>
             </div>
           </div>
+
+          {/* Meals Consumed Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="bg-white rounded-2xl border border-green-200 shadow-lg p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Meals Consumed</h3>
+                <div className="p-2 rounded-lg bg-green-50">
+                  <Utensils size={18} className="text-green-600" />
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-green-600">{todayStats.mealCount}</span>
+                  <span className="text-lg text-gray-600">meals</span>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">Total logged today</p>
+              </div>
+
+              {todayStats.meals.length > 0 ? (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-700">Today's Meals</h4>
+                  <div className="space-y-2">
+                    {todayStats.meals.map((meal) => (
+                      <div key={meal.id} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
+                        <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+                          <Utensils className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 capitalize">{meal.meal_type}</p>
+                          <p className="text-xs text-gray-600 truncate">{meal.meal_description}</p>
+                          {meal.nutrition?.calories && (
+                            <p className="text-xs text-gray-500">
+                              {meal.nutrition.calories} cal
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-xs text-gray-500">
+                            {new Date(meal.created_at).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <Utensils className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500">No meals logged yet</p>
+                  <p className="text-xs text-gray-400 mt-1">Start tracking your meals today!</p>
+                </div>
+              )}
+
+              <div className="mt-4 pt-4 border-t border-green-100">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Goal</span>
+                  <span className="font-semibold text-green-600">3-4 meals daily</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-2 mt-2">
+                  <div
+                    className="h-full bg-green-500 rounded-full transition-all duration-500 ease-out"
+                    style={{ width: `${Math.min((todayStats.mealCount / 4) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </motion.div>
