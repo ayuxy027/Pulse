@@ -155,6 +155,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         content: msg.message_content,
                         role: msg.sender_type === 'user' ? 'user' : 'assistant',
                         timestamp: new Date(msg.created_at)
+                        // Note: Database messages don't have toolCalls, but we'll preserve them for UI messages
                     }));
 
                     setMessages(formattedMessages);
@@ -209,44 +210,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             content,
             role: 'user',
             timestamp: new Date(),
-            context_data: validMentions.length > 0 ? { dataTypes: validMentions } : undefined,
-            toolCalls: validMentions.length > 0 ? toolCalls : undefined
+            context_data: validMentions.length > 0 ? { dataTypes: validMentions } : undefined
+            // No toolCalls for user messages - only assistant messages show tool notifications
         };
 
         setMessages(prev => [...prev, userMessage]);
         setIsLoading(true);
 
-        const animateToolCalls = async () => {
-            for (let i = 0; i < toolCalls.length; i++) {
-                await new Promise(resolve => setTimeout(resolve, 300));
-                setMessages(prev => prev.map(msg =>
-                    msg.id === userMessage.id
-                        ? {
-                            ...msg,
-                            toolCalls: msg.toolCalls?.map((tc, idx) =>
-                                idx === i ? { ...tc, status: 'fetching' as const } : tc
-                            )
-                        }
-                        : msg
-                ));
-
-                await new Promise(resolve => setTimeout(resolve, 400));
-                setMessages(prev => prev.map(msg =>
-                    msg.id === userMessage.id
-                        ? {
-                            ...msg,
-                            toolCalls: msg.toolCalls?.map((tc, idx) =>
-                                idx === i ? { ...tc, status: 'completed' as const } : tc
-                            )
-                        }
-                        : msg
-                ));
-            }
-        };
-
-        if (validMentions.length > 0) {
-            animateToolCalls();
-        }
+        // No tool call animation for user messages - only assistant messages show tool notifications
 
         try {
             const result = await agentService.processUserQuery(
@@ -289,6 +260,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             };
 
             setMessages(prev => [...prev, assistantMessage]);
+
+            // Don't refresh from database immediately to preserve tool call notifications
+            // The tool call notification will persist in the UI state
         } catch (error) {
             console.error('Error processing message:', error);
             const errorMessage: ChatMessage = {
@@ -342,12 +316,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     )}
                                 </div>
 
-                                {/* Tool Calls - Beautiful Notification */}
-                                {message.toolCalls && message.toolCalls.length > 0 && (
-                                    <ToolCallNotification
-                                        toolCalls={message.toolCalls}
-                                        isAutoDetected={message.toolCalls.some(tc => tc.id.startsWith('auto-tool-'))}
-                                    />
+                                {/* Tool Calls - Embedded within message content for assistant messages */}
+                                {message.role === 'assistant' && message.toolCalls && message.toolCalls.length > 0 && (
+                                    <div className="mt-4">
+                                        <ToolCallNotification
+                                            toolCalls={message.toolCalls}
+                                            isAutoDetected={message.toolCalls.some(tc => tc.id.startsWith('auto-tool-'))}
+                                        />
+                                    </div>
                                 )}
 
                                 {/* Timestamp */}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Bot, Target, Database, CheckCircle, Zap, Brain, User, BarChart3, Calendar, Utensils, Dumbbell, Clock, Settings } from 'lucide-react';
+import { Bot, Target, CheckCircle, User, BarChart3, Calendar, Utensils, Dumbbell, Clock, Settings } from 'lucide-react';
 
 interface ToolCallNotificationProps {
     toolCalls: Array<{
@@ -43,7 +43,7 @@ const ToolCallNotification: React.FC<ToolCallNotificationProps> = ({
         <motion.div
             initial={{ opacity: 0, y: 5, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            className={`mt-2 p-3 rounded-lg border ${isAutoDetected
+            className={`p-3 rounded-lg border ${isAutoDetected
                 ? 'bg-gray-50 border-gray-200'
                 : 'bg-gray-50 border-gray-200'
                 }`}
