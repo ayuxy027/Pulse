@@ -2,8 +2,9 @@
  * RemindersSection - Manages one-time reminders that auto-delete when checked
  */
 
-import React, { useState, useEffect } from 'react';
-import { Plus, Check, X, Loader2, Clock, Calendar, Trash2, Bell } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, Check, X, Loader2, Clock, Calendar, Trash2, Bell, AlertCircle, Target, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { createReminder, getUserReminders, completeReminder, deleteReminder } from '../../services/remindersService';
 import { Reminder } from '../../types/habits';
 
@@ -29,14 +30,23 @@ export const RemindersSection: React.FC = () => {
     fetchReminders();
   }, []);
 
-  const fetchReminders = async () => {
+  const fetchReminders = useCallback(async () => {
     setIsLoading(true);
-    const result = await getUserReminders();
-    if (result.success && result.data) {
-      setReminders(result.data);
+    setError('');
+    try {
+      const result = await getUserReminders();
+      if (result.success && result.data) {
+        setReminders(result.data);
+      } else {
+        setError(result.error || 'Failed to load reminders');
+      }
+    } catch (error) {
+      console.error('Error fetching reminders:', error);
+      setError('An unexpected error occurred while loading reminders');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  };
+  }, []);
 
   const resetForm = () => {
     setDescription('');
@@ -118,11 +128,21 @@ export const RemindersSection: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="bg-white rounded-2xl border border-gray-200 shadow-lg p-5"
+    >
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="flex items-center justify-between mb-6"
+      >
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-purple-100">
+          <div className="p-1.5 rounded-lg bg-linear-to-br from-purple-100 to-purple-200">
             <Bell size={16} className="text-purple-600" />
           </div>
           <div>
@@ -132,18 +152,39 @@ export const RemindersSection: React.FC = () => {
             </p>
           </div>
         </div>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => setIsFormOpen(!isFormOpen)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all shadow-sm text-sm ${
-            isFormOpen
-              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              : 'bg-purple-500 text-white hover:bg-purple-600'
-          }`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all shadow-sm text-sm ${isFormOpen
+            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-linear-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700'
+            }`}
         >
           {isFormOpen ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
           {isFormOpen ? 'Cancel' : 'Add Reminder'}
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
+
+      {/* Error Display */}
+      {error && !isFormOpen && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-red-800">Error</p>
+            <p className="text-sm text-red-700 mt-1">{error}</p>
+          </div>
+          <button
+            onClick={() => setError('')}
+            className="ml-auto text-red-400 hover:text-red-600 transition-colors"
+            aria-label="Dismiss error"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* Add Reminder Form */}
       {isFormOpen && (
@@ -232,15 +273,14 @@ export const RemindersSection: React.FC = () => {
         <div className="space-y-2 max-h-[500px] overflow-y-auto">
           {reminders.map((reminder) => {
             const overdue = isOverdue(reminder.reminder_date, reminder.reminder_time);
-            
+
             return (
               <div
                 key={reminder.id}
-                className={`group p-3 rounded-xl border transition-all duration-200 ${
-                  overdue
-                    ? 'bg-red-50 border-red-200'
-                    : 'bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200'
-                }`}
+                className={`group p-3 rounded-xl border transition-all duration-200 ${overdue
+                  ? 'bg-red-50 border-red-200'
+                  : 'bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200'
+                  }`}
               >
                 <div className="flex items-start gap-3">
                   {/* Checkbox */}
@@ -254,7 +294,7 @@ export const RemindersSection: React.FC = () => {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 text-sm">{reminder.description}</p>
-                    
+
                     <div className="flex items-center gap-2 mt-1.5 text-xs">
                       <span className={`flex items-center gap-1 ${overdue ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>
                         <Calendar className="w-3 h-3" />
@@ -285,6 +325,6 @@ export const RemindersSection: React.FC = () => {
           })}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };

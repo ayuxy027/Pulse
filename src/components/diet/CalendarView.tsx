@@ -3,8 +3,9 @@
  * Interactive calendar showing diet tracking data by day
  */
 
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, X, Flame, Droplet, Apple, Loader2, Sparkles, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight, X, Flame, Droplet, Apple, Loader2, Sparkles, TrendingUp, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getDietEntriesByDate, getUserDietEntries } from '../../services/dietEntryService';
 import { getUserHabits } from '../../services/habitsService';
 import { generateDaySummary, generateFallbackSummary, DaySummaryData } from '../../services/aiSummaryService';
@@ -25,44 +26,54 @@ const CalendarView: React.FC = () => {
     insights?: string[];
   } | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadMonthData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDate]);
 
-  const loadMonthData = async () => {
+  const loadMonthData = useCallback(async () => {
     setLoading(true);
+    setError(null);
 
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+    try {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
 
-    // Calculate first and last day of month
-    const firstDay = new Date(year, month, 1).toISOString().split('T')[0];
-    const lastDay = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
+      // Calculate first and last day of month
+      const firstDay = new Date(year, month, 1).toISOString().split('T')[0];
+      const lastDay = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
 
-    const datesSet = new Set<string>();
+      const datesSet = new Set<string>();
 
-    // Get all entries for the month to check which dates have data
-    const entriesResult = await getUserDietEntries(firstDay + 'T00:00:00', lastDay);
-    if (entriesResult.success && entriesResult.data) {
-      entriesResult.data.forEach(entry => {
-        // For meals, use meal_date. For water, use created_at date
-        let entryDate: string;
-        if (entry.entry_type === 'meal' && entry.meal_date) {
-          entryDate = entry.meal_date;
-        } else {
-          entryDate = entry.created_at.split('T')[0];
-        }
-        datesSet.add(entryDate);
-      });
+      // Get all entries for the month to check which dates have data
+      const entriesResult = await getUserDietEntries(firstDay + 'T00:00:00', lastDay);
+      if (entriesResult.success && entriesResult.data) {
+        entriesResult.data.forEach(entry => {
+          // For meals, use meal_date. For water, use created_at date
+          let entryDate: string;
+          if (entry.entry_type === 'meal' && entry.meal_date) {
+            entryDate = entry.meal_date;
+          } else {
+            entryDate = entry.created_at.split('T')[0];
+          }
+          datesSet.add(entryDate);
+        });
+      } else {
+        setError(entriesResult.error || 'Failed to load calendar data');
+      }
+
+      setDatesWithData(datesSet);
+    } catch (error) {
+      console.error('Error loading month data:', error);
+      setError('An unexpected error occurred while loading calendar data');
+    } finally {
+      setLoading(false);
     }
+  }, [currentDate]);
 
-    setDatesWithData(datesSet);
-    setLoading(false);
-  };
-
-  const handleDayClick = async (dateStr: string) => {
+  const handleDayClick = useCallback(async (dateStr: string) => {
     // Check if this date has data
     if (!datesWithData.has(dateStr)) {
       return;
@@ -71,106 +82,112 @@ const CalendarView: React.FC = () => {
     setSelectedDay(dateStr);
     setLoadingDetails(true);
     setDayDetails(null);
+    setError(null);
 
-    // Fetch full day details
-    const [entriesResult, habitsResult] = await Promise.all([
-      getDietEntriesByDate(dateStr),
-      getUserHabits(),
-    ]);
+    try {
+      // Fetch full day details
+      const [entriesResult, habitsResult] = await Promise.all([
+        getDietEntriesByDate(dateStr),
+        getUserHabits(),
+      ]);
 
-    const entries = entriesResult.success ? entriesResult.data || [] : [];
-    const allHabits = habitsResult.success ? habitsResult.data || [] : [];
+      const entries = entriesResult.success ? entriesResult.data || [] : [];
+      const allHabits = habitsResult.success ? habitsResult.data || [] : [];
 
-    // Filter habits completed on this day
-    const habits = allHabits.filter(habit => {
-      if (!habit.is_completed || !habit.completed_at) return false;
-      const completedDate = new Date(habit.completed_at).toISOString().split('T')[0];
-      return completedDate === dateStr;
-    });
+      // Filter habits completed on this day
+      const habits = allHabits.filter(habit => {
+        if (!habit.is_completed || !habit.completed_at) return false;
+        const completedDate = new Date(habit.completed_at).toISOString().split('T')[0];
+        return completedDate === dateStr;
+      });
 
-    // Calculate totals from entries
-    let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, waterIntake = 0, mealCount = 0;
+      // Calculate totals from entries
+      let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, waterIntake = 0, mealCount = 0;
 
-    entries.forEach(entry => {
-      if (entry.entry_type === 'water' && entry.water_amount) {
-        waterIntake += entry.water_amount;
-      } else if (entry.entry_type === 'meal' && entry.nutrition) {
-        totalCalories += entry.nutrition.calories || 0;
-        totalProtein += entry.nutrition.protein || 0;
-        totalCarbs += entry.nutrition.carbs || 0;
-        totalFat += entry.nutrition.fat || 0;
-        mealCount++;
+      entries.forEach(entry => {
+        if (entry.entry_type === 'water' && entry.water_amount) {
+          waterIntake += entry.water_amount;
+        } else if (entry.entry_type === 'meal' && entry.nutrition) {
+          totalCalories += entry.nutrition.calories || 0;
+          totalProtein += entry.nutrition.protein || 0;
+          totalCarbs += entry.nutrition.carbs || 0;
+          totalFat += entry.nutrition.fat || 0;
+          mealCount++;
+        }
+      });
+
+      // Calculate calories burned
+      let caloriesBurned = 0, habitCount = 0;
+      habits.forEach(habit => {
+        caloriesBurned += habit.calories_burned || 0;
+        habitCount++;
+      });
+
+      // Create summary object
+      const summary: DailySummary = {
+        id: '',
+        user_id: '',
+        date: dateStr,
+        total_calories: totalCalories,
+        total_protein: totalProtein,
+        total_carbs: totalCarbs,
+        total_fat: totalFat,
+        water_intake: waterIntake,
+        calories_burned: caloriesBurned,
+        meal_count: mealCount,
+        habit_count: habitCount,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      // Double-check if there's any data
+      if (mealCount === 0 && waterIntake === 0 && habitCount === 0) {
+        setLoadingDetails(false);
+        setSelectedDay(null);
+        return;
       }
-    });
 
-    // Calculate calories burned
-    let caloriesBurned = 0, habitCount = 0;
-    habits.forEach(habit => {
-      caloriesBurned += habit.calories_burned || 0;
-      habitCount++;
-    });
+      // Generate AI summary
+      const summaryData: DaySummaryData = {
+        date: dateStr,
+        entries,
+        habits,
+        totalCalories,
+        totalProtein,
+        totalCarbs,
+        totalFat,
+        waterIntake,
+        caloriesBurned,
+      };
 
-    // Create summary object
-    const summary: DailySummary = {
-      id: '',
-      user_id: '',
-      date: dateStr,
-      total_calories: totalCalories,
-      total_protein: totalProtein,
-      total_carbs: totalCarbs,
-      total_fat: totalFat,
-      water_intake: waterIntake,
-      calories_burned: caloriesBurned,
-      meal_count: mealCount,
-      habit_count: habitCount,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+      const aiResult = await generateDaySummary(summaryData);
 
-    // Double-check if there's any data
-    if (mealCount === 0 && waterIntake === 0 && habitCount === 0) {
+      // Use fallback if AI fails
+      if (!aiResult.success) {
+        const fallback = generateFallbackSummary(summaryData);
+        setDayDetails({
+          summary,
+          entries,
+          habits,
+          aiSummary: fallback.summary,
+          insights: fallback.insights,
+        });
+      } else {
+        setDayDetails({
+          summary,
+          entries,
+          habits,
+          aiSummary: aiResult.summary,
+          insights: aiResult.insights,
+        });
+      }
+    } catch (error) {
+      console.error('Error loading day details:', error);
+      setError('Failed to load day details');
+    } finally {
       setLoadingDetails(false);
-      setSelectedDay(null);
-      return;
     }
-
-    // Generate AI summary
-    const summaryData: DaySummaryData = {
-      date: dateStr,
-      entries,
-      habits,
-      totalCalories,
-      totalProtein,
-      totalCarbs,
-      totalFat,
-      waterIntake,
-      caloriesBurned,
-    };
-
-    const aiResult = await generateDaySummary(summaryData);
-
-    // Use fallback if AI fails
-    if (!aiResult.success) {
-      const fallback = generateFallbackSummary(summaryData);
-      setDayDetails({
-        summary,
-        entries,
-        habits,
-        aiSummary: fallback.summary,
-        insights: fallback.insights,
-      });
-    } else {
-      setDayDetails({
-        summary,
-        entries,
-        habits,
-        aiSummary: aiResult.summary,
-        insights: aiResult.insights,
-      });
-    }
-
-    setLoadingDetails(false);
-  };
+  }, [datesWithData]);
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -179,13 +196,13 @@ const CalendarView: React.FC = () => {
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  const previousMonth = () => {
+  const previousMonth = useCallback(() => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
-  };
+  }, [currentDate]);
 
-  const nextMonth = () => {
+  const nextMonth = useCallback(() => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
-  };
+  }, [currentDate]);
 
   const isToday = (dateStr: string) => {
     const today = new Date().toISOString().split('T')[0];
@@ -251,28 +268,75 @@ const CalendarView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="space-y-6"
+    >
+      {/* Error Display */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 shadow-sm"
+          >
+            <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-red-800">Error</p>
+              <p className="text-sm text-red-700 mt-1">{error}</p>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-red-400 hover:text-red-600 transition-colors"
+              aria-label="Dismiss error"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Calendar Card */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6"
+      >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={previousMonth}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <ChevronLeft className="w-5 h-5 text-gray-600" />
-          </button>
+          </motion.button>
 
-          <h2 className="text-xl font-semibold text-gray-900">
+          <motion.h2
+            key={`${currentDate.getMonth()}-${currentDate.getFullYear()}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-xl font-semibold text-gray-900"
+          >
             {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </h2>
+          </motion.h2>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={nextMonth}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <ChevronRight className="w-5 h-5 text-gray-600" />
-          </button>
+          </motion.button>
         </div>
 
         {/* Calendar Grid */}
@@ -314,7 +378,7 @@ const CalendarView: React.FC = () => {
             <span className="text-gray-600">No Data</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Day Details Modal */}
       {selectedDay && (
@@ -355,7 +419,7 @@ const CalendarView: React.FC = () => {
                 <>
                   {/* AI Summary */}
                   {dayDetails.aiSummary && (
-                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
+                    <div className="bg-linear-to-br from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
                       <div className="flex items-center gap-2 mb-3">
                         <Sparkles className="w-5 h-5 text-blue-600" />
                         <h4 className="font-semibold text-gray-900">AI Summary</h4>
@@ -371,7 +435,7 @@ const CalendarView: React.FC = () => {
                       <div className="space-y-2">
                         {dayDetails.insights.map((insight, index) => (
                           <div key={index} className="flex items-start gap-3 bg-gray-50 rounded-lg p-3">
-                            <TrendingUp className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <TrendingUp className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
                             <p className="text-sm text-gray-700">{insight}</p>
                           </div>
                         ))}
@@ -484,7 +548,7 @@ const CalendarView: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

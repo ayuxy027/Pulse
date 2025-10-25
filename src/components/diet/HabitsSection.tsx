@@ -2,8 +2,9 @@
  * HabitsSection - Manages user habits with AI-powered calorie tracking
  */
 
-import React, { useState, useEffect } from 'react';
-import { Plus, Check, X, Loader2, Flame, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, Check, X, Loader2, Flame, Trash2, AlertCircle, Target, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { createHabit, getUserHabits, toggleHabitCompletion, deleteHabit, updateHabitCalories } from '../../services/habitsService';
 import { analyzeCalorieBurn } from '../../services/calorieBurnService';
 import { Habit, HabitType } from '../../types/habits';
@@ -23,14 +24,23 @@ export const HabitsSection: React.FC = () => {
     fetchHabits();
   }, []);
 
-  const fetchHabits = async () => {
+  const fetchHabits = useCallback(async () => {
     setIsLoading(true);
-    const result = await getUserHabits();
-    if (result.success && result.data) {
-      setHabits(result.data);
+    setError('');
+    try {
+      const result = await getUserHabits();
+      if (result.success && result.data) {
+        setHabits(result.data);
+      } else {
+        setError(result.error || 'Failed to load habits');
+      }
+    } catch (error) {
+      console.error('Error fetching habits:', error);
+      setError('An unexpected error occurred while loading habits');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  };
+  }, []);
 
   const resetForm = () => {
     setDescription('');
@@ -64,7 +74,7 @@ export const HabitsSection: React.FC = () => {
 
       // Analyze calories burned with AI
       const analysisResult = await analyzeCalorieBurn(description);
-      
+
       if (analysisResult.success && analysisResult.caloriesBurned) {
         await updateHabitCalories(createResult.data.id, analysisResult.caloriesBurned);
       }
@@ -98,11 +108,21 @@ export const HabitsSection: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="bg-white rounded-2xl border border-gray-200 shadow-lg p-5"
+    >
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="flex items-center justify-between mb-6"
+      >
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-blue-100">
+          <div className="p-1.5 rounded-lg bg-linear-to-br from-blue-100 to-blue-200">
             <Flame size={16} className="text-blue-600" />
           </div>
           <div>
@@ -112,18 +132,39 @@ export const HabitsSection: React.FC = () => {
             </p>
           </div>
         </div>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => setIsFormOpen(!isFormOpen)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all shadow-sm text-sm ${
-            isFormOpen
-              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              : 'bg-blue-500 text-white hover:bg-blue-600'
-          }`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all shadow-sm text-sm ${isFormOpen
+            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-linear-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'
+            }`}
         >
           {isFormOpen ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
           {isFormOpen ? 'Cancel' : 'Add Habit'}
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
+
+      {/* Error Display */}
+      {error && !isFormOpen && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-red-800">Error</p>
+            <p className="text-sm text-red-700 mt-1">{error}</p>
+          </div>
+          <button
+            onClick={() => setError('')}
+            className="ml-auto text-red-400 hover:text-red-600 transition-colors"
+            aria-label="Dismiss error"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* Add Habit Form */}
       {isFormOpen && (
@@ -196,21 +237,19 @@ export const HabitsSection: React.FC = () => {
           {habits.map((habit) => (
             <div
               key={habit.id}
-              className={`group p-3 rounded-xl border transition-all duration-200 ${
-                habit.is_completed
-                  ? 'bg-green-50 border-green-200'
-                  : 'bg-white border-gray-200 hover:bg-blue-50 hover:border-blue-200'
-              }`}
+              className={`group p-3 rounded-xl border transition-all duration-200 ${habit.is_completed
+                ? 'bg-green-50 border-green-200'
+                : 'bg-white border-gray-200 hover:bg-blue-50 hover:border-blue-200'
+                }`}
             >
               <div className="flex items-start gap-3">
                 {/* Checkbox */}
                 <button
                   onClick={() => handleToggleCompletion(habit.id, habit.is_completed)}
-                  className={`shrink-0 w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center ${
-                    habit.is_completed
-                      ? 'bg-green-500 border-green-500'
-                      : 'border-gray-300 hover:border-blue-500'
-                  }`}
+                  className={`shrink-0 w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center ${habit.is_completed
+                    ? 'bg-green-500 border-green-500'
+                    : 'border-gray-300 hover:border-blue-500'
+                    }`}
                 >
                   {habit.is_completed && <Check className="w-4 h-4 text-white" />}
                 </button>
@@ -220,13 +259,12 @@ export const HabitsSection: React.FC = () => {
                   <p className={`font-medium text-sm ${habit.is_completed ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
                     {habit.description}
                   </p>
-                  
+
                   <div className="flex items-center gap-2 mt-1.5 text-xs">
-                    <span className={`px-2 py-0.5 rounded-full font-medium ${
-                      habit.habit_type === 'daily' ? 'bg-blue-100 text-blue-700' :
+                    <span className={`px-2 py-0.5 rounded-full font-medium ${habit.habit_type === 'daily' ? 'bg-blue-100 text-blue-700' :
                       habit.habit_type === 'weekly' ? 'bg-green-100 text-green-700' :
-                      'bg-purple-100 text-purple-700'
-                    }`}>
+                        'bg-purple-100 text-purple-700'
+                      }`}>
                       {habit.habit_type}
                     </span>
                     {habit.calories_burned && (
@@ -250,6 +288,6 @@ export const HabitsSection: React.FC = () => {
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
