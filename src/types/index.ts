@@ -28,6 +28,16 @@ export type {
   NutritionAnalysisResponse,
 } from './dietEntry';
 
+// Re-export habits and reminders types
+export type {
+  HabitType,
+  Habit,
+  CreateHabit,
+  Reminder,
+  CreateReminder,
+  CalorieBurnAnalysisResponse,
+} from './habits';
+
 // Priority levels for cases and tasks
 export type Priority = 'High' | 'Medium' | 'Low';
 
