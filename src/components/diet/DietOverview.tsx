@@ -472,21 +472,21 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl border border-indigo-200 shadow-lg p-8"
+            className="bg-white rounded-2xl border border-gray-200 shadow-lg p-8"
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Today's Focus</h3>
-              <div className="p-2 rounded-lg bg-indigo-50">
-                <Target size={18} className="text-indigo-600" />
+              <div className="p-2 rounded-lg bg-gray-50">
+                <Target size={18} className="text-gray-600" />
               </div>
             </div>
 
             <div className="space-y-6">
               {/* Focus Areas */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 rounded-lg bg-blue-500">
+                    <div className="p-2 rounded-lg bg-gray-600">
                       <Droplet className="w-4 h-4 text-white" />
                     </div>
                     <div>
@@ -495,16 +495,16 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-blue-600">
+                    <p className="text-lg font-bold text-gray-900">
                       {Math.round((todayStats.water / todayStats.waterGoal) * 100)}%
                     </p>
                     <p className="text-xs text-gray-500">of daily goal</p>
                   </div>
                 </div>
 
-                <div className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 rounded-lg bg-green-500">
+                    <div className="p-2 rounded-lg bg-gray-600">
                       <Utensils className="w-4 h-4 text-white" />
                     </div>
                     <div>
@@ -513,7 +513,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-green-600">
+                    <p className="text-lg font-bold text-gray-900">
                       {todayStats.mealCount}/4
                     </p>
                     <p className="text-xs text-gray-500">meals logged</p>
@@ -522,10 +522,10 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
               </div>
 
               {/* Progress Summary */}
-              <div className="bg-linear-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-purple-500">
+                    <div className="p-2 rounded-lg bg-gray-600">
                       <TrendingUp className="w-4 h-4 text-white" />
                     </div>
                     <div>
@@ -534,7 +534,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-purple-600">
+                    <p className="text-2xl font-bold text-gray-900">
                       {Math.round(
                         ((todayStats.calories / todayStats.calorieGoal) * 0.4 +
                           (todayStats.water / todayStats.waterGoal) * 0.3 +
@@ -547,7 +547,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
 
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className="h-full bg-linear-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500 ease-out"
+                    className="h-full bg-gray-600 rounded-full transition-all duration-500 ease-out"
                     style={{
                       width: `${Math.round(
                         ((todayStats.calories / todayStats.calorieGoal) * 0.4 +
@@ -568,13 +568,13 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
                 <div className="space-y-2">
                   <p className="text-xs text-gray-600">
                     {todayStats.water < todayStats.waterGoal
-                      ? `💧 Drink ${todayStats.waterGoal - todayStats.water} more cups of water`
-                      : "✅ Great job staying hydrated!"}
+                      ? `Drink ${todayStats.waterGoal - todayStats.water} more cups of water`
+                      : "Great job staying hydrated!"}
                   </p>
                   <p className="text-xs text-gray-600">
                     {todayStats.mealCount < 3
-                      ? `🍽️ Log ${3 - todayStats.mealCount} more meals today`
-                      : "✅ Excellent meal tracking!"}
+                      ? `Log ${3 - todayStats.mealCount} more meals today`
+                      : "Excellent meal tracking!"}
                   </p>
                 </div>
               </div>

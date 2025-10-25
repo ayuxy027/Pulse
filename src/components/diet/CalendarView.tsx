@@ -225,7 +225,7 @@ const CalendarView: React.FC = () => {
 
     // Empty cells before month starts
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-20"></div>);
+      days.push(<div key={`empty-${i}`} className="h-24"></div>);
     }
 
     // Days of the month
@@ -235,33 +235,37 @@ const CalendarView: React.FC = () => {
       const hasData = datesWithData.has(dateStr);
 
       days.push(
-        <div
+        <motion.div
           key={day}
           onClick={() => hasData && handleDayClick(dateStr)}
-          className="relative group h-20"
+          className="relative group h-24"
+          whileHover={{ scale: hasData ? 1.02 : 1 }}
+          whileTap={{ scale: hasData ? 0.98 : 1 }}
         >
           <div
             className={`
-              relative w-full h-full flex flex-col items-center justify-center rounded-lg transition-all
+              relative w-full h-full flex flex-col items-center justify-center rounded-xl transition-all duration-200
               ${today
-                ? 'border-2 border-blue-500 bg-blue-50 font-semibold cursor-pointer'
+                ? 'border-2 border-gray-600 bg-gray-100 font-semibold cursor-pointer shadow-md'
                 : hasData
-                  ? 'bg-green-50 hover:bg-green-100 border border-green-200 cursor-pointer hover:shadow-md'
+                  ? 'bg-gray-50 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:shadow-lg'
                   : 'border border-gray-100 cursor-not-allowed opacity-40'
               }
             `}
           >
-            <span className={`text-sm ${today ? 'text-blue-600 font-bold' : hasData ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
+            <span className={`text-base font-medium ${today ? 'text-gray-900' : hasData ? 'text-gray-800' : 'text-gray-400'}`}>
               {day}
             </span>
 
             {hasData && (
-              <div className="mt-1 text-xs text-green-600">
-                <span>•</span>
+              <div className="mt-1 flex items-center gap-1">
+                <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       );
     }
 
@@ -307,10 +311,10 @@ const CalendarView: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6"
+        className="bg-white rounded-2xl border border-gray-200 shadow-lg p-8"
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -318,21 +322,24 @@ const CalendarView: React.FC = () => {
             <Button
               onClick={previousMonth}
               variant="secondary"
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors w-auto h-auto"
+              className="p-3 rounded-xl hover:bg-gray-100 transition-colors w-auto h-auto"
             >
               <ChevronLeft className="w-5 h-5 text-gray-600" />
             </Button>
           </motion.div>
 
-          <motion.h2
-            key={`${currentDate.getMonth()}-${currentDate.getFullYear()}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="text-xl font-semibold text-gray-900"
-          >
-            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </motion.h2>
+          <div className="text-center">
+            <motion.h2
+              key={`${currentDate.getMonth()}-${currentDate.getFullYear()}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="text-2xl font-semibold text-gray-900"
+            >
+              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+            </motion.h2>
+            <p className="text-sm text-gray-500 mt-1">Track your daily nutrition progress</p>
+          </div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -341,7 +348,7 @@ const CalendarView: React.FC = () => {
             <Button
               onClick={nextMonth}
               variant="secondary"
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors w-auto h-auto"
+              className="p-3 rounded-xl hover:bg-gray-100 transition-colors w-auto h-auto"
             >
               <ChevronRight className="w-5 h-5 text-gray-600" />
             </Button>
@@ -357,34 +364,52 @@ const CalendarView: React.FC = () => {
         ) : (
           <>
             {/* Day headers */}
-            <div className="grid grid-cols-7 gap-2 mb-2">
+            <div className="grid grid-cols-7 gap-3 mb-4">
               {daysOfWeek.map((day) => (
-                <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+                <div key={day} className="text-center text-sm font-semibold text-gray-600 py-3 bg-gray-50 rounded-lg">
                   {day}
                 </div>
               ))}
             </div>
 
             {/* Calendar days */}
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-3">
               {renderCalendar()}
             </div>
           </>
         )}
 
         {/* Legend */}
-        <div className="mt-6 pt-4 border-t border-gray-100 flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded border-2 border-blue-500 bg-blue-50"></div>
-            <span className="text-gray-600">Today</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-50 border border-green-200"></div>
-            <span className="text-gray-600">Has Data</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded border border-gray-100 opacity-50"></div>
-            <span className="text-gray-600">No Data</span>
+        <div className="mt-8 pt-6 border-t border-gray-100">
+          <h4 className="text-sm font-semibold text-gray-900 mb-4">Legend</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="w-4 h-4 rounded-lg border-2 border-gray-600 bg-gray-100"></div>
+              <div>
+                <span className="text-sm font-medium text-gray-900">Today</span>
+                <p className="text-xs text-gray-500">Current date</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="w-4 h-4 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center">
+                <div className="flex gap-0.5">
+                  <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                  <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                  <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                </div>
+              </div>
+              <div>
+                <span className="text-sm font-medium text-gray-900">Has Data</span>
+                <p className="text-xs text-gray-500">Logged entries</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="w-4 h-4 rounded-lg border border-gray-100 opacity-50"></div>
+              <div>
+                <span className="text-sm font-medium text-gray-900">No Data</span>
+                <p className="text-xs text-gray-500">No entries</p>
+              </div>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -392,11 +417,17 @@ const CalendarView: React.FC = () => {
       {/* Day Details Modal */}
       {selectedDay && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+          >
             {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-8 flex items-center justify-between z-10">
               <div>
-                <h3 className="text-2xl font-semibold text-gray-900">
+                <h3 className="text-3xl font-semibold text-gray-900">
                   {new Date(selectedDay).toLocaleDateString('en-US', {
                     weekday: 'long',
                     month: 'long',
@@ -404,7 +435,7 @@ const CalendarView: React.FC = () => {
                     year: 'numeric'
                   })}
                 </h3>
-                <p className="text-sm text-gray-500 mt-1">Detailed nutrition and activity summary</p>
+                <p className="text-sm text-gray-500 mt-2">Detailed nutrition and activity summary</p>
               </div>
               <Button
                 onClick={() => {
@@ -412,14 +443,14 @@ const CalendarView: React.FC = () => {
                   setDayDetails(null);
                 }}
                 variant="secondary"
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors w-auto h-auto"
+                className="p-3 hover:bg-gray-100 rounded-xl transition-colors w-auto h-auto"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </Button>
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 space-y-6">
+            <div className="p-8 space-y-8">
               {loadingDetails ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -429,24 +460,28 @@ const CalendarView: React.FC = () => {
                 <>
                   {/* AI Summary */}
                   {dayDetails.aiSummary && (
-                    <div className="bg-linear-to-br from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Sparkles className="w-5 h-5 text-blue-600" />
-                        <h4 className="font-semibold text-gray-900">AI Summary</h4>
+                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-gray-600">
+                          <Sparkles className="w-5 h-5 text-white" />
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-900">AI Summary</h4>
                       </div>
-                      <p className="text-gray-700 leading-relaxed">{dayDetails.aiSummary}</p>
+                      <p className="text-gray-700 leading-relaxed text-base">{dayDetails.aiSummary}</p>
                     </div>
                   )}
 
                   {/* Insights */}
                   {dayDetails.insights && dayDetails.insights.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-3">Key Insights</h4>
-                      <div className="space-y-2">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Key Insights</h4>
+                      <div className="space-y-3">
                         {dayDetails.insights.map((insight, index) => (
-                          <div key={index} className="flex items-start gap-3 bg-gray-50 rounded-lg p-3">
-                            <TrendingUp className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                            <p className="text-sm text-gray-700">{insight}</p>
+                          <div key={index} className="flex items-start gap-3 bg-gray-50 rounded-lg p-4">
+                            <div className="p-1.5 rounded-lg bg-gray-600 mt-0.5 shrink-0">
+                              <TrendingUp className="w-4 h-4 text-white" />
+                            </div>
+                            <p className="text-sm text-gray-700 leading-relaxed">{insight}</p>
                           </div>
                         ))}
                       </div>
@@ -455,40 +490,54 @@ const CalendarView: React.FC = () => {
 
                   {/* Stats Overview */}
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Nutrition Overview</h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-orange-50 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Flame className="w-4 h-4 text-orange-600" />
-                          <span className="text-xs text-gray-600">Calories</span>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-6">Nutrition Overview</h4>
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="p-2 rounded-lg bg-gray-600">
+                            <Flame className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-600">Calories</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">
+                        <p className="text-3xl font-bold text-gray-900">
                           {dayDetails.summary.total_calories}
                         </p>
                       </div>
-                      <div className="bg-blue-50 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Droplet className="w-4 h-4 text-blue-600" />
-                          <span className="text-xs text-gray-600">Water</span>
+                      <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="p-2 rounded-lg bg-gray-600">
+                            <Droplet className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-600">Water</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {dayDetails.summary.water_intake} cups
+                        <p className="text-3xl font-bold text-gray-900">
+                          {dayDetails.summary.water_intake}
                         </p>
+                        <p className="text-xs text-gray-500 mt-1">cups</p>
                       </div>
-                      <div className="bg-green-50 rounded-lg p-4">
-                        <span className="text-xs text-gray-600">Protein</span>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {dayDetails.summary.total_protein}g
-                        </p>
-                      </div>
-                      <div className="bg-red-50 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Flame className="w-4 h-4 text-red-600" />
-                          <span className="text-xs text-gray-600">Burned</span>
+                      <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="p-2 rounded-lg bg-gray-600">
+                            <Apple className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-600">Protein</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">
+                        <p className="text-3xl font-bold text-gray-900">
+                          {dayDetails.summary.total_protein}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">grams</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="p-2 rounded-lg bg-gray-600">
+                            <Flame className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-600">Burned</span>
+                        </div>
+                        <p className="text-3xl font-bold text-gray-900">
                           {dayDetails.summary.calories_burned}
                         </p>
+                        <p className="text-xs text-gray-500 mt-1">calories</p>
                       </div>
                     </div>
                   </div>
@@ -496,31 +545,33 @@ const CalendarView: React.FC = () => {
                   {/* Meals List */}
                   {dayDetails.entries.filter(e => e.entry_type === 'meal').length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                        <Apple className="w-4 h-4" />
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-gray-600">
+                          <Apple className="w-4 h-4 text-white" />
+                        </div>
                         Meals ({dayDetails.entries.filter(e => e.entry_type === 'meal').length})
                       </h4>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {dayDetails.entries
                           .filter(e => e.entry_type === 'meal')
                           .map((entry) => (
-                            <div key={entry.id} className="bg-gray-50 rounded-lg p-3">
-                              <div className="flex items-center justify-between mb-1">
-                                <span className="font-medium text-gray-900 capitalize">
+                            <div key={entry.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-semibold text-gray-900 capitalize">
                                   {entry.meal_type}
                                 </span>
                                 {entry.nutrition && (
-                                  <span className="text-sm text-orange-600 font-medium">
+                                  <span className="text-sm text-gray-600 font-medium">
                                     {entry.nutrition.calories} cal
                                   </span>
                                 )}
                               </div>
-                              <p className="text-sm text-gray-600">{entry.meal_description}</p>
+                              <p className="text-sm text-gray-600 mb-3">{entry.meal_description}</p>
                               {entry.nutrition && (
-                                <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                                  <span>P: {entry.nutrition.protein}g</span>
-                                  <span>C: {entry.nutrition.carbs}g</span>
-                                  <span>F: {entry.nutrition.fat}g</span>
+                                <div className="flex items-center gap-6 text-xs text-gray-500">
+                                  <span>Protein: {entry.nutrition.protein}g</span>
+                                  <span>Carbs: {entry.nutrition.carbs}g</span>
+                                  <span>Fat: {entry.nutrition.fat}g</span>
                                 </div>
                               )}
                             </div>
@@ -532,16 +583,18 @@ const CalendarView: React.FC = () => {
                   {/* Habits List */}
                   {dayDetails.habits.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-3">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">
                         Completed Habits ({dayDetails.habits.length})
                       </h4>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {dayDetails.habits.map((habit) => (
-                          <div key={habit.id} className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
-                            <span className="text-sm text-gray-700">{habit.description}</span>
+                          <div key={habit.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200 flex items-center justify-between">
+                            <span className="text-sm text-gray-700 font-medium">{habit.description}</span>
                             {habit.calories_burned && (
-                              <span className="text-sm text-red-600 font-medium flex items-center gap-1">
-                                <Flame className="w-3 h-3" />
+                              <span className="text-sm text-gray-600 font-medium flex items-center gap-2">
+                                <div className="p-1 rounded-lg bg-gray-600">
+                                  <Flame className="w-3 h-3 text-white" />
+                                </div>
                                 {habit.calories_burned} cal
                               </span>
                             )}
@@ -555,7 +608,7 @@ const CalendarView: React.FC = () => {
                 <p className="text-center text-gray-500 py-12">No data available</p>
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </motion.div>
