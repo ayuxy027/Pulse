@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AgentService } from '../../services/agentService';
 import { getSupabaseUser } from '../../services/authService';
 import ChatInput from './ChatInput';
-import { ImageAnalysisService } from '../../services/imageAnalysisService';
 import MarkdownRenderer from '../ui/MarkdownRenderer';
 import { Bot, Loader2 } from 'lucide-react';
 
@@ -12,21 +11,23 @@ interface ChatMessage {
     role: 'user' | 'assistant';
     timestamp: Date;
     thinking?: string; // For dual agent thinking process
-    context_data?: any; // For attached data context
-    attachments?: string[]; // For image attachments
+    context_data?: {
+        dataType?: string;
+        [key: string]: unknown;
+    }; // For attached data context via @-mentions
 }
 
 interface ChatInterfaceProps {
-    conversations?: any[];
+    conversations?: unknown[];
     loading?: boolean;
     error?: string | null;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = (props) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = () => {
     const [messages, setMessages] = useState<ChatMessage[]>([
         {
             id: 'initial',
-            content: 'Hello! I\'m your health coach. Ask me about your diet, nutrition, or attach specific data with @ mentions.',
+            content: 'Hello! I\'m your health coach. Ask me about your diet, nutrition, or attach specific data with @ mentions like @profile, @health, @today, @meals, @habits, or @reminders.',
             role: 'assistant',
             timestamp: new Date(),
         }
@@ -34,35 +35,45 @@ const ChatInterface: React.FC<ChatInterfaceProps> = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const agentService = useRef(new AgentService()).current;
-    const imageAnalysisService = useRef(new ImageAnalysisService()).current;
+
+    const scrollToBottom = useCallback(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, []);
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        // Only scroll to bottom when new messages are added, not on initial load
+        if (messages.length > 1) {
+            scrollToBottom();
+        }
+    }, [messages, scrollToBottom]);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    // Extract @ mentions from query
-    const extractMentions = (text: string): string[] => {
+    // Extract @ mentions from query - memoized and enhanced
+    const extractMentions = useCallback((text: string): string[] => {
         const mentions = text.match(/@(\w+)/g) || [];
-        return mentions.map(m => m.substring(1)); // Remove @
-    };
+        return mentions.map(m => m.substring(1).toLowerCase()); // Remove @ and normalize
+    }, []);
 
-    const handleSendMessage = async (content: string) => {
+    // Validate mention types
+    const isValidMention = useCallback((mention: string): boolean => {
+        const validMentions = ['profile', 'health', 'today', 'meals', 'habits', 'reminders'];
+        return validMentions.includes(mention.toLowerCase());
+    }, []);
+
+    const handleSendMessage = useCallback(async (content: string) => {
         const user = await getSupabaseUser();
         if (!user) return;
 
         // Extract @ mentions for context filtering
         const mentions = extractMentions(content);
+        const validMentions = mentions.filter(m => isValidMention(m));
 
-        // Add user message
+        // Add user message with context data
         const userMessage: ChatMessage = {
             id: Date.now().toString(),
             content,
             role: 'user',
             timestamp: new Date(),
+            context_data: validMentions.length > 0 ? { dataTypes: validMentions } : undefined
         };
 
         setMessages(prev => [...prev, userMessage]);
@@ -70,7 +81,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = (props) => {
 
         try {
             // Process through dual agents with context filtering
-            const result = await agentService.processUserQuery(user.id, content, mentions.length > 0 ? mentions : undefined);
+            const result = await agentService.processUserQuery(
+                user.id,
+                content,
+                validMentions.length > 0 ? validMentions : undefined
+            );
 
             const assistantMessage: ChatMessage = {
                 id: `ai-${Date.now()}`,
@@ -94,9 +109,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = (props) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [agentService, extractMentions, isValidMention]);
 
-    const handleAttachData = (dataType: string) => {
+    const handleAttachData = useCallback((dataType: string) => {
         // Show attachment in message for UI feedback
         const attachedMessage: ChatMessage = {
             id: `attach-${Date.now()}`,
@@ -106,63 +121,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = (props) => {
             context_data: { dataType }
         };
         setMessages(prev => [...prev, attachedMessage]);
-    };
-
-    const handleAttachImage = async (file: File) => {
-        const user = await getSupabaseUser();
-        if (!user) return;
-
-        // Add image upload message
-        const uploadMessage: ChatMessage = {
-            id: `upload-${Date.now()}`,
-            content: 'Processing image...',
-            role: 'user',
-            timestamp: new Date(),
-            attachments: [URL.createObjectURL(file)]
-        };
-        setMessages(prev => [...prev, uploadMessage]);
-
-        try {
-            // Analyze image
-            const analysis = await imageAnalysisService.analyzeFoodImage(file);
-
-            // Add analysis as AI response
-            const analysisMessage: ChatMessage = {
-                id: `analysis-${Date.now()}`,
-                content: `Analyzed your meal: **${analysis.foodName}**\n\n**Calories:** ${analysis.calories}\n**Health Score:** ${analysis.healthVerdict?.healthScore}/100\n\n${analysis.analysisSummary}`,
-                role: 'assistant',
-                timestamp: new Date(),
-                thinking: `Image analysis completed`,
-                context_data: analysis
-            };
-
-            setMessages(prev => [...prev, analysisMessage]);
-        } catch (error) {
-            console.error('Error analyzing image:', error);
-            const errorMessage: ChatMessage = {
-                id: `error-${Date.now()}`,
-                content: 'Sorry, I had trouble analyzing your image. Please try again.',
-                role: 'assistant',
-                timestamp: new Date(),
-            };
-            setMessages(prev => [...prev, errorMessage]);
-        }
-    };
+    }, []);
 
     return (
-        <div className="flex flex-col h-full bg-gray-50">
+        <div className="flex flex-col h-full bg-white">
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
                 {messages.map((message) => (
                     <div
                         key={message.id}
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                        <div className="flex gap-3 max-w-3xl">
+                        <div className="flex gap-3 max-w-4xl">
                             {/* Avatar for assistant */}
                             {message.role === 'assistant' && (
-                                <div className="flex-shrink-0">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                                <div className="shrink-0">
+                                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                                         <Bot className="w-5 h-5 text-white" />
                                     </div>
                                 </div>
@@ -175,17 +149,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = (props) => {
                                     : 'bg-gray-100 text-gray-800 shadow-sm border border-gray-100'
                                     }`}
                             >
-                                {/* Image Attachments */}
-                                {message.attachments && message.attachments.map((url, idx) => (
-                                    <div key={idx} className="mb-2">
-                                        <img
-                                            src={url}
-                                            alt="Uploaded meal"
-                                            className="max-w-xs rounded-lg border border-gray-200"
-                                        />
-                                    </div>
-                                ))}
-
                                 {/* Thinking Process (collapsible) */}
                                 {message.thinking && message.role === 'assistant' && (
                                     <details className="mb-2">
@@ -203,7 +166,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = (props) => {
                                     {message.role === 'assistant' ? (
                                         <MarkdownRenderer content={message.content} fontSize={14} />
                                     ) : (
-                                        <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                                        <p className="whitespace-pre-wrap">{message.content}</p>
                                     )}
                                 </div>
 
@@ -226,8 +189,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = (props) => {
                 {/* Loading Indicator */}
                 {isLoading && (
                     <div className="flex justify-start">
-                        <div className="flex gap-3 max-w-3xl">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                        <div className="flex gap-3 max-w-4xl">
+                            <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center shrink-0">
                                 <Bot className="w-5 h-5 text-white" />
                             </div>
                             <div className="bg-gray-100 text-gray-800 rounded-2xl px-4 py-3 shadow-sm border border-gray-100 flex items-center gap-2">
@@ -245,7 +208,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = (props) => {
             <ChatInput
                 onSendMessage={handleSendMessage}
                 onAttachData={handleAttachData}
-                onAttachImage={handleAttachImage}
                 disabled={isLoading}
             />
         </div>
