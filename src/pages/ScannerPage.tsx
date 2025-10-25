@@ -3,6 +3,10 @@ import { Upload, Sparkles, Shield, TrendingUp, CheckCircle, BrainCircuit, Micros
 import { analyzeFoodImage, FoodAnalysisResult } from '../services/foodAnalysisService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, BarChart, Bar } from 'recharts';
+import { BsDatabaseCheck } from "react-icons/bs";
+import { LuFileHeart } from "react-icons/lu";
+import { MdOutlineZoomInMap } from "react-icons/md";
+import { GiMuscleUp } from 'react-icons/gi';
 
 /**
  * ScannerPage - AI-Based Food Scanner Interface
@@ -55,6 +59,7 @@ const ScannerPage: React.FC = () => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 setUploadedImage(e.target?.result as string);
+                setIsImageUploaded(true);
             };
             reader.readAsDataURL(file);
         }
@@ -169,6 +174,49 @@ const ScannerPage: React.FC = () => {
                     >
                         Advanced AI-powered food analysis with real-time nutrition insights and health recommendations
                     </motion.p>
+                </motion.div>
+
+                {/* Features Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3"
+                >
+                    {[
+                        {
+                            icon: BsDatabaseCheck,
+                            title: "Accurate Analysis",
+                            description: "AI-powered detection of food items and nutritional content"
+                        },
+                        {
+                            icon: LuFileHeart,
+                            title: "Health Tracking",
+                            description: "Track calories, macros, and dietary information effortlessly"
+                        },
+                        {
+                            icon: MdOutlineZoomInMap,
+                            title: "Detailed Insights",
+                            description: "Get personalized recommendations based on your health profile"
+                        }
+                    ].map((feature, index) => {
+                        const FeatureIcon = feature.icon;
+                        return (
+                            <motion.div
+                                key={index}
+                                whileHover={{ y: -5 }}
+                                className="p-6 bg-white rounded-lg shadow-md border border-gray-200"
+                            >
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="p-3 rounded-lg bg-gray-100">
+                                        <FeatureIcon className="w-6 h-6 text-gray-700" />
+                                    </div>
+                                    <h3 className="font-semibold text-gray-900">{feature.title}</h3>
+                                </div>
+                                <p className="text-sm text-gray-600">{feature.description}</p>
+                            </motion.div>
+                        );
+                    })}
                 </motion.div>
 
                 {/* Upload Section */}
@@ -443,6 +491,31 @@ const ScannerPage: React.FC = () => {
                                     Food Analysis completed successfully
                                 </span>
                             </motion.div>
+
+                            {/* Scanned Image Section */}
+                            {uploadedImage && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.25 }}
+                                className="p-6 bg-white rounded-xl shadow-lg border border-gray-200"
+                            >
+                                <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                                    Scanned Image
+                                </h3>
+                                <div className="relative h-80 w-full overflow-hidden rounded-lg shadow-md">
+                                    <img
+                                        src={uploadedImage}
+                                        alt="Scanned food"
+                                        className="absolute inset-0 w-full h-full object-contain bg-gray-50"
+                                    />
+                                    <div className="absolute top-3 right-3 flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-md">
+                                        <GiMuscleUp className="w-4 h-4 text-gray-600" />
+                                        <span className="text-xs font-semibold text-gray-700">AI Analyzed</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+                            )}
 
                             {/* Top Row - Key Metrics */}
                             <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 md:grid-cols-2">
