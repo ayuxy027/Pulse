@@ -5,7 +5,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import React, { useState, useEffect } from 'react';
-import { Flame, Droplet, Loader2, Utensils } from 'lucide-react';
+import { Flame, Droplet, Loader2, Utensils, Target, TrendingUp, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getDietEntriesByDate } from '../../services/dietEntryService';
 import { getUserHabits } from '../../services/habitsService';
@@ -462,6 +462,120 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
                 <div className="text-center">
                   <p className="text-xs text-gray-500 mb-1">Remaining</p>
                   <p className="text-lg font-bold text-green-600">{Math.max(0, todayStats.calorieGoal - todayStats.calories)}</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Today's Focus Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-2xl border border-indigo-200 shadow-lg p-8"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Today's Focus</h3>
+              <div className="p-2 rounded-lg bg-indigo-50">
+                <Target size={18} className="text-indigo-600" />
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {/* Focus Areas */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 rounded-lg bg-blue-500">
+                      <Droplet className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">Hydration</p>
+                      <p className="text-xs text-gray-600">Stay hydrated</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-blue-600">
+                      {Math.round((todayStats.water / todayStats.waterGoal) * 100)}%
+                    </p>
+                    <p className="text-xs text-gray-500">of daily goal</p>
+                  </div>
+                </div>
+
+                <div className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 rounded-lg bg-green-500">
+                      <Utensils className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">Meals</p>
+                      <p className="text-xs text-gray-600">Regular eating</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-green-600">
+                      {todayStats.mealCount}/4
+                    </p>
+                    <p className="text-xs text-gray-500">meals logged</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Summary */}
+              <div className="bg-linear-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-purple-500">
+                      <TrendingUp className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">Daily Progress</p>
+                      <p className="text-xs text-gray-600">Overall completion</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-purple-600">
+                      {Math.round(
+                        ((todayStats.calories / todayStats.calorieGoal) * 0.4 +
+                          (todayStats.water / todayStats.waterGoal) * 0.3 +
+                          (todayStats.mealCount / 4) * 0.3) * 100
+                      )}%
+                    </p>
+                    <p className="text-xs text-gray-500">completion</p>
+                  </div>
+                </div>
+
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="h-full bg-linear-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500 ease-out"
+                    style={{
+                      width: `${Math.round(
+                        ((todayStats.calories / todayStats.calorieGoal) * 0.4 +
+                          (todayStats.water / todayStats.waterGoal) * 0.3 +
+                          (todayStats.mealCount / 4) * 0.3) * 100
+                      )}%`
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Quick Tips */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <Clock className="w-4 h-4 text-gray-600" />
+                  <p className="text-sm font-semibold text-gray-900">Quick Tips</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs text-gray-600">
+                    {todayStats.water < todayStats.waterGoal
+                      ? `💧 Drink ${todayStats.waterGoal - todayStats.water} more cups of water`
+                      : "✅ Great job staying hydrated!"}
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    {todayStats.mealCount < 3
+                      ? `🍽️ Log ${3 - todayStats.mealCount} more meals today`
+                      : "✅ Excellent meal tracking!"}
+                  </p>
                 </div>
               </div>
             </div>
