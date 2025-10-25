@@ -5,6 +5,7 @@ import { fetchChatMessages } from '../../services/chatService';
 import { getGroqResponse } from '../../services/llmService';
 import ChatInput from './ChatInput';
 import ToolCallNotification from './ToolCallNotification';
+import ToolUsageNotification from './ToolUsageNotification';
 import { Bot, Loader2, Zap, Database, Sparkles, Brain, CheckCircle, Clock, User, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -17,11 +18,11 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
             remarkPlugins={[remarkGfm]}
             components={{
                 li: ({ ...props }) => <li className="list-item marker:text-gray-600" {...props} />,
-                a: ({ ...props }) => <a target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:underline" {...props} />,
+                a: ({ ...props }) => <a target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium" {...props} />,
                 code: ({ className, children, ...props }) => {
                     const match = /language-(\w+)/.exec(className || '');
                     return !match ? (
-                        <code className="px-1 py-0.5 bg-gray-100 rounded text-sm font-mono" {...props}>{children}</code>
+                        <code className="px-2 py-1 bg-gray-100 rounded text-sm font-mono text-gray-800" {...props}>{children}</code>
                     ) : (
                         <code className={className} {...props}>
                             {children}
@@ -47,13 +48,28 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
                     <ol className="list-decimal list-inside space-y-1 mb-3" {...props}>{children}</ol>
                 ),
                 strong: ({ children, ...props }) => (
-                    <strong className="font-semibold text-gray-900" {...props}>{children}</strong>
+                    <strong className="font-bold text-gray-900" {...props}>{children}</strong>
                 ),
                 em: ({ children, ...props }) => (
-                    <em className="italic text-gray-600" {...props}>{children}</em>
+                    <em className="italic text-gray-700 font-medium" {...props}>{children}</em>
+                ),
+                u: ({ children, ...props }) => (
+                    <u className="underline decoration-2 underline-offset-2" {...props}>{children}</u>
                 ),
                 blockquote: ({ children, ...props }) => (
-                    <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 my-3" {...props}>{children}</blockquote>
+                    <blockquote className="border-l-4 border-blue-300 pl-4 italic text-gray-600 my-3 bg-blue-50 py-2 rounded-r" {...props}>{children}</blockquote>
+                ),
+                // Enhanced table support
+                table: ({ children, ...props }) => (
+                    <div className="overflow-x-auto my-4">
+                        <table className="min-w-full border border-gray-200 rounded-lg" {...props}>{children}</table>
+                    </div>
+                ),
+                th: ({ children, ...props }) => (
+                    <th className="px-4 py-2 bg-gray-100 border-b border-gray-200 text-left font-semibold text-gray-800" {...props}>{children}</th>
+                ),
+                td: ({ children, ...props }) => (
+                    <td className="px-4 py-2 border-b border-gray-200 text-gray-700" {...props}>{children}</td>
                 )
             }}
         >
@@ -343,6 +359,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         </div>
                     </div>
                 ))}
+
+                {/* Tool Usage Notification - Show as separate message bubble */}
+                {messages.length > 0 && messages[messages.length - 1].role === 'assistant' &&
+                    messages[messages.length - 1].toolCalls && messages[messages.length - 1].toolCalls.length > 0 && (
+                        <ToolUsageNotification
+                            toolsUsed={messages[messages.length - 1].toolCalls.map(tc => tc.tool)}
+                            isFromAI={true}
+                        />
+                    )}
 
                 {/* Loading Indicator */}
                 {isLoading && (
