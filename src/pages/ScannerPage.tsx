@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Sparkles, Shield, TrendingUp, CheckCircle, BrainCircuit, Microscope, Leaf, XCircle, Activity, Target, Image as ImageIcon } from 'lucide-react';
 import { analyzeFoodImage, FoodAnalysisResult } from '../services/foodAnalysisService';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,6 +33,24 @@ const ScannerPage: React.FC = () => {
     const [processingSteps, setProcessingSteps] = useState<string[]>([]);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Load from localStorage on mount
+    useEffect(() => {
+        const saved = localStorage.getItem('foodAnalysis');
+        const savedImage = localStorage.getItem('uploadedImage');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                setAnalysisResult(data);
+                setAnalysisProgress(100);
+                if (savedImage) {
+                    setUploadedImage(savedImage);
+                }
+            } catch (e) {
+                console.error('Failed to load saved analysis');
+            }
+        }
+    }, []);
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -148,6 +166,8 @@ const ScannerPage: React.FC = () => {
             await new Promise((r) => setTimeout(r, 300));
             addProcessingStep("Analysis complete!");
             setAnalysisResult(result);
+            localStorage.setItem('foodAnalysis', JSON.stringify(result));
+            localStorage.setItem('uploadedImage', uploadedImage || '');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Analysis failed');
         } finally {
@@ -965,6 +985,8 @@ const ScannerPage: React.FC = () => {
                                         setCurrentStep(0);
                                         setError(null);
                                         setIsAnalyzing(false);
+                                        localStorage.removeItem('foodAnalysis');
+                                        localStorage.removeItem('uploadedImage');
                                     }}
                                     className="w-auto"
                                 >
