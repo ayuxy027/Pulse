@@ -7,13 +7,15 @@ interface ChatInputProps {
     onAttachData: (dataType: string) => void;
     onAttachImage: (file: File) => void;
     disabled?: boolean;
+    showWrapper?: boolean;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
     onSendMessage,
     onAttachData,
     onAttachImage,
-    disabled
+    disabled,
+    showWrapper = true
 }) => {
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false); // This isLoading is for the input component itself, not the overall chat
@@ -99,13 +101,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
         setIsEnhancing(false);
     };
 
-    return (
-        <div
-            className="w-full p-4 bg-gray-50 border-t border-gray-200"
-        >
-            <div
-                className="w-full flex flex-col gap-2 rounded-xl border border-gray-200 bg-white shadow-sm p-4"
-            >
+    const inputContent = (
+        <>
+            <div className="relative w-full flex flex-col gap-2 rounded-xl border border-gray-200 bg-white shadow-sm p-4">
                 {/* Suggestions Dropdown */}
                 {showSuggestions && suggestions.length > 0 && (
                     <div className="absolute bottom-full mb-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto w-full">
@@ -138,7 +136,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     }
                     className="bg-transparent outline-none w-full resize-none text-gray-800 placeholder-gray-400 text-sm font-normal leading-tight"
                     rows={1}
-                    style={{ minHeight: '22px', maxHeight: '100px' }} // Adjust as needed
+                    style={{ minHeight: '22px', maxHeight: '100px' }}
                     disabled={disabled || isLoading || isEnhancing}
                 />
 
@@ -147,7 +145,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     <div className="flex items-center gap-3">
                         {/* Plus for attachments (general) */}
                         <button
-                            onClick={() => fileInputRef.current?.click()} // Re-using for image for now
+                            onClick={() => fileInputRef.current?.click()}
                             className="p-1 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
                             title="Attach file"
                             disabled={disabled || isLoading || isEnhancing}
@@ -178,7 +176,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
                             inputValue={inputValue}
                             onEnhancementComplete={handleEnhancementComplete}
                             disabled={disabled || isLoading || isEnhancing}
-                            setIsEnhancing={setIsEnhancing} // Pass setter to manage internal state
                         />
                         {(disabled || isLoading || isEnhancing) ? (
                             <div className="w-5 h-5 flex items-center justify-center">
@@ -206,8 +203,18 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 accept="image/*"
                 className="hidden"
             />
-        </div>
+        </>
     );
+
+    if (showWrapper) {
+        return (
+            <div className="w-full p-4 bg-gray-50 border-t border-gray-200">
+                {inputContent}
+            </div>
+        );
+    }
+
+    return <div className="w-full">{inputContent}</div>;
 };
 
 export default ChatInput;
