@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Activity, Droplets, Utensils, Target, Heart, Zap } from 'lucide-react';
+import { getTodayHealthStats, HealthStats as HealthStatsData } from '../../services/healthStatsService';
 
 // BMI Background with Shorter Bars
 const BMIBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Shorter Bars - Reduced Height Values */}
     <div className="absolute inset-4 flex items-end justify-between">
       {[0.1, 0.2, 0.15, 0.3, 0.25, 0.4, 0.3, 0.45, 0.35, 0.5, 0.4, 0.45].map((height, i) => (
         <div
@@ -21,7 +21,6 @@ const BMIBackground = () => (
 const WaterBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Line Chart Spanning Card */}
     <div className="absolute inset-4">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <polyline
@@ -46,7 +45,6 @@ const WaterBackground = () => (
 const CaloriesBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Shorter Bars - Reduced Height Values */}
     <div className="absolute inset-4 flex items-end justify-between">
       {[0.15, 0.25, 0.2, 0.35, 0.3, 0.4, 0.25, 0.45, 0.35, 0.3, 0.4, 0.3, 0.35, 0.45, 0.4].map((height, i) => (
         <div
@@ -62,10 +60,8 @@ const CaloriesBackground = () => (
 const StepsBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Double line chart spanning card */}
     <div className="absolute inset-8">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {/* Goal line */}
         <polyline
           className="text-gray-500"
           stroke="currentColor"
@@ -74,7 +70,6 @@ const StepsBackground = () => (
           strokeDasharray="5,5"
           points="5,30 15,32 25,28 35,31 45,29 55,30 65,28 75,31 85,29 95,30"
         />
-        {/* Actual progress line */}
         <polyline
           className="text-gray-600"
           stroke="currentColor"
@@ -90,10 +85,8 @@ const StepsBackground = () => (
 const SleepBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Sleep pattern wave chart */}
     <div className="absolute inset-6">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {/* Sleep wave pattern */}
         <polyline
           className="text-gray-600"
           stroke="currentColor"
@@ -101,7 +94,6 @@ const SleepBackground = () => (
           fill="none"
           points="5,70 15,60 25,75 35,50 45,80 55,40 65,70 75,45 85,75 95,60"
         />
-        {/* Deep sleep line */}
         <polyline
           className="text-gray-500"
           stroke="currentColor"
@@ -118,10 +110,8 @@ const SleepBackground = () => (
 const HeartRateBackground = () => (
   <div className="absolute inset-0 opacity-25">
     <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Heart rate pattern */}
     <div className="absolute inset-6">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {/* Heart rate spikes */}
         <polyline
           className="text-gray-600"
           stroke="currentColor"
@@ -129,7 +119,6 @@ const HeartRateBackground = () => (
           fill="none"
           points="5,60 10,40 15,60 20,30 25,60 30,35 35,60 40,45 45,60 50,25 55,60 60,40 65,60 70,50 75,60 80,35 85,60 90,45 95,60"
         />
-        {/* Resting heart rate line */}
         <polyline
           className="text-gray-500"
           stroke="currentColor"
@@ -162,7 +151,6 @@ const HealthStatCard: React.FC<HealthStatCardProps> = ({
 }) => {
   return (
     <div className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 bg-white rounded-xl border border-gray-100 hover:border-gray-200 overflow-hidden relative">
-      {/* Subtle background visualization */}
       {Chart && (
         <div className="absolute inset-0">
           <Chart />
@@ -205,11 +193,40 @@ interface HealthStatsProps {
   error?: string | null;
 }
 
-const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
-  if (loading) {
+const HealthStats: React.FC<HealthStatsProps> = ({ loading: externalLoading, error: externalError }) => {
+  const [healthData, setHealthData] = useState<HealthStatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHealthStats = async () => {
+      try {
+        setLoading(true);
+        const result = await getTodayHealthStats();
+        
+        if (result.success && result.data) {
+          setHealthData(result.data);
+          setError(null);
+        } else {
+          setError(result.error || 'Failed to load health stats');
+        }
+      } catch (err) {
+        console.error('Error fetching health stats:', err);
+        setError('Failed to load health stats');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHealthStats();
+  }, []);
+
+  const isLoading = externalLoading !== undefined ? externalLoading : loading;
+  const displayError = externalError !== undefined ? externalError : error;
+
+  if (isLoading) {
     return (
       <div className="flex flex-col space-y-4">
-        {/* Section Header */}
         <div className="space-y-1 flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">
             Health Overview
@@ -217,7 +234,6 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           <div className="w-10 h-0.5 bg-linear-to-r from-gray-300 to-gray-400 rounded-full"></div>
         </div>
 
-        {/* Loading Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
@@ -237,10 +253,9 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
     );
   }
 
-  if (error) {
+  if (displayError) {
     return (
       <div className="flex flex-col space-y-4">
-        {/* Section Header */}
         <div className="space-y-1 flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">
             Health Overview
@@ -249,7 +264,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center flex items-center justify-center min-h-[200px]">
-          <p className="text-red-500 text-sm">Error: {error}</p>
+          <p className="text-red-500 text-sm">Error: {displayError}</p>
         </div>
       </div>
     );
@@ -257,7 +272,6 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
 
   return (
     <div className="flex flex-col space-y-4">
-      {/* Section Header */}
       <div className="space-y-1 flex-shrink-0">
         <h2 className="text-xl font-bold text-gray-900 tracking-tight">
           Health Overview
@@ -265,28 +279,27 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
         <div className="w-10 h-0.5 bg-linear-to-r from-gray-300 to-gray-400 rounded-full"></div>
       </div>
 
-      {/* Health Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         <HealthStatCard
           title="BMI"
-          value="22.5"
-          subtitle="Normal"
+          value={healthData?.bmi?.value ? healthData.bmi.value.toString() : "N/A"}
+          subtitle={healthData?.bmi?.category || "No data"}
           icon={Activity}
           color="bg-linear-to-br from-gray-600 to-gray-700"
           chart={BMIBackground}
         />
         <HealthStatCard
           title="Water Intake"
-          value="2.5L"
-          subtitle="Goal: 2.5L"
+          value={healthData?.waterIntake ? `${healthData.waterIntake.current}L` : "0L"}
+          subtitle={healthData?.waterIntake ? `Goal: ${healthData.waterIntake.goal}L` : "Goal: 2.5L"}
           icon={Droplets}
           color="bg-linear-to-br from-gray-500 to-gray-600"
           chart={WaterBackground}
         />
         <HealthStatCard
           title="Calories"
-          value="2,200"
-          subtitle="Goal: 2,000"
+          value={healthData?.calories ? healthData.calories.current.toLocaleString() : "0"}
+          subtitle={healthData?.calories ? `Goal: ${healthData.calories.goal.toLocaleString()}` : "Goal: 2,000"}
           icon={Utensils}
           color="bg-linear-to-br from-gray-700 to-gray-800"
           chart={CaloriesBackground}
@@ -304,8 +317,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="7.5h"
           subtitle="Goal: 8h"
           icon={Heart}
-          color="bg-linear-to-br from-gray-500 to-gray-600"
-          size="small"
+          color="bg-gradient-to-br from-gray-500 to-gray-600"
           chart={SleepBackground}
         />
         <HealthStatCard
@@ -313,8 +325,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="72"
           subtitle="BPM"
           icon={Zap}
-          color="bg-linear-to-br from-gray-700 to-gray-800"
-          size="small"
+          color="bg-gradient-to-br from-gray-700 to-gray-800"
           chart={HeartRateBackground}
         />
       </div>

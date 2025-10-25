@@ -7,7 +7,7 @@ import CoachPage from './pages/CoachPage';
 import DashboardPage from './pages/DashboardPage';
 import ScannerPage from './pages/ScannerPage';
 import TrackerPage from './pages/TrackerPage';
-import PlannerPage from './pages/PlannerPage';
+import Diary from './pages/Diary'
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Layout from './components/layout/Layout';
@@ -45,7 +45,7 @@ const PulseaiInterface: React.FC = () => {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/scanner" element={<ScannerPage />} />
               <Route path="/tracker" element={<TrackerPage />} />
-              <Route path="/planner" element={<PlannerPage />} />
+              <Route path="/planner" element={<Diary />} />
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
 
