@@ -1,129 +1,21 @@
-🧬 AI-Based Healthcare Platform – User Flow
-Step 1: Landing / Homepage
+# Pulse.ai Technical Context
 
-User visits the platform.
+## Core Architecture
+Dual-agent AI system: Analyzer (context gathering) + Coach (response generation). Supabase backend with 8 tables: users, user_profiles, health_metrics, daily_tracking, diet_entries, habits, reminders, recent_chats.
 
-Presented with:
+## Data Flow
+User query → Analyzer fetches all 8 tables → Context synthesis → Coach generates response → Stores in recent_chats. @-mention system for specific data access.
 
-Quick intro / tagline
+## Key Features
+- Image analysis: Meal recognition with nutrition breakdown
+- Dual agent: Context-aware health recommendations
+- Real-time tracking: Daily health metrics, hydration, sleep
+- Behavioral patterns: Habit tracking with streaks/badges
+- Immunity scoring: Multi-factor health index calculation
+- Dietary management: Allergy/condition-aware recommendations
 
-“Start your personalized health journey” CTA → triggers onboarding form.
+## Implementation
+React 19.2.0, TypeScript, Tailwind CSS 4.x, Supabase, Groq API (gpt-oss-20b), Framer Motion. RLS policies ensure data privacy.
 
-Optional: preview of recent chats (from /chat_history) for returning users.
-
-Step 2: Onboarding / Profile Setup
-
-User fills in personal health form:
-
-Basic stats: height, weight → calculate BMI
-
-Lifestyle: gym/no gym, sleep patterns, daily activity
-
-Diet: veg/non-veg/jain, likes/dislikes, allergies
-
-Health conditions / diseases
-
-Self-assessment: immunity rating / last illness
-
-All inputs stored in Supabase user profile.
-
-✅ Outcome: User now has a personalized profile that feeds every AI recommendation.
-
-Step 3: Dual-Agent Chat Interface (/chat)
-
-User can ask any health-related query:
-
-Food suggestions, meal advice, immunity tips, exercise recommendations.
-
-Agent Flow:
-
-Analyzer Agent: fetches user profile + tracker data + chat history → summarizes context.
-
-Coach Agent: reads Analyzer context → replies with personalized, actionable advice.
-
-Chat remembers previous interactions → AI can reference past suggestions or trends.
-
-Example:
-
-User: “Can I eat pizza tonight?”
-AI: “You had pizza earlier today, and your calorie intake is high — better skip it.”
-
-Step 4: Image Query of Food
-
-User can upload a food photo inside chat or dedicated module.
-
-AI identifies the meal → returns:
-
-Calories, nutrient breakdown, health impact, immunity effect
-
-Personalized recommendation based on user profile (allergies, diet type, goals).
-
-Step 5: Intake & Diet Management
-
-User logs meals, hydration, and optionally workouts.
-
-Diet Agent tracks:
-
-Daily calorie intake
-
-Nutrient balance
-
-Water consumption
-
-Recommends:
-
-Recipes & meal suggestions
-
-Supplements if required
-
-All logs automatically update Tracker Dashboard.
-
-Step 6: Tracker / Dashboard
-
-Unified health hub showing:
-
-Diet plans & intake history
-
-Water & workout logs
-
-Calendar view of daily totals (calories, hydration, activity)
-
-Immunity Index (computed from BMI, diet, activity, last illness)
-
-Gamification & streaks (hydration streaks, diet compliance badges)
-
-Users can monitor progress trends visually.
-
-Step 7: Chat History & Quick Access
-
-On homepage or inside dashboard:
-
-View past chats for reference
-
-Click to reopen conversation in dual-agent chat interface
-
-Helps AI retain memory and provide consistent advice over time.
-
-Step 8: Continuous Engagement
-
-AI proactively suggests:
-
-Daily meals
-
-Hydration reminders
-
-Weekly immunity insights
-
-Goal nudges based on streaks or missed targets
-
-✅ Outcome: The platform feels alive, responsive, and hyper-personalized.
-
-💡 Crux:
-
-User onboarding → profile creation → dual-agent chat → image + diet logging → unified tracker → gamification → proactive insights.
-
-Every feature is interconnected, feeding Supabase → AI → Tracker → User.
-
-also in the avatar, ad user avatar once their auth is completed
-
-also add their name in the dashboard
+## Tech Stack
+Frontend: React, TypeScript, Tailwind, Supabase auth. Backend: Supabase DB, Groq LLM integration. AI: Dual-agent context synthesis, image analysis, pattern recognition.
