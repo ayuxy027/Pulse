@@ -7,7 +7,6 @@ import React, { useState, useEffect } from 'react';
 import { Flame, TrendingUp, Droplet, Apple, Clock, Trash2, Loader2 } from 'lucide-react';
 import { getDietEntriesByDate, deleteDietEntry } from '../../services/dietEntryService';
 import { getUserHabits } from '../../services/habitsService';
-import { updateTodaySummary } from '../../services/daySummaryService';
 import { DietEntry, MealType } from '../../types/dietEntry';
 import { Habit } from '../../types/habits';
 
@@ -55,8 +54,6 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
 
   useEffect(() => {
     fetchTodayData();
-    // Update daily summary when component mounts or refreshes
-    updateTodaySummary();
   }, [refreshTrigger]);
 
   const fetchTodayData = async () => {
@@ -121,8 +118,6 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
       const result = await deleteDietEntry(entryId);
       if (result.success) {
         await fetchTodayData();
-        // Update the daily summary table
-        await updateTodaySummary();
       }
     }
   };
