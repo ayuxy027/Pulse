@@ -29,7 +29,7 @@ const AddTasksForm: React.FC<AddTasksFormProps> = ({ onTaskAdd }) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!formData.title.trim() || !formData.time) {
             return;
         }
@@ -39,7 +39,7 @@ const AddTasksForm: React.FC<AddTasksFormProps> = ({ onTaskAdd }) => {
         // Simulate API call
         setTimeout(() => {
             onTaskAdd?.(formData);
-            
+
             // Reset form
             setFormData({
                 title: '',
@@ -47,10 +47,10 @@ const AddTasksForm: React.FC<AddTasksFormProps> = ({ onTaskAdd }) => {
                 priority: 'medium',
                 date: new Date().toISOString().split('T')[0]
             });
-            
+
             setIsSubmitting(false);
             setSuccessMessage(true);
-            
+
             // Hide success message after 3 seconds
             setTimeout(() => {
                 setSuccessMessage(false);
@@ -68,7 +68,7 @@ const AddTasksForm: React.FC<AddTasksFormProps> = ({ onTaskAdd }) => {
                 <h3 className="text-lg font-semibold text-gray-900">
                     Add Tasks
                 </h3>
-                <div className="p-2 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100">
+                <div className="p-2 rounded-lg bg-linear-to-br from-purple-100 to-pink-100">
                     <Sparkles size={18} className="text-purple-600" />
                 </div>
             </div>
@@ -129,33 +129,30 @@ const AddTasksForm: React.FC<AddTasksFormProps> = ({ onTaskAdd }) => {
                         <button
                             type="button"
                             onClick={() => handleChange('priority', 'high')}
-                            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                formData.priority === 'high'
-                                    ? 'bg-red-500 text-white shadow-md shadow-red-200'
-                                    : 'bg-red-50 text-red-700 hover:bg-red-100'
-                            }`}
+                            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${formData.priority === 'high'
+                                ? 'bg-red-500 text-white shadow-md shadow-red-200'
+                                : 'bg-red-50 text-red-700 hover:bg-red-100'
+                                }`}
                         >
                             High
                         </button>
                         <button
                             type="button"
                             onClick={() => handleChange('priority', 'medium')}
-                            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                formData.priority === 'medium'
-                                    ? 'bg-yellow-500 text-white shadow-md shadow-yellow-200'
-                                    : 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
-                            }`}
+                            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${formData.priority === 'medium'
+                                ? 'bg-yellow-500 text-white shadow-md shadow-yellow-200'
+                                : 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
+                                }`}
                         >
                             Medium
                         </button>
                         <button
                             type="button"
                             onClick={() => handleChange('priority', 'low')}
-                            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                formData.priority === 'low'
-                                    ? 'bg-green-500 text-white shadow-md shadow-green-200'
-                                    : 'bg-green-50 text-green-700 hover:bg-green-100'
-                            }`}
+                            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${formData.priority === 'low'
+                                ? 'bg-green-500 text-white shadow-md shadow-green-200'
+                                : 'bg-green-50 text-green-700 hover:bg-green-100'
+                                }`}
                         >
                             Low
                         </button>
@@ -166,11 +163,10 @@ const AddTasksForm: React.FC<AddTasksFormProps> = ({ onTaskAdd }) => {
                 <button
                     type="submit"
                     disabled={isSubmitting || !formData.title.trim() || !formData.time}
-                    className={`w-full py-3 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 ${
-                        isSubmitting || !formData.title.trim() || !formData.time
-                            ? 'bg-gray-300 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg shadow-purple-200 hover:shadow-xl'
-                    }`}
+                    className={`w-full py-3 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 ${isSubmitting || !formData.title.trim() || !formData.time
+                        ? 'bg-gray-300 cursor-not-allowed'
+                        : 'bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg shadow-purple-200 hover:shadow-xl'
+                        }`}
                 >
                     {isSubmitting ? (
                         <>
@@ -202,19 +198,19 @@ const AddTasksForm: React.FC<AddTasksFormProps> = ({ onTaskAdd }) => {
                 </h4>
                 <div className="space-y-2">
                     <div className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 shrink-0"></div>
                         <p className="text-xs text-gray-600">
                             Set reminders for hydration every 2 hours
                         </p>
                     </div>
                     <div className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-pink-400 mt-1.5 flex-shrink-0"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-pink-400 mt-1.5 shrink-0"></div>
                         <p className="text-xs text-gray-600">
                             Plan meals ahead for better tracking
                         </p>
                     </div>
                     <div className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 shrink-0"></div>
                         <p className="text-xs text-gray-600">
                             High priority tasks appear first
                         </p>

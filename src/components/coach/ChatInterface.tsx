@@ -3,7 +3,8 @@ import { AgentService } from '../../services/agentService';
 import { getSupabaseUser } from '../../services/authService';
 import ChatInput from './ChatInput';
 import MarkdownRenderer from '../ui/MarkdownRenderer';
-import { Bot, Loader2, Zap, Database } from 'lucide-react';
+import { Bot, Loader2, Zap, Database, Sparkles, Brain, CheckCircle, Clock, User } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ChatMessage {
     id: string;
@@ -158,104 +159,151 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
     }, []);
 
     return (
-        <div className="flex flex-col h-full bg-white">
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
-                {messages.map((message) => (
-                    <div
-                        key={message.id}
-                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                        <div className="flex gap-3 max-w-4xl">
-                            {/* Avatar for assistant */}
-                            {message.role === 'assistant' && (
-                                <div className="shrink-0">
-                                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                                        <Bot className="w-5 h-5 text-white" />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Message Content */}
-                            <div
-                                className={`rounded-2xl px-4 py-3 ${message.role === 'user'
-                                    ? 'bg-blue-500 text-white'
-                                    : 'bg-gray-100 text-gray-800 shadow-sm border border-gray-100'
-                                    }`}
-                            >
-                                {/* Message Content */}
-                                <div className="prose prose-sm max-w-none">
-                                    {message.role === 'assistant' ? (
-                                        <MarkdownRenderer content={message.content} fontSize={14} />
-                                    ) : (
-                                        <p className="whitespace-pre-wrap">{message.content}</p>
-                                    )}
-                                </div>
-
-                                {/* Tool Calls - Tech Style */}
-                                {message.toolCalls && message.toolCalls.length > 0 && (
-                                    <div className="mt-3 space-y-2 pt-2 border-t border-gray-200/50">
-                                        {message.toolCalls.map((toolCall) => (
-                                            <div
-                                                key={toolCall.id}
-                                                className="flex items-center gap-2 text-xs font-mono"
-                                            >
-                                                <div className="flex items-center gap-1.5">
-                                                    {toolCall.status === 'initiated' && (
-                                                        <>
-                                                            <Zap className="w-3 h-3 text-yellow-500" />
-                                                            <span className="text-cyan-400">Tool call initiated</span>
-                                                            <span className="text-gray-500">→</span>
-                                                            <span className="text-purple-400">@{toolCall.tool}</span>
-                                                        </>
-                                                    )}
-                                                    {toolCall.status === 'fetching' && (
-                                                        <>
-                                                            <Database className="w-3 h-3 text-blue-500 animate-pulse" />
-                                                            <span className="text-blue-400">Fetching</span>
-                                                            <span className="text-gray-500">from Supabase</span>
-                                                            <span className="text-gray-500">→</span>
-                                                            <span className="text-green-400">@{toolCall.tool}</span>
-                                                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
-                                                        </>
-                                                    )}
-                                                    {toolCall.status === 'completed' && (
-                                                        <>
-                                                            <Database className="w-3 h-3 text-green-500" />
-                                                            <span className="text-green-400">Fetched</span>
-                                                            <span className="text-gray-500">@{toolCall.tool}</span>
-                                                            <span className="text-green-500 ml-1">✓</span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
+        <div className="flex flex-col h-full bg-[#f8f6f1]">
+            {/* Messages Area - No header here since it's in CoachPage */}
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 bg-[#f8f6f1]">
+                <AnimatePresence>
+                    {messages.map((message, index) => (
+                        <motion.div
+                            key={message.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                            <div className="flex gap-4 max-w-4xl">
+                                {/* Avatar - Only for assistant */}
+                                {message.role === 'assistant' && (
+                                    <div className="shrink-0">
+                                        <div className="w-10 h-10 rounded-xl bg-gray-700 flex items-center justify-center shadow-sm">
+                                            <Bot className="w-5 h-5 text-white" />
+                                        </div>
                                     </div>
                                 )}
 
-                                {/* Timestamp */}
-                                <div className={`text-xs mt-2 opacity-70`}>
-                                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </div>
+                                {/* Message Content */}
+                                <motion.div
+                                    initial={{ scale: 0.95 }}
+                                    animate={{ scale: 1 }}
+                                    className={`rounded-xl px-5 py-4 max-w-2xl shadow-sm ${message.role === 'user'
+                                            ? 'bg-gray-700 text-white'
+                                            : 'bg-white text-gray-800 border border-gray-200'
+                                        }`}
+                                >
+                                    {/* Message Content */}
+                                    <div className="prose prose-sm max-w-none">
+                                        {message.role === 'assistant' ? (
+                                            <MarkdownRenderer
+                                                content={message.content}
+                                                fontSize={14}
+                                                color="#374151"
+                                            />
+                                        ) : (
+                                            <p className="whitespace-pre-wrap text-white text-sm leading-relaxed tracking-tight">{message.content}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Tool Calls - Beautiful Style */}
+                                    {message.toolCalls && message.toolCalls.length > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            className="mt-4 space-y-3 pt-4 border-t border-gray-200/50"
+                                        >
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <Sparkles className="w-4 h-4 text-gray-600" />
+                                                <span className="text-sm font-medium tracking-tight text-gray-700">Fetching your data...</span>
+                                            </div>
+                                            {message.toolCalls.map((toolCall, idx) => (
+                                                <motion.div
+                                                    key={toolCall.id}
+                                                    initial={{ opacity: 0, x: -10 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: idx * 0.1 }}
+                                                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        {toolCall.status === 'initiated' && (
+                                                            <>
+                                                                <div className="p-1.5 bg-gray-200 rounded-lg">
+                                                                    <Zap className="w-3 h-3 text-gray-600" />
+                                                                </div>
+                                                                <span className="text-sm font-medium tracking-tight text-gray-700">Initializing</span>
+                                                                <span className="text-gray-400">→</span>
+                                                                <span className="text-sm font-semibold tracking-tight text-gray-800">@{toolCall.tool}</span>
+                                                            </>
+                                                        )}
+                                                        {toolCall.status === 'fetching' && (
+                                                            <>
+                                                                <div className="p-1.5 bg-gray-200 rounded-lg">
+                                                                    <Database className="w-3 h-3 text-gray-600 animate-pulse" />
+                                                                </div>
+                                                                <span className="text-sm font-medium tracking-tight text-gray-700">Fetching</span>
+                                                                <span className="text-gray-400">from database</span>
+                                                                <span className="text-gray-400">→</span>
+                                                                <span className="text-sm font-semibold tracking-tight text-gray-800">@{toolCall.tool}</span>
+                                                                <div className="w-2 h-2 bg-gray-600 rounded-full animate-ping"></div>
+                                                            </>
+                                                        )}
+                                                        {toolCall.status === 'completed' && (
+                                                            <>
+                                                                <div className="p-1.5 bg-gray-200 rounded-lg">
+                                                                    <CheckCircle className="w-3 h-3 text-gray-700" />
+                                                                </div>
+                                                                <span className="text-sm font-medium tracking-tight text-gray-700">Completed</span>
+                                                                <span className="text-gray-400">@{toolCall.tool}</span>
+                                                                <span className="text-gray-600 ml-1">✓</span>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </motion.div>
+                                    )}
+
+                                    {/* Timestamp */}
+                                    <div className={`flex items-center gap-2 mt-3 text-xs tracking-tight ${message.role === 'user' ? 'text-white/60' : 'text-gray-400'}`}>
+                                        <Clock className="w-3 h-3" />
+                                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                </motion.div>
                             </div>
-                        </div>
-                    </div>
-                ))}
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
 
                 {/* Loading Indicator */}
-                {isLoading && (
-                    <div className="flex justify-start">
-                        <div className="flex gap-3 max-w-4xl">
-                            <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center shrink-0">
-                                <Bot className="w-5 h-5 text-white" />
+                <AnimatePresence>
+                    {isLoading && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="flex justify-start"
+                        >
+                            <div className="flex gap-4 max-w-4xl">
+                                <div className="w-10 h-10 rounded-xl bg-gray-700 flex items-center justify-center shadow-sm shrink-0">
+                                    <Bot className="w-5 h-5 text-white" />
+                                </div>
+                                <motion.div
+                                    initial={{ scale: 0.95 }}
+                                    animate={{ scale: 1 }}
+                                    className="bg-white text-gray-800 rounded-xl px-5 py-4 shadow-sm border border-gray-200 flex items-center gap-3"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-2 bg-gray-100 rounded-lg">
+                                            <Brain className="w-4 h-4 text-gray-700 animate-pulse" />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Loader2 className="w-4 h-4 animate-spin text-gray-600" />
+                                            <span className="text-sm font-medium tracking-tight text-gray-700">AI is thinking...</span>
+                                        </div>
+                                    </div>
+                                </motion.div>
                             </div>
-                            <div className="bg-gray-100 text-gray-800 rounded-2xl px-4 py-3 shadow-sm border border-gray-100 flex items-center gap-2">
-                                <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                                <span className="text-sm text-gray-600">Thinking...</span>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 <div ref={messagesEndRef} />
             </div>

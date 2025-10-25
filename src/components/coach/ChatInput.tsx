@@ -183,7 +183,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
     if (showWrapper) {
         return (
-            <div className="w-full p-4 bg-gray-50 border-t border-gray-200">
+            <div className="w-full p-4 bg-[#f8f6f1] border-t border-gray-200">
                 {inputContent}
             </div>
         );
