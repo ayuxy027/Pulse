@@ -59,7 +59,7 @@ const ScannerPage: React.FC = () => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 setUploadedImage(e.target?.result as string);
-                setIsImageUploaded(true); // Fix: Set this state to show preview
+                setIsImageUploaded(true);
             };
             reader.readAsDataURL(file);
         }
@@ -91,19 +91,25 @@ const ScannerPage: React.FC = () => {
         setCurrentStep(0);
 
         try {
-            // Simulate processing steps with progress
+            // Send API request and run progress animation concurrently
+            addProcessingStep("Initializing AI analysis pipeline...");
+            setAnalysisProgress(15);
+
+            // Start API request
+            const apiPromise = analyzeFoodImage(uploadedImage);
+
+            // Run progress animation concurrently
             const steps = [
-                { message: "Initializing AI analysis pipeline...", duration: 1000 },
                 { message: "Uploading image to cloud...", duration: 1500 },
                 { message: "Performing cloud-based image analysis...", duration: 2000 },
-                { message: "Running AI model predictions...", duration: 2500 },
-                { message: "Analyzing nutrition patterns...", duration: 2000 },
+                { message: "Running AI model predictions...", duration: 2000 },
+                { message: "Analyzing nutrition patterns...", duration: 1500 },
                 { message: "Generating health recommendations...", duration: 1500 },
                 { message: "Finalizing analysis report...", duration: 1000 },
             ];
 
-            let progress = 0;
-            const progressIncrement = 100 / steps.length;
+            let progress = 15;
+            const progressIncrement = (85) / steps.length;
 
             for (let i = 0; i < steps.length; i++) {
                 const step = steps[i];
@@ -113,21 +119,23 @@ const ScannerPage: React.FC = () => {
                 const startProgress = progress;
                 const endProgress = progress + progressIncrement;
                 const duration = step.duration;
-                const startTime = Date.now();
+                const stepStart = Date.now();
 
                 while (progress < endProgress) {
-                    const elapsed = Date.now() - startTime;
+                    const elapsed = Date.now() - stepStart;
                     const percentage = Math.min(elapsed / duration, 1);
                     progress = startProgress + progressIncrement * percentage;
                     setAnalysisProgress(Math.min(progress, 99));
                     await new Promise((r) => setTimeout(r, 50));
                 }
-                await new Promise((r) => setTimeout(r, 200));
+                await new Promise((r) => setTimeout(r, 100));
             }
 
-            const result = await analyzeFoodImage(uploadedImage);
+            // Wait for API to complete
+            const result = await apiPromise;
+
             setAnalysisProgress(100);
-            await new Promise((r) => setTimeout(r, 500));
+            await new Promise((r) => setTimeout(r, 300));
             addProcessingStep("Analysis complete!");
             setAnalysisResult(result);
         } catch (err) {
@@ -207,6 +215,49 @@ const ScannerPage: React.FC = () => {
                         <h3 className="font-semibold text-gray-900 text-sm mb-1">Smart Tracking</h3>
                         <p className="text-gray-600 text-xs">Monitor your nutrition intake and health progress over time</p>
                     </div>
+                </motion.div>
+
+                {/* Features Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3"
+                >
+                    {[
+                        {
+                            icon: BsDatabaseCheck,
+                            title: "Accurate Analysis",
+                            description: "AI-powered detection of food items and nutritional content"
+                        },
+                        {
+                            icon: LuFileHeart,
+                            title: "Health Tracking",
+                            description: "Track calories, macros, and dietary information effortlessly"
+                        },
+                        {
+                            icon: MdOutlineZoomInMap,
+                            title: "Detailed Insights",
+                            description: "Get personalized recommendations based on your health profile"
+                        }
+                    ].map((feature, index) => {
+                        const FeatureIcon = feature.icon;
+                        return (
+                            <motion.div
+                                key={index}
+                                whileHover={{ y: -5 }}
+                                className="p-6 bg-white rounded-lg shadow-md border border-gray-200"
+                            >
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="p-3 rounded-lg bg-gray-100">
+                                        <FeatureIcon className="w-6 h-6 text-gray-700" />
+                                    </div>
+                                    <h3 className="font-semibold text-gray-900">{feature.title}</h3>
+                                </div>
+                                <p className="text-sm text-gray-600">{feature.description}</p>
+                            </motion.div>
+                        );
+                    })}
                 </motion.div>
 
                 {/* Upload Section */}
@@ -488,29 +539,30 @@ const ScannerPage: React.FC = () => {
                                 </span>
                             </motion.div>
 
-                            {/* Image Preview in Results */}
+                            {/* Scanned Image Section */}
+                            {uploadedImage && (
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3 }}
-                                className="mb-8"
+                                transition={{ delay: 0.25 }}
+                                className="p-6 bg-white rounded-xl shadow-lg border border-gray-200"
                             >
-                                <div className="max-w-2xl mx-auto">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">
-                                        Scanned Image
-                                    </h3>
-                                    <div className="relative overflow-hidden rounded-2xl shadow-xl border border-gray-200">
-                                        <img
-                                            src={uploadedImage || ''}
-                                            alt="Scanned food"
-                                            className="w-full h-64 object-cover"
-                                        />
-                                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-                                            <span className="text-sm font-medium text-gray-700">AI Analyzed</span>
-                                        </div>
+                                <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                                    Scanned Image
+                                </h3>
+                                <div className="relative h-80 w-full overflow-hidden rounded-lg shadow-md">
+                                    <img
+                                        src={uploadedImage}
+                                        alt="Scanned food"
+                                        className="absolute inset-0 w-full h-full object-contain bg-gray-50"
+                                    />
+                                    <div className="absolute top-3 right-3 flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-md">
+                                        <GiMuscleUp className="w-4 h-4 text-gray-600" />
+                                        <span className="text-xs font-semibold text-gray-700">AI Analyzed</span>
                                     </div>
                                 </div>
                             </motion.div>
+                            )}
 
                             {/* Top Row - Key Metrics */}
                             <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 md:grid-cols-2">
@@ -704,7 +756,7 @@ const ScannerPage: React.FC = () => {
                                                 transition={{ duration: 1, delay: 0.8 }}
                                             ></motion.div>
                                         </div>
-                                        <span className="text-sm font-bold text-gray-800">~{analysisResult.confidenceLevel}%</span>
+                                        <span className="pt-2 text-sm font-medium text-gray-700">{analysisResult.confidenceLevel}%</span>
                                     </div>
                                 </div>
                             </motion.div>
