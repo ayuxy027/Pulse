@@ -62,8 +62,13 @@ const CalendarView: React.FC = () => {
     const entriesResult = await getUserDietEntries(firstDay + 'T00:00:00', lastDay);
     if (entriesResult.success && entriesResult.data) {
       entriesResult.data.forEach(entry => {
-        // Extract just the date part from created_at timestamp
-        const entryDate = entry.created_at.split('T')[0];
+        // For meals, use meal_date. For water, use created_at date
+        let entryDate: string;
+        if (entry.entry_type === 'meal' && entry.meal_date) {
+          entryDate = entry.meal_date;
+        } else {
+          entryDate = entry.created_at.split('T')[0];
+        }
         datesSet.add(entryDate);
       });
     }

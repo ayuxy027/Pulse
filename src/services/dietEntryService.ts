@@ -134,11 +134,17 @@ export async function getDietEntriesByDate(
       return { success: false, error: 'User not authenticated' };
     }
 
-    const { data, error } = await supabase
+    // Get entries where:
+    // - meal_date matches the date (for meals)
+    // - OR created_at is on that date (for water entries)
+    const startOfDay = `${date}T00:00:00`;
+    const endOfDay = `${date}T23:59:59`;
+
+    const { data: entries, error } = await supabase
       .from('diet_entries')
       .select('*')
       .eq('user_id', user.id)
-      .or(`meal_date.eq.${date},created_at.gte.${date}T00:00:00,created_at.lte.${date}T23:59:59`)
+      .or(`meal_date.eq.${date},and(created_at.gte.${startOfDay},created_at.lte.${endOfDay})`)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -146,7 +152,7 @@ export async function getDietEntriesByDate(
       return { success: false, error: error.message };
     }
 
-    return { success: true, data: data || [] };
+    return { success: true, data: entries || [] };
   } catch (error) {
     console.error('Unexpected error fetching diet entries by date:', error);
     return { success: false, error: 'Failed to fetch diet entries' };
