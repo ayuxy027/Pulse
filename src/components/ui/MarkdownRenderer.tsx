@@ -42,121 +42,72 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
     // Custom components to maintain styling consistency
     const components: Components = {
-        // Headers
+        // Headers - Simple and formal
         h1: ({ children, ...props }) => (
             <h1 {...props} style={{
-                fontSize: `${fontSize * 1.8}px`,
-                fontWeight: '800',
-                margin: '16px 0 12px 0',
+                fontSize: `${fontSize * 1.5}px`,
+                fontWeight: '700',
+                margin: '12px 0 8px 0',
                 color: '#1f2937',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                borderBottom: '4px solid #e5e7eb',
-                paddingBottom: '12px',
-                textAlign: 'center'
+                borderBottom: '2px solid #e5e7eb',
+                paddingBottom: '8px'
             }}>
                 {children}
             </h1>
         ),
         h2: ({ children, ...props }) => (
             <h2 {...props} style={{
-                fontSize: `${fontSize * 1.4}px`,
-                fontWeight: '700',
-                margin: '16px 0 8px 0',
-                color: '#1f2937',
-                background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                borderLeft: '6px solid #3b82f6',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
+                fontSize: `${fontSize * 1.3}px`,
+                fontWeight: '600',
+                margin: '10px 0 6px 0',
+                color: '#374151'
             }}>
                 {children}
             </h2>
         ),
         h3: ({ children, ...props }) => (
             <h3 {...props} style={{
-                fontSize: `${fontSize * 1.2}px`,
+                fontSize: `${fontSize * 1.1}px`,
                 fontWeight: '600',
-                margin: '12px 0 6px 0',
-                color: '#4b5563',
-                backgroundColor: '#f1f5f9',
-                padding: '8px 12px',
-                borderRadius: '8px',
-                borderLeft: '3px solid #10b981'
+                margin: '8px 0 4px 0',
+                color: '#4b5563'
             }}>
                 {children}
             </h3>
         ),
 
-        // Lists
+        // Lists - Simple and clean
         ul: ({ children, ...props }) => (
             <ul {...props} style={{
-                margin: '12px 0',
-                paddingLeft: '0',
-                background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                borderRadius: '16px',
-                padding: '16px 20px',
-                border: '2px solid #e2e8f0',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
-                listStyle: 'none'
+                margin: '8px 0',
+                paddingLeft: '20px'
             }}>
                 {children}
             </ul>
         ),
         ol: ({ children, ...props }) => (
             <ol {...props} style={{
-                margin: '12px 0',
-                paddingLeft: '0',
-                background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                borderRadius: '16px',
-                padding: '16px 20px',
-                border: '2px solid #e2e8f0',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
-                listStyle: 'none'
+                margin: '8px 0',
+                paddingLeft: '20px'
             }}>
                 {children}
             </ol>
         ),
         li: ({ children, ...props }) => (
             <li {...props} style={{
-                margin: '8px 0',
-                lineHeight: '1.7',
-                color: '#374151',
-                padding: '8px 12px',
-                borderRadius: '8px',
-                backgroundColor: '#f8fafc',
-                borderLeft: '4px solid #3b82f6',
-                position: 'relative',
-                paddingLeft: '32px'
+                margin: '4px 0',
+                lineHeight: '1.6',
+                color: '#374151'
             }}>
-                <span style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '8px',
-                    height: '8px',
-                    backgroundColor: '#3b82f6',
-                    borderRadius: '50%'
-                }}></span>
                 {children}
             </li>
         ),
 
-        // Emphasis
+        // Emphasis - Simple and formal
         strong: ({ children, ...props }) => (
             <strong {...props} style={{
-                fontWeight: '800',
-                color: '#1f2937',
-                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                padding: '4px 8px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                border: '1px solid #f59e0b'
+                fontWeight: '600',
+                color: '#1f2937'
             }}>
                 {children}
             </strong>
@@ -164,11 +115,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         em: ({ children, ...props }) => (
             <em {...props} style={{
                 fontStyle: 'italic',
-                color: '#6b7280',
-                backgroundColor: '#f1f5f9',
-                padding: '2px 6px',
-                borderRadius: '6px',
-                border: '1px solid #d1d5db'
+                color: '#6b7280'
             }}>
                 {children}
             </em>

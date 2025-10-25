@@ -44,26 +44,26 @@ const ToolCallNotification: React.FC<ToolCallNotificationProps> = ({
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             className={`mt-4 p-4 rounded-2xl border-2 ${isAutoDetected
-                    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'
-                    : 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200'
+                ? 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-300'
+                : 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200'
                 }`}
         >
             {/* Header */}
             <div className="flex items-center gap-3 mb-4">
-                <div className={`p-2 rounded-xl ${isAutoDetected ? 'bg-blue-100' : 'bg-gray-100'
+                <div className={`p-2 rounded-xl ${isAutoDetected ? 'bg-gray-200' : 'bg-gray-100'
                     }`}>
                     {isAutoDetected ? (
-                        <Brain className="w-5 h-5 text-blue-600" />
+                        <Brain className="w-5 h-5 text-gray-600" />
                     ) : (
                         <Sparkles className="w-5 h-5 text-gray-600" />
                     )}
                 </div>
                 <div>
-                    <h4 className={`font-semibold text-sm ${isAutoDetected ? 'text-blue-800' : 'text-gray-800'
+                    <h4 className={`font-semibold text-sm ${isAutoDetected ? 'text-gray-800' : 'text-gray-800'
                         }`}>
                         {isAutoDetected ? '🤖 Auto-detected your needs' : '✨ Fetching your data'}
                     </h4>
-                    <p className={`text-xs ${isAutoDetected ? 'text-blue-600' : 'text-gray-600'
+                    <p className={`text-xs ${isAutoDetected ? 'text-gray-600' : 'text-gray-600'
                         }`}>
                         {isAutoDetected
                             ? 'I automatically detected what data you need for this question'
@@ -82,8 +82,8 @@ const ToolCallNotification: React.FC<ToolCallNotificationProps> = ({
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
                         className={`flex items-center gap-3 p-3 rounded-xl border ${isAutoDetected
-                                ? 'bg-white/60 border-blue-200'
-                                : 'bg-white/60 border-gray-200'
+                            ? 'bg-white/60 border-gray-300'
+                            : 'bg-white/60 border-gray-200'
                             }`}
                     >
                         {/* Tool Icon */}
@@ -94,7 +94,7 @@ const ToolCallNotification: React.FC<ToolCallNotificationProps> = ({
                         {/* Tool Info */}
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                                <span className={`font-medium text-sm ${isAutoDetected ? 'text-blue-800' : 'text-gray-800'
+                                <span className={`font-medium text-sm ${isAutoDetected ? 'text-gray-800' : 'text-gray-800'
                                     }`}>
                                     {getToolName(toolCall.tool)}
                                 </span>
@@ -109,7 +109,7 @@ const ToolCallNotification: React.FC<ToolCallNotificationProps> = ({
                                     )}
                                     {toolCall.status === 'fetching' && (
                                         <>
-                                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-ping"></div>
                                             <span className="text-xs text-gray-500">Fetching...</span>
                                         </>
                                     )}
@@ -145,8 +145,8 @@ const ToolCallNotification: React.FC<ToolCallNotificationProps> = ({
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 className={`mt-3 p-2 rounded-lg text-center ${isAutoDetected
-                        ? 'bg-blue-100/50 text-blue-700'
-                        : 'bg-gray-100/50 text-gray-700'
+                    ? 'bg-blue-100/50 text-blue-700'
+                    : 'bg-gray-100/50 text-gray-700'
                     }`}
             >
                 <span className="text-xs font-medium">

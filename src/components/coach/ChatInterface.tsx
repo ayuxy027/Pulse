@@ -2,11 +2,65 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AgentService } from '../../services/agentService';
 import { getSupabaseUser } from '../../services/authService';
 import { fetchChatMessages } from '../../services/chatService';
+import { getGroqResponse } from '../../services/llmService';
 import ChatInput from './ChatInput';
-import MarkdownRenderer from '../ui/MarkdownRenderer';
 import ToolCallNotification from './ToolCallNotification';
 import { Bot, Loader2, Zap, Database, Sparkles, Brain, CheckCircle, Clock, User, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+// Sexy MarkdownRenderer component inspired by the reference
+const MarkdownRenderer = ({ content }: { content: string }) => {
+    return (
+        <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+                li: ({ ...props }) => <li className="list-item marker:text-blue-600" {...props} />,
+                a: ({ ...props }) => <a target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" {...props} />,
+                code: ({ className, children, ...props }) => {
+                    const match = /language-(\w+)/.exec(className || '');
+                    return !match ? (
+                        <code className="px-1 py-0.5 bg-gray-100 rounded text-sm font-mono" {...props}>{children}</code>
+                    ) : (
+                        <code className={className} {...props}>
+                            {children}
+                        </code>
+                    );
+                },
+                h1: ({ children, ...props }) => (
+                    <h1 className="text-xl font-bold text-gray-900 mb-3 mt-4 first:mt-0" {...props}>{children}</h1>
+                ),
+                h2: ({ children, ...props }) => (
+                    <h2 className="text-lg font-semibold text-gray-800 mb-2 mt-3" {...props}>{children}</h2>
+                ),
+                h3: ({ children, ...props }) => (
+                    <h3 className="text-base font-semibold text-gray-700 mb-2 mt-2" {...props}>{children}</h3>
+                ),
+                p: ({ children, ...props }) => (
+                    <p className="text-gray-700 leading-relaxed mb-2" {...props}>{children}</p>
+                ),
+                ul: ({ children, ...props }) => (
+                    <ul className="list-disc list-inside space-y-1 mb-3" {...props}>{children}</ul>
+                ),
+                ol: ({ children, ...props }) => (
+                    <ol className="list-decimal list-inside space-y-1 mb-3" {...props}>{children}</ol>
+                ),
+                strong: ({ children, ...props }) => (
+                    <strong className="font-semibold text-gray-900" {...props}>{children}</strong>
+                ),
+                em: ({ children, ...props }) => (
+                    <em className="italic text-gray-600" {...props}>{children}</em>
+                ),
+                blockquote: ({ children, ...props }) => (
+                    <blockquote className="border-l-4 border-blue-200 pl-4 italic text-gray-600 my-3" {...props}>{children}</blockquote>
+                )
+            }}
+        >
+            {content}
+        </ReactMarkdown>
+    );
+};
 
 interface ChatMessage {
     id: string;
@@ -261,7 +315,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                 {/* Avatar - Only for assistant */}
                                 {message.role === 'assistant' && (
                                     <div className="shrink-0">
-                                        <div className="w-10 h-10 rounded-xl bg-gray-700 flex items-center justify-center shadow-sm">
+                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
                                             <Bot className="w-5 h-5 text-white" />
                                         </div>
                                     </div>
@@ -271,21 +325,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                 <motion.div
                                     initial={{ scale: 0.95, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
-                                    className={`rounded-2xl px-6 py-5 max-w-2xl shadow-lg border-2 ${message.role === 'user'
-                                        ? 'bg-gradient-to-br from-gray-700 to-gray-800 text-white border-gray-600'
-                                        : 'bg-white text-gray-800 border-gray-200 hover:border-gray-300'
+                                    whileHover={{ scale: 1.02 }}
+                                    className={`max-w-[80%] p-4 rounded-2xl shadow-lg border-2 transition-all duration-200 ${message.role === 'user'
+                                        ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border-blue-500 ml-auto'
+                                        : 'bg-white text-gray-800 border-gray-200 hover:border-blue-300 hover:shadow-xl'
                                         }`}
                                 >
                                     {/* Message Content */}
                                     <div className="prose prose-sm max-w-none">
                                         {message.role === 'assistant' ? (
-                                            <MarkdownRenderer
-                                                content={message.content}
-                                                fontSize={14}
-                                                color="#374151"
-                                            />
+                                            <MarkdownRenderer content={message.content} />
                                         ) : (
-                                            <p className="whitespace-pre-wrap text-white text-sm leading-relaxed tracking-tight">{message.content}</p>
+                                            <p className="whitespace-pre-wrap text-white text-sm leading-relaxed">{message.content}</p>
                                         )}
                                     </div>
 
@@ -318,13 +369,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             className="flex justify-start"
                         >
                             <div className="flex gap-4 max-w-4xl">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg shrink-0">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shrink-0">
                                     <Bot className="w-5 h-5 text-white" />
                                 </div>
                                 <motion.div
                                     initial={{ scale: 0.95, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
-                                    className="bg-white text-gray-800 rounded-2xl px-6 py-5 shadow-lg border-2 border-gray-200 hover:border-gray-300 flex items-center gap-4"
+                                    whileHover={{ scale: 1.02 }}
+                                    className="max-w-[80%] bg-white text-gray-800 rounded-2xl p-4 shadow-lg border-2 border-gray-200 hover:border-blue-300 hover:shadow-xl flex items-center gap-3"
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl">

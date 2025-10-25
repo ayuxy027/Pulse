@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import ChatInterface from '../components/coach/ChatInterface';
+import DeleteChatModal from '../components/coach/DeleteChatModal';
 import { MessageSquare, History, Bot, User, Trash2, MoreVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchRecentChats, fetchChatMessages, deleteChat, RecentChat } from '../services/chatService';
@@ -21,6 +22,8 @@ const CoachPage: React.FC = () => {
     const [recentChats, setRecentChats] = useState<RecentChat[]>([]);
     const [isLoadingChats, setIsLoadingChats] = useState(true);
     const [hoveredChat, setHoveredChat] = useState<string | null>(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [chatToDelete, setChatToDelete] = useState<{ id: string; title: string } | null>(null);
 
     // Load recent chats on mount
     useEffect(() => {
@@ -62,32 +65,39 @@ const CoachPage: React.FC = () => {
         }
     }, [handleChatSelect]);
 
-    const handleDeleteChat = useCallback(async (chatId: string, e: React.MouseEvent) => {
+    const handleDeleteChat = useCallback((chatId: string, chatTitle: string, e: React.MouseEvent) => {
         e.stopPropagation();
+        setChatToDelete({ id: chatId, title: chatTitle });
+        setDeleteModalOpen(true);
+    }, []);
 
-        if (window.confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
-            try {
-                const user = await getSupabaseUser();
-                if (user) {
-                    const success = await deleteChat(user.id, chatId);
-                    if (success) {
-                        // Remove from local state
-                        setRecentChats(prev => prev.filter(chat => chat.chat_id !== chatId));
+    const confirmDeleteChat = useCallback(async () => {
+        if (!chatToDelete) return;
 
-                        // If this was the selected chat, clear selection
-                        if (selectedChat === chatId) {
-                            setSelectedChat(null);
-                        }
-                    } else {
-                        alert('Failed to delete chat. Please try again.');
+        try {
+            const user = await getSupabaseUser();
+            if (user) {
+                const success = await deleteChat(user.id, chatToDelete.id);
+                if (success) {
+                    // Remove from local state
+                    setRecentChats(prev => prev.filter(chat => chat.chat_id !== chatToDelete.id));
+
+                    // If this was the selected chat, clear selection
+                    if (selectedChat === chatToDelete.id) {
+                        setSelectedChat(null);
                     }
+                } else {
+                    alert('Failed to delete chat. Please try again.');
                 }
-            } catch (error) {
-                console.error('Error deleting chat:', error);
-                alert('Failed to delete chat. Please try again.');
             }
+        } catch (error) {
+            console.error('Error deleting chat:', error);
+            alert('Failed to delete chat. Please try again.');
+        } finally {
+            setDeleteModalOpen(false);
+            setChatToDelete(null);
         }
-    }, [selectedChat]);
+    }, [chatToDelete, selectedChat]);
 
     const refreshChats = useCallback(async () => {
         try {
@@ -212,7 +222,7 @@ const CoachPage: React.FC = () => {
                                                     initial={{ opacity: 0, scale: 0.8 }}
                                                     animate={{ opacity: 1, scale: 1 }}
                                                     exit={{ opacity: 0, scale: 0.8 }}
-                                                    onClick={(e) => handleDeleteChat(conversation.id, e)}
+                                                    onClick={(e) => handleDeleteChat(conversation.id, conversation.title, e)}
                                                     className="p-2 rounded-xl bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm hover:shadow-md"
                                                     title="Delete chat"
                                                 >
@@ -254,6 +264,14 @@ const CoachPage: React.FC = () => {
                     </div>
                 </div>
             </motion.div>
+
+            {/* Delete Chat Modal */}
+            <DeleteChatModal
+                isOpen={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onConfirm={confirmDeleteChat}
+                chatTitle={chatToDelete?.title || ''}
+            />
         </div>
     );
 };

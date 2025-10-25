@@ -144,7 +144,7 @@ Provide a concise analysis (2-3 sentences maximum).`;
     const groqResponse = await getGroqResponse(analyzerPrompt);
     
     // Coach Agent (Groq - gpt-oss-20b): Generate personalized response
-    const coachPrompt = `You are a professional health coach. Provide structured, actionable health and nutrition advice.
+    const coachPrompt = `You are a professional health coach. Provide direct, actionable health and nutrition advice.
 
 CONTEXT ANALYSIS:
 ${groqResponse}
@@ -154,39 +154,24 @@ USER QUESTION: ${userQuery}
 USER HEALTH DATA:
 ${context}
 
-CRITICAL INSTRUCTIONS:
+INSTRUCTIONS:
 - Be direct, professional, and actionable
 - Use the health data to provide SPECIFIC, personalized recommendations
-- Structure responses with clear sections and bullet points
-- Make responses scannable and easy to read
 - Focus on actionable advice, not generic information
 - Use data-driven insights from their health profile
 - Be concise but comprehensive
-
-REQUIRED FORMAT:
-## 🎯 **Key Insights**
-- 2-3 bullet points of main findings from their data
-- Be specific about what their data shows
-- Highlight any concerns or positive patterns
-
-## 📋 **Action Items**
-- 3-4 specific, actionable steps they can take TODAY
-- Include specific foods, portions, or activities
-- Make it clear what they should do next
-
-## 💡 **Pro Tips**
-- 2-3 additional helpful tips based on their profile
-- Include specific recommendations for their situation
-- Reference their dietary restrictions or goals if applicable
+- Write in a formal, professional tone
+- Provide specific recommendations based on their actual data
 
 RESPONSE STYLE:
-- Use bullet points for easy scanning
-- Bold important information
+- Write in clear, professional paragraphs
 - Be specific with numbers, portions, and timelines
 - Reference their actual data (meals, habits, etc.)
 - If protein deficiency is detected, suggest specific protein sources or supplements
+- Avoid emojis and casual language
+- Use formal, medical-professional tone
 
-Respond as a professional health coach with structured, actionable advice:`;
+Respond as a professional health coach with direct, actionable advice:`;
 
     const deepSeekResponse = await getDeepSeekResponse(coachPrompt);
 
