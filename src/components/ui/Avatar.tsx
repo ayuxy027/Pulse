@@ -18,7 +18,7 @@ const Avatar: React.FC<AvatarProps> = ({
     alt,
     size = "w-8 h-8"
 }) => (
-    <div className={`${size} rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 flex-shrink-0 ring-2 ring-white shadow-sm`}>
+    <div className={`${size} rounded-full overflow-hidden bg-linear-to-br from-blue-500 to-blue-600 flex-shrink-0 ring-2 ring-white shadow-sm`}>
         {src ? (
             <img src={src} alt={alt} className="w-full h-full object-cover" />
         ) : (

@@ -4,15 +4,11 @@ import { RemindersSection } from './RemindersSection';
 
 /**
  * RemindersView - Manage habits and reminders
- * Displays habits tracking and one-time reminders
  */
 const RemindersView: React.FC = () => {
     return (
-        <div className="space-y-6">
-            {/* Habits Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <HabitsSection />
-
-            {/* Reminders Section */}
             <RemindersSection />
         </div>
     );

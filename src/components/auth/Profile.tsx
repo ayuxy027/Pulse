@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import Avatar from '../ui/Avatar';
 import StaticInfoSection from './profile/StaticInfoSection';
 import HealthMetricsSection from './profile/HealthMetricsSection';
-import DailyTrackingSection from './profile/DailyTrackingSection';
 import { profileService } from '../../services/profileService';
-import { StaticProfile, HealthMetrics, DailyTracking } from '../../types/profile';
+import { StaticProfile, HealthMetrics } from '../../types/profile';
 
 const Profile = () => {
   const session = useSession();
@@ -15,7 +14,6 @@ const Profile = () => {
 
   const [staticProfile, setStaticProfile] = useState<StaticProfile | null>(null);
   const [healthMetrics, setHealthMetrics] = useState<HealthMetrics | null>(null);
-  const [dailyTracking, setDailyTracking] = useState<DailyTracking | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>();
 
@@ -28,15 +26,13 @@ const Profile = () => {
         setError(undefined);
 
         // Load all profile data
-        const [static_data, health_data, daily_data] = await Promise.all([
+        const [static_data, health_data] = await Promise.all([
           profileService.getStaticProfile(session.user.id),
           profileService.getLatestHealthMetrics(session.user.id),
-          profileService.getTodayTracking(session.user.id),
         ]);
 
         setStaticProfile(static_data);
         setHealthMetrics(health_data);
-        setDailyTracking(daily_data);
       } catch (err) {
         console.error('Error loading profile:', err);
         setError('Failed to load profile data');
@@ -83,20 +79,6 @@ const Profile = () => {
       }
     } catch (err) {
       console.error('Error saving health metrics:', err);
-      throw err;
-    }
-  };
-
-  const handleDailyTrackingSave = async (data: Partial<DailyTracking>) => {
-    try {
-      if (!session?.user?.id) return;
-      const updated = await profileService.upsertDailyTracking(
-        session.user.id,
-        data
-      );
-      setDailyTracking(updated);
-    } catch (err) {
-      console.error('Error saving daily tracking:', err);
       throw err;
     }
   };
@@ -158,13 +140,6 @@ const Profile = () => {
               data={healthMetrics || undefined}
               isLoading={isLoading}
               onSave={handleHealthMetricsSave}
-            />
-
-            {/* Section 3: Daily Tracking */}
-            <DailyTrackingSection
-              data={dailyTracking || undefined}
-              isLoading={isLoading}
-              onSave={handleDailyTrackingSave}
             />
 
             {/* Sign Out Button */}

@@ -4,7 +4,7 @@ import { Activity, Droplets, Utensils, Target, Heart, Zap } from 'lucide-react';
 // BMI Background with Shorter Bars
 const BMIBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     {/* Shorter Bars - Reduced Height Values */}
     <div className="absolute inset-4 flex items-end justify-between">
       {[0.1, 0.2, 0.15, 0.3, 0.25, 0.4, 0.3, 0.45, 0.35, 0.5, 0.4, 0.45].map((height, i) => (
@@ -20,7 +20,7 @@ const BMIBackground = () => (
 
 const WaterBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     {/* Line Chart Spanning Card */}
     <div className="absolute inset-4">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -45,7 +45,7 @@ const WaterBackground = () => (
 
 const CaloriesBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     {/* Shorter Bars - Reduced Height Values */}
     <div className="absolute inset-4 flex items-end justify-between">
       {[0.15, 0.25, 0.2, 0.35, 0.3, 0.4, 0.25, 0.45, 0.35, 0.3, 0.4, 0.3, 0.35, 0.45, 0.4].map((height, i) => (
@@ -61,7 +61,7 @@ const CaloriesBackground = () => (
 
 const StepsBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     {/* Double line chart spanning card */}
     <div className="absolute inset-8">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -89,7 +89,7 @@ const StepsBackground = () => (
 
 const SleepBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     {/* Sleep pattern wave chart */}
     <div className="absolute inset-6">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -117,7 +117,7 @@ const SleepBackground = () => (
 
 const HeartRateBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     {/* Heart rate pattern */}
     <div className="absolute inset-6">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -214,7 +214,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">
             Health Overview
           </h2>
-          <div className="w-10 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
+          <div className="w-10 h-0.5 bg-linear-to-r from-gray-300 to-gray-400 rounded-full"></div>
         </div>
 
         {/* Loading Cards */}
@@ -245,7 +245,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">
             Health Overview
           </h2>
-          <div className="w-10 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
+          <div className="w-10 h-0.5 bg-linear-to-r from-gray-300 to-gray-400 rounded-full"></div>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center flex items-center justify-center min-h-[200px]">
@@ -262,7 +262,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
         <h2 className="text-xl font-bold text-gray-900 tracking-tight">
           Health Overview
         </h2>
-        <div className="w-10 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
+        <div className="w-10 h-0.5 bg-linear-to-r from-gray-300 to-gray-400 rounded-full"></div>
       </div>
 
       {/* Health Stats Grid */}
@@ -272,7 +272,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="22.5"
           subtitle="Normal"
           icon={Activity}
-          color="bg-gradient-to-br from-gray-600 to-gray-700"
+          color="bg-linear-to-br from-gray-600 to-gray-700"
           chart={BMIBackground}
         />
         <HealthStatCard
@@ -280,7 +280,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="2.5L"
           subtitle="Goal: 2.5L"
           icon={Droplets}
-          color="bg-gradient-to-br from-gray-500 to-gray-600"
+          color="bg-linear-to-br from-gray-500 to-gray-600"
           chart={WaterBackground}
         />
         <HealthStatCard
@@ -288,7 +288,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="2,200"
           subtitle="Goal: 2,000"
           icon={Utensils}
-          color="bg-gradient-to-br from-gray-700 to-gray-800"
+          color="bg-linear-to-br from-gray-700 to-gray-800"
           chart={CaloriesBackground}
         />
         <HealthStatCard
@@ -296,7 +296,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="8,432"
           subtitle="Goal: 10,000"
           icon={Target}
-          color="bg-gradient-to-br from-gray-600 to-gray-700"
+          color="bg-linear-to-br from-gray-600 to-gray-700"
           chart={StepsBackground}
         />
         <HealthStatCard
@@ -304,7 +304,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="7.5h"
           subtitle="Goal: 8h"
           icon={Heart}
-          color="bg-gradient-to-br from-gray-500 to-gray-600"
+          color="bg-linear-to-br from-gray-500 to-gray-600"
           size="small"
           chart={SleepBackground}
         />
@@ -313,7 +313,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading, error }) => {
           value="72"
           subtitle="BPM"
           icon={Zap}
-          color="bg-gradient-to-br from-gray-700 to-gray-800"
+          color="bg-linear-to-br from-gray-700 to-gray-800"
           size="small"
           chart={HeartRateBackground}
         />

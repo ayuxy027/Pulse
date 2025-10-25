@@ -46,7 +46,7 @@ export const DietDashboard: React.FC = () => {
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-orange-400 to-orange-500 h-2 rounded-full transition-all duration-500"
+              className="bg-linear-to-r from-orange-400 to-orange-500 h-2 rounded-full transition-all duration-500"
               style={{ width: `${calculatePercentage(todayStats.calories.consumed, todayStats.calories.target)}%` }}
             />
           </div>
@@ -65,7 +65,7 @@ export const DietDashboard: React.FC = () => {
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-blue-400 to-blue-500 h-2 rounded-full transition-all duration-500"
+              className="bg-linear-to-r from-blue-400 to-blue-500 h-2 rounded-full transition-all duration-500"
               style={{ width: `${calculatePercentage(todayStats.protein.consumed, todayStats.protein.target)}%` }}
             />
           </div>
@@ -84,7 +84,7 @@ export const DietDashboard: React.FC = () => {
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-2 rounded-full transition-all duration-500"
+              className="bg-linear-to-r from-yellow-400 to-yellow-500 h-2 rounded-full transition-all duration-500"
               style={{ width: `${calculatePercentage(todayStats.carbs.consumed, todayStats.carbs.target)}%` }}
             />
           </div>
@@ -103,7 +103,7 @@ export const DietDashboard: React.FC = () => {
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-purple-400 to-purple-500 h-2 rounded-full transition-all duration-500"
+              className="bg-linear-to-r from-purple-400 to-purple-500 h-2 rounded-full transition-all duration-500"
               style={{ width: `${calculatePercentage(todayStats.fat.consumed, todayStats.fat.target)}%` }}
             />
           </div>
@@ -122,7 +122,7 @@ export const DietDashboard: React.FC = () => {
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-2 rounded-full transition-all duration-500"
+              className="bg-linear-to-r from-cyan-400 to-cyan-500 h-2 rounded-full transition-all duration-500"
               style={{ width: `${calculatePercentage(todayStats.water.consumed, todayStats.water.target)}%` }}
             />
           </div>

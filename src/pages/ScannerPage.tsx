@@ -46,7 +46,7 @@ const ScannerPage: React.FC = () => {
                 if (savedImage) {
                     setUploadedImage(savedImage);
                 }
-            } catch (e) {
+            } catch {
                 console.error('Failed to load saved analysis');
             }
         }
@@ -277,7 +277,7 @@ const ScannerPage: React.FC = () => {
                                                 backgroundColor: "#FFFFFF",
                                             }
                                     }
-                                    className="relative p-6 rounded-xl border-2 border-dashed transition-all duration-300 bg-gradient-to-r from-gray-50 to-white"
+                                    className="relative p-6 rounded-xl border-2 border-dashed transition-all duration-300 bg-linear-to-r from-gray-50 to-white"
                                     style={{ opacity: isAnalyzing ? 0.6 : 1 }}
                                     onDragEnter={handleDrag}
                                     onDragLeave={handleDrag}
@@ -553,7 +553,7 @@ const ScannerPage: React.FC = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.1 }}
-                                    className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300"
+                                    className="p-6 bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300"
                                 >
                                     <div className="flex gap-3 items-center mb-6">
                                         <div className="p-3 bg-gray-100 rounded-xl">
@@ -578,7 +578,7 @@ const ScannerPage: React.FC = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2 }}
-                                    className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300"
+                                    className="p-6 bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300"
                                 >
                                     <div className="flex gap-3 items-center mb-6">
                                         <div className="p-3 bg-gray-100 rounded-xl">
@@ -603,7 +603,7 @@ const ScannerPage: React.FC = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.3 }}
-                                    className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300"
+                                    className="p-6 bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300"
                                 >
                                     <div className="flex gap-3 items-center mb-6">
                                         <div className="p-3 bg-gray-100 rounded-xl">
@@ -629,10 +629,10 @@ const ScannerPage: React.FC = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
                                     className={`p-6 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300 ${analysisResult.immunityImpact.overall === 'positive'
-                                        ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-100/50'
+                                        ? 'bg-linear-to-br from-green-50 to-green-100 border-green-100/50'
                                         : analysisResult.immunityImpact.overall === 'negative'
-                                            ? 'bg-gradient-to-br from-red-50 to-red-100 border-red-100/50'
-                                            : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
+                                            ? 'bg-linear-to-br from-red-50 to-red-100 border-red-100/50'
+                                            : 'bg-linear-to-br from-gray-50 to-gray-100 border-gray-100/50'
                                         }`}
                                 >
                                     <div className="flex gap-3 items-center mb-6">
@@ -782,7 +782,7 @@ const ScannerPage: React.FC = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.7 }}
-                                    className="p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-100"
+                                    className="p-6 bg-linear-to-br from-green-50 to-blue-50 rounded-xl border border-green-100"
                                 >
                                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                         <Shield className="w-5 h-5 text-green-600" />
@@ -847,7 +847,7 @@ const ScannerPage: React.FC = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.9 }}
-                                    className="p-6 bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-100"
+                                    className="p-6 bg-linear-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-100"
                                 >
                                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                         <Target className="w-5 h-5 text-purple-600" />
@@ -887,13 +887,13 @@ const ScannerPage: React.FC = () => {
                                         </h3>
                                     </div>
                                 </div>
-                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-8">
+                                <div className="bg-linear-to-r from-gray-50 to-gray-100 rounded-2xl p-8">
                                     <p className="text-gray-700 text-lg leading-relaxed text-center mb-6">{analysisResult.analysisSummary}</p>
                                     <div className="flex items-center gap-3 max-w-md mx-auto">
                                         <span className="text-sm font-medium text-gray-600">AI Confidence:</span>
                                         <div className="flex-1 bg-gray-200 rounded-full h-3">
                                             <motion.div
-                                                className="bg-gradient-to-r from-gray-600 to-gray-700 h-3 rounded-full"
+                                                className="bg-linear-to-r from-gray-600 to-gray-700 h-3 rounded-full"
                                                 initial={{ width: "0%" }}
                                                 animate={{ width: `${analysisResult.confidenceLevel}%` }}
                                                 transition={{ duration: 1, delay: 1.1 }}
@@ -951,7 +951,7 @@ const ScannerPage: React.FC = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 1.2 }}
-                                className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100 p-6"
+                                className="bg-linear-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100 p-6"
                             >
                                 <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                     <Sparkles size={20} className="text-blue-600" />

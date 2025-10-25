@@ -306,7 +306,7 @@ let userPreferences: DietPreferences = {
     proteinGoal: 120,
     carbsGoal: 250,
     fiberGoal: 30,
-    waterGoal: 3000,
+    waterGoal: 3000, // 3 liters = 12 cups of 250ml each
     mealTimes: {
         breakfast: '8:00 AM',
         lunch: '1:00 PM',

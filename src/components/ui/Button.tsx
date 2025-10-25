@@ -31,13 +31,8 @@ const Button: React.FC<ButtonProps & ButtonHTMLAttributes<HTMLButtonElement>> = 
     gap-2
     focus:outline-none
     border
-    w-[356px]
-    h-[36px]
     opacity-100
-    px-[20px]
-    py-[8px]
     border-[1px]
-    text-white
     text-sm
     font-medium
     leading-5
@@ -56,6 +51,11 @@ const Button: React.FC<ButtonProps & ButtonHTMLAttributes<HTMLButtonElement>> = 
       focus:ring-2
       focus:ring-blue-500/20
       focus:ring-offset-2
+      text-white
+      w-[356px]
+      h-[36px]
+      px-[20px]
+      py-[8px]
       before:content-['']
       before:absolute
       before:inset-0
@@ -74,10 +74,13 @@ const Button: React.FC<ButtonProps & ButtonHTMLAttributes<HTMLButtonElement>> = 
     `,
     secondary: `
       bg-gray-100
-      text-gray-700
       border-gray-200
       hover:bg-gray-200
       focus:ring-gray-300
+      w-[356px]
+      h-[36px]
+      px-[20px]
+      py-[8px]
     `,
   };
 
