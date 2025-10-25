@@ -1,7 +1,9 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import ChatInterface from '../components/coach/ChatInterface';
 import { MessageSquare, History, Bot, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fetchRecentChats, fetchChatMessages, RecentChat } from '../services/chatService';
+import { getSupabaseUser } from '../services/authService';
 
 interface Conversation {
     id: string;
@@ -16,28 +18,37 @@ interface Conversation {
  */
 const CoachPage: React.FC = () => {
     const [selectedChat, setSelectedChat] = useState<string | null>(null);
+    const [recentChats, setRecentChats] = useState<RecentChat[]>([]);
+    const [isLoadingChats, setIsLoadingChats] = useState(true);
 
-    // Memoize conversations to prevent unnecessary re-renders
-    const conversations = useMemo<Conversation[]>(() => [
-        {
-            id: '1',
-            title: 'BMI Analysis Discussion',
-            preview: 'Your BMI is in the normal range, but we should focus on muscle building.',
-            timestamp: '2024-01-15'
-        },
-        {
-            id: '2',
-            title: 'Nutrition Planning',
-            preview: 'Can you help me create a meal plan for weight loss?',
-            timestamp: '2024-01-14'
-        },
-        {
-            id: '3',
-            title: 'Workout Strategy',
-            preview: 'We need to increase your cardio sessions to meet your fitness goals.',
-            timestamp: '2024-01-13'
-        }
-    ], []);
+    // Load recent chats on mount
+    useEffect(() => {
+        const loadRecentChats = async () => {
+            try {
+                const user = await getSupabaseUser();
+                if (user) {
+                    const chats = await fetchRecentChats(user.id, 20);
+                    setRecentChats(chats);
+                }
+            } catch (error) {
+                console.error('Error loading recent chats:', error);
+            } finally {
+                setIsLoadingChats(false);
+            }
+        };
+
+        loadRecentChats();
+    }, []);
+
+    // Transform RecentChat to Conversation format for display
+    const conversations = useMemo<Conversation[]>(() => {
+        return recentChats.map(chat => ({
+            id: chat.chat_id,
+            title: chat.chat_title,
+            preview: chat.message_content.substring(0, 100) + (chat.message_content.length > 100 ? '...' : ''),
+            timestamp: new Date(chat.created_at).toLocaleDateString()
+        }));
+    }, [recentChats]);
 
     const handleChatSelect = useCallback((chatId: string) => {
         setSelectedChat(chatId);
@@ -78,9 +89,19 @@ const CoachPage: React.FC = () => {
 
                 {/* Chat Interface */}
                 <ChatInterface
-                    conversations={[]}
-                    loading={false}
-                    error={null}
+                    selectedChatId={selectedChat}
+                    onChatCreated={(chatId) => {
+                        setSelectedChat(chatId);
+                        // Refresh the chat list to include the new chat
+                        const refreshChats = async () => {
+                            const user = await getSupabaseUser();
+                            if (user) {
+                                const chats = await fetchRecentChats(user.id, 20);
+                                setRecentChats(chats);
+                            }
+                        };
+                        refreshChats();
+                    }}
                 />
             </motion.div>
 
@@ -104,55 +125,65 @@ const CoachPage: React.FC = () => {
 
                 {/* Chat List */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                    <AnimatePresence>
-                        {conversations.map((conversation, index) => (
-                            <motion.div
-                                key={conversation.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                onClick={() => handleChatSelect(conversation.id)}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => handleKeyDown(e, conversation.id)}
-                                className={`group p-4 rounded-xl border cursor-pointer transition-all duration-200 ${selectedChat === conversation.id
+                    {/* Loading State */}
+                    {isLoadingChats && (
+                        <div className="flex items-center justify-center py-8">
+                            <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                        </div>
+                    )}
+
+                    {/* Conversations List */}
+                    {!isLoadingChats && (
+                        <AnimatePresence>
+                            {conversations.map((conversation, index) => (
+                                <motion.div
+                                    key={conversation.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    onClick={() => handleChatSelect(conversation.id)}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => handleKeyDown(e, conversation.id)}
+                                    className={`group p-4 rounded-xl border cursor-pointer transition-all duration-200 ${selectedChat === conversation.id
                                         ? 'bg-gray-50 border-gray-300 shadow-sm'
                                         : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm hover:bg-gray-50'
-                                    }`}
-                            >
-                                <div className="flex items-start gap-3 mb-2">
-                                    <div className={`p-1.5 rounded-lg ${selectedChat === conversation.id
+                                        }`}
+                                >
+                                    <div className="flex items-start gap-3 mb-2">
+                                        <div className={`p-1.5 rounded-lg ${selectedChat === conversation.id
                                             ? 'bg-gray-200'
                                             : 'bg-gray-100 group-hover:bg-gray-200'
-                                        }`}>
-                                        <MessageSquare className={`w-4 h-4 ${selectedChat === conversation.id
+                                            }`}>
+                                            <MessageSquare className={`w-4 h-4 ${selectedChat === conversation.id
                                                 ? 'text-gray-700'
                                                 : 'text-gray-600'
-                                            }`} />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className={`font-semibold text-sm truncate tracking-tight ${selectedChat === conversation.id
+                                                }`} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className={`font-semibold text-sm truncate tracking-tight ${selectedChat === conversation.id
                                                 ? 'text-gray-900'
                                                 : 'text-gray-900'
-                                            }`}>
-                                            {conversation.title}
-                                        </h4>
+                                                }`}>
+                                                {conversation.title}
+                                            </h4>
+                                        </div>
                                     </div>
-                                </div>
-                                <p className="text-sm text-gray-600 line-clamp-2 ml-8">
-                                    {conversation.preview}
-                                </p>
-                                <div className="flex items-center gap-2 mt-3 ml-8">
-                                    <span className="text-xs text-gray-400">
-                                        {conversation.timestamp}
-                                    </span>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
+                                    <p className="text-sm text-gray-600 line-clamp-2 ml-8">
+                                        {conversation.preview}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-3 ml-8">
+                                        <span className="text-xs text-gray-400">
+                                            {conversation.timestamp}
+                                        </span>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    )}
 
                     {/* Empty State */}
-                    {conversations.length === 0 && (
+                    {!isLoadingChats && conversations.length === 0 && (
                         <div className="flex flex-col items-center justify-center h-full text-center p-8">
                             <div className="p-4 bg-gray-100 rounded-full mb-4">
                                 <MessageSquare className="w-8 h-8 text-gray-400" />

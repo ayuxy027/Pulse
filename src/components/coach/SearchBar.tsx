@@ -1,10 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
-import { ChatConversation } from '../../services/mockDataService';
 import { searchChatConversations, getSearchSuggestions, highlightSearchTerms, SearchResult } from '../../services/searchService';
 
+interface Conversation {
+    id: number;
+    title: string;
+    last_message: string;
+    created_at: string;
+    updated_at: string;
+}
+
 interface SearchBarProps {
-    conversations: ChatConversation[];
+    conversations: Conversation[];
     onSearchResults: (results: SearchResult[]) => void;
     placeholder?: string;
     className?: string;

@@ -1,10 +1,17 @@
 import React from 'react';
 import SearchBar from './SearchBar';
-import { ChatConversation } from '../../services/mockDataService';
 import { SearchResult } from '../../services/searchService';
 
+interface Conversation {
+    id: number;
+    title: string;
+    last_message: string;
+    created_at: string;
+    updated_at: string;
+}
+
 interface ChatHeaderProps {
-    conversations: ChatConversation[];
+    conversations: Conversation[];
     onSearchResults: (results: SearchResult[]) => void;
 }
 

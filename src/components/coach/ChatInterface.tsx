@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AgentService } from '../../services/agentService';
 import { getSupabaseUser } from '../../services/authService';
+import { fetchChatMessages } from '../../services/chatService';
 import ChatInput from './ChatInput';
 import MarkdownRenderer from '../ui/MarkdownRenderer';
 import { Bot, Loader2, Zap, Database, Sparkles, Brain, CheckCircle, Clock, User } from 'lucide-react';
@@ -31,9 +32,14 @@ interface ChatInterfaceProps {
     conversations?: unknown[];
     loading?: boolean;
     error?: string | null;
+    selectedChatId?: string | null;
+    onChatCreated?: (chatId: string) => void;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = () => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({
+    selectedChatId,
+    onChatCreated
+}) => {
     const [messages, setMessages] = useState<ChatMessage[]>([
         {
             id: 'initial',
@@ -43,6 +49,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
         }
     ]);
     const [isLoading, setIsLoading] = useState(false);
+    const [currentChatId, setCurrentChatId] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const agentService = useRef(new AgentService()).current;
 
@@ -55,6 +62,53 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
             scrollToBottom();
         }
     }, [messages, scrollToBottom]);
+
+    // Load chat messages when selectedChatId changes
+    useEffect(() => {
+        const loadChatMessages = async () => {
+            if (selectedChatId) {
+                setIsLoading(true);
+                try {
+                    const user = await getSupabaseUser();
+                    if (!user) return;
+
+                    // Set current chat ID
+                    setCurrentChatId(selectedChatId);
+
+                    // Fetch messages for the selected chat
+                    const chatMessages = await fetchChatMessages(user.id, selectedChatId);
+
+                    // Convert to ChatMessage format
+                    const formattedMessages: ChatMessage[] = chatMessages.map((msg, index) => ({
+                        id: msg.id || `msg-${index}`,
+                        content: msg.message_content,
+                        role: msg.sender_type === 'user' ? 'user' : 'assistant',
+                        timestamp: new Date(msg.created_at)
+                    }));
+
+                    setMessages(formattedMessages);
+                } catch (error) {
+                    console.error('Error loading chat messages:', error);
+                    // Keep initial message if there's an error
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                // Reset to initial state when no chat is selected
+                setMessages([
+                    {
+                        id: 'initial',
+                        content: 'Hello! I\'m your health coach. Ask me about your diet, nutrition, or attach specific data with @ mentions like @profile, @health, @today, @meals, @habits, or @reminders.',
+                        role: 'assistant',
+                        timestamp: new Date(),
+                    }
+                ]);
+                setCurrentChatId(null);
+            }
+        };
+
+        loadChatMessages();
+    }, [selectedChatId]);
 
     const extractMentions = useCallback((text: string): string[] => {
         const mentions = text.match(/@(\w+)/g) || [];
@@ -127,8 +181,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
             const result = await agentService.processUserQuery(
                 user.id,
                 content,
-                validMentions.length > 0 ? validMentions : undefined
+                validMentions.length > 0 ? validMentions : undefined,
+                currentChatId
             );
+
+            // Update currentChatId if we got a new one
+            if (result.chatId) {
+                setCurrentChatId(result.chatId);
+
+                // Call parent callback when new chat is created
+                if (!selectedChatId && onChatCreated) {
+                    onChatCreated(result.chatId);
+                }
+            }
 
             const assistantMessage: ChatMessage = {
                 id: `ai-${Date.now()}`,
@@ -152,7 +217,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [agentService, extractMentions, isValidMention]);
+    }, [agentService, extractMentions, isValidMention, currentChatId, selectedChatId, onChatCreated]);
 
     const handleAttachData = useCallback(() => {
         // No separate attachment message - sent with query
@@ -186,8 +251,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
                                     initial={{ scale: 0.95 }}
                                     animate={{ scale: 1 }}
                                     className={`rounded-xl px-5 py-4 max-w-2xl shadow-sm ${message.role === 'user'
-                                            ? 'bg-gray-700 text-white'
-                                            : 'bg-white text-gray-800 border border-gray-200'
+                                        ? 'bg-gray-700 text-white'
+                                        : 'bg-white text-gray-800 border border-gray-200'
                                         }`}
                                 >
                                     {/* Message Content */}
