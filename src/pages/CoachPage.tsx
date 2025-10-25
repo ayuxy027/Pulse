@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import ChatInterface from '../components/coach/ChatInterface';
 import DeleteChatModal from '../components/coach/DeleteChatModal';
-import { MessageSquare, History, Bot, User, Trash2, MoreVertical, Search, Plus, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { fetchRecentChats, fetchChatMessages, deleteChat, RecentChat } from '../services/chatService';
+import { MessageSquare, Bot, User, Trash2, Search, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { fetchRecentChats, deleteChat, RecentChat } from '../services/chatService';
 import { getSupabaseUser } from '../services/authService';
 
 interface Conversation {
@@ -21,7 +21,6 @@ const CoachPage: React.FC = () => {
     const [selectedChat, setSelectedChat] = useState<string | null>(null);
     const [recentChats, setRecentChats] = useState<RecentChat[]>([]);
     const [isLoadingChats, setIsLoadingChats] = useState(true);
-    const [hoveredChat, setHoveredChat] = useState<string | null>(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [chatToDelete, setChatToDelete] = useState<{ id: string; title: string } | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -145,11 +144,7 @@ const CoachPage: React.FC = () => {
                             <Bot className="w-6 h-6 text-gray-700" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">AI Health Coach</h2>
-                            <p className="text-sm text-gray-600">Your personalized health and nutrition assistant</p>
-                        </div>
-                        <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full border border-gray-200">
-                            <div className="w-2 h-2 bg-gray-600 rounded-full animate-pulse"></div>
+                            <h2 className="text-3xl font-bold tracking-tight text-gray-900">Your Personal AI Coach</h2>
                         </div>
                     </div>
                 </div>
@@ -198,11 +193,9 @@ const CoachPage: React.FC = () => {
                     </div>
 
                     {/* New Chat Button */}
-                    <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                    <button
                         onClick={handleNewChat}
-                        className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-200 shadow-lg hover:shadow-xl"
+                        className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-xl hover:from-gray-800 hover:to-gray-900 transition-colors duration-200 shadow-lg"
                     >
                         <div className="p-1.5 bg-white/20 rounded-lg">
                             <Plus className="w-4 h-4" />
@@ -211,8 +204,7 @@ const CoachPage: React.FC = () => {
                             <div className="font-semibold text-sm">New Chat</div>
                             <div className="text-xs text-gray-300">Start a fresh conversation</div>
                         </div>
-                        <Sparkles className="w-4 h-4 text-yellow-300" />
-                    </motion.button>
+                    </button>
                 </div>
 
                 {/* Chat List */}
@@ -220,14 +212,14 @@ const CoachPage: React.FC = () => {
                     {/* Loading State */}
                     {isLoadingChats && (
                         <div className="flex flex-col items-center justify-center py-12">
-                            <div className="w-8 h-8 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-3"></div>
+                            <div className="w-8 h-8 border-3 border-gray-200 border-t-gray-600 rounded-full animate-spin mb-3"></div>
                             <p className="text-sm text-gray-500">Loading conversations...</p>
                         </div>
                     )}
 
                     {/* Conversations List */}
                     {!isLoadingChats && (
-                        <AnimatePresence>
+                        <>
                             {filteredConversations.length === 0 && searchQuery ? (
                                 <div className="flex flex-col items-center justify-center py-8">
                                     <Search className="w-8 h-8 text-gray-400 mb-2" />
@@ -235,69 +227,54 @@ const CoachPage: React.FC = () => {
                                     <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
                                 </div>
                             ) : (
-                                filteredConversations.map((conversation, index) => (
-                                    <motion.div
+                                filteredConversations.map((conversation) => (
+                                    <div
                                         key={conversation.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: index * 0.1 }}
                                         onClick={() => handleChatSelect(conversation.id)}
                                         role="button"
                                         tabIndex={0}
                                         onKeyDown={(e) => handleKeyDown(e, conversation.id)}
-                                        onMouseEnter={() => setHoveredChat(conversation.id)}
-                                        onMouseLeave={() => setHoveredChat(null)}
-                                        className={`group p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${selectedChat === conversation.id
-                                            ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300 shadow-lg'
-                                            : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow-lg hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50'
+                                        className={`group p-3 rounded-lg border cursor-pointer transition-colors duration-200 ${selectedChat === conversation.id
+                                            ? 'bg-gray-50 border-gray-300'
+                                            : 'bg-white border-gray-200 hover:border-gray-300'
                                             }`}
                                     >
-                                        <div className="flex items-start gap-3 mb-2">
-                                            <div className={`p-2 rounded-xl ${selectedChat === conversation.id
-                                                ? 'bg-gradient-to-br from-blue-200 to-indigo-200'
-                                                : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-blue-100 group-hover:to-indigo-100'
+                                        <div className="flex items-center gap-3">
+                                            <div className={`p-1.5 rounded-lg ${selectedChat === conversation.id
+                                                ? 'bg-gray-200'
+                                                : 'bg-gray-100'
                                                 }`}>
-                                                <MessageSquare className={`w-4 h-4 ${selectedChat === conversation.id
-                                                    ? 'text-blue-700'
-                                                    : 'text-gray-600 group-hover:text-blue-600'
+                                                <MessageSquare className={`w-3.5 h-3.5 ${selectedChat === conversation.id
+                                                    ? 'text-gray-700'
+                                                    : 'text-gray-600'
                                                     }`} />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h4 className={`font-semibold text-sm truncate tracking-tight ${selectedChat === conversation.id
+                                                <h4 className={`font-medium text-sm truncate ${selectedChat === conversation.id
                                                     ? 'text-gray-900'
                                                     : 'text-gray-900'
                                                     }`}>
                                                     {conversation.title}
                                                 </h4>
                                             </div>
-                                            {/* Delete Button - Only show on hover */}
-                                            <AnimatePresence>
-                                                {hoveredChat === conversation.id && (
-                                                    <motion.button
-                                                        initial={{ opacity: 0, scale: 0.8 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        exit={{ opacity: 0, scale: 0.8 }}
-                                                        onClick={(e) => handleDeleteChat(conversation.id, conversation.title, e)}
-                                                        className="p-2 rounded-xl bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm hover:shadow-md"
-                                                        title="Delete chat"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </motion.button>
-                                                )}
-                                            </AnimatePresence>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs text-gray-400">
+                                                    {conversation.timestamp}
+                                                </span>
+                                                {/* Delete Button - Always visible */}
+                                                <button
+                                                    onClick={(e) => handleDeleteChat(conversation.id, conversation.title, e)}
+                                                    className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-colors duration-200"
+                                                    title="Delete chat"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
                                         </div>
-                                        <p className="text-sm text-gray-600 line-clamp-2 ml-8">
-                                            {conversation.preview}
-                                        </p>
-                                        <div className="flex items-center gap-2 mt-3 ml-8">
-                                            <span className="text-xs text-gray-400">
-                                                {conversation.timestamp}
-                                            </span>
-                                        </div>
-                                    </motion.div>
+                                    </div>
                                 ))
                             )}
-                        </AnimatePresence>
+                        </>
                     )}
 
                     {/* Empty State */}

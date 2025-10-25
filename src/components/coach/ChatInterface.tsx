@@ -295,118 +295,87 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className="flex flex-col h-full bg-[#f8f6f1]">
             {/* Messages Area - No header here since it's in CoachPage */}
             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 bg-[#f8f6f1]">
-                <AnimatePresence>
-                    {messages.map((message, index) => (
-                        <motion.div
-                            key={message.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                        >
-                            <div className="flex gap-4 max-w-4xl">
-                                {/* Avatar - Only for assistant */}
-                                {message.role === 'assistant' && (
-                                    <div className="shrink-0">
-                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg">
-                                            <Bot className="w-5 h-5 text-white" />
-                                        </div>
+                {messages.map((message, index) => (
+                    <div
+                        key={message.id}
+                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                        <div className="flex gap-4 max-w-4xl">
+                            {/* Avatar - Only for assistant */}
+                            {message.role === 'assistant' && (
+                                <div className="shrink-0">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg">
+                                        <Bot className="w-5 h-5 text-white" />
                                     </div>
+                                </div>
+                            )}
+
+                            {/* Message Content */}
+                            <div
+                                className={`max-w-[80%] p-4 rounded-2xl shadow-lg border-2 transition-colors duration-200 ${message.role === 'user'
+                                    ? 'bg-gradient-to-br from-gray-700 to-gray-800 text-white border-gray-600 ml-auto'
+                                    : 'bg-white text-gray-800 border-gray-200 hover:border-gray-400'
+                                    }`}
+                            >
+                                {/* Message Content */}
+                                <div className="prose prose-sm max-w-none">
+                                    {message.role === 'assistant' ? (
+                                        <MarkdownRenderer content={message.content} />
+                                    ) : (
+                                        <p className="whitespace-pre-wrap text-white text-sm leading-relaxed">{message.content}</p>
+                                    )}
+                                </div>
+
+                                {/* Tool Calls - Beautiful Notification */}
+                                {message.toolCalls && message.toolCalls.length > 0 && (
+                                    <ToolCallNotification
+                                        toolCalls={message.toolCalls}
+                                        isAutoDetected={message.toolCalls.some(tc => tc.id.startsWith('auto-tool-'))}
+                                    />
                                 )}
 
-                                {/* Message Content */}
-                                <motion.div
-                                    initial={{ scale: 0.95, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    whileHover={{ scale: 1.02 }}
-                                    className={`max-w-[80%] p-4 rounded-2xl shadow-lg border-2 transition-all duration-200 ${message.role === 'user'
-                                        ? 'bg-gradient-to-br from-gray-700 to-gray-800 text-white border-gray-600 ml-auto'
-                                        : 'bg-white text-gray-800 border-gray-200 hover:border-gray-400 hover:shadow-xl'
-                                        }`}
-                                >
-                                    {/* Message Content */}
-                                    <div className="prose prose-sm max-w-none">
-                                        {message.role === 'assistant' ? (
-                                            <MarkdownRenderer content={message.content} />
-                                        ) : (
-                                            <p className="whitespace-pre-wrap text-white text-sm leading-relaxed">{message.content}</p>
-                                        )}
-                                    </div>
-
-                                    {/* Tool Calls - Beautiful Notification */}
-                                    {message.toolCalls && message.toolCalls.length > 0 && (
-                                        <ToolCallNotification
-                                            toolCalls={message.toolCalls}
-                                            isAutoDetected={message.toolCalls.some(tc => tc.id.startsWith('auto-tool-'))}
-                                        />
-                                    )}
-
-                                    {/* Timestamp */}
-                                    <div className={`flex items-center gap-2 mt-3 text-xs tracking-tight ${message.role === 'user' ? 'text-white/60' : 'text-gray-400'}`}>
-                                        <Clock className="w-3 h-3" />
-                                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-                                </motion.div>
+                                {/* Timestamp */}
+                                <div className={`flex items-center gap-2 mt-3 text-xs tracking-tight ${message.role === 'user' ? 'text-white/60' : 'text-gray-400'}`}>
+                                    <Clock className="w-3 h-3" />
+                                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
                             </div>
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
+                        </div>
+                    </div>
+                ))}
 
                 {/* Loading Indicator */}
-                <AnimatePresence>
-                    {isLoading && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="flex justify-start"
-                        >
-                            <div className="flex gap-4 max-w-4xl">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg shrink-0">
-                                    <Bot className="w-5 h-5 text-white" />
-                                </div>
-                                <motion.div
-                                    initial={{ scale: 0.95, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    whileHover={{ scale: 1.02 }}
-                                    className="max-w-[80%] bg-white text-gray-800 rounded-2xl p-4 shadow-lg border-2 border-gray-200 hover:border-gray-400 hover:shadow-xl flex items-center gap-3"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl">
-                                            <Brain className="w-5 h-5 text-gray-600 animate-pulse" />
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <Loader2 className="w-5 h-5 animate-spin text-gray-600" />
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-semibold text-gray-800">AI is thinking...</span>
-                                                <span className="text-xs text-gray-500">Analyzing your question and gathering insights</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Animated dots */}
-                                    <div className="flex gap-1 ml-2">
-                                        <motion.div
-                                            animate={{ opacity: [0.4, 1, 0.4] }}
-                                            transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-                                            className="w-2 h-2 bg-gray-500 rounded-full"
-                                        />
-                                        <motion.div
-                                            animate={{ opacity: [0.4, 1, 0.4] }}
-                                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-                                            className="w-2 h-2 bg-gray-500 rounded-full"
-                                        />
-                                        <motion.div
-                                            animate={{ opacity: [0.4, 1, 0.4] }}
-                                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-                                            className="w-2 h-2 bg-gray-500 rounded-full"
-                                        />
-                                    </div>
-                                </motion.div>
+                {isLoading && (
+                    <div className="flex justify-start">
+                        <div className="flex gap-4 max-w-4xl">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg shrink-0">
+                                <Bot className="w-5 h-5 text-white" />
                             </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                            <div className="max-w-[80%] bg-white text-gray-800 rounded-2xl p-4 shadow-lg border-2 border-gray-200 flex items-center gap-3"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl">
+                                        <Brain className="w-5 h-5 text-gray-600 animate-pulse" />
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <Loader2 className="w-5 h-5 animate-spin text-gray-600" />
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-semibold text-gray-800">AI is thinking...</span>
+                                            <span className="text-xs text-gray-500">Analyzing your question and gathering insights</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Static dots */}
+                                <div className="flex gap-1 ml-2">
+                                    <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                                    <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                                    <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div ref={messagesEndRef} />
             </div>

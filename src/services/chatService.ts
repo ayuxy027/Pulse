@@ -65,7 +65,7 @@ export const storeChatMessage = async (
     const senderName = message.role === 'user' ? null : 'AI Health Coach';
     
     // Insert the message
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('recent_chats')
       .insert({
         user_id: userId,
