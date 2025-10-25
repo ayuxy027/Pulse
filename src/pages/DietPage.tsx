@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { NutritionSummary, StreakCard, UpcomingTasks, AddTasksForm, CalendarView, RemindersView } from '../components/diet';
+import { CalendarView, RemindersView, DietOverview } from '../components/diet';
+import { AddDietEntryForm } from '../components/diet/AddDietEntryForm';
+import { Plus } from 'lucide-react';
 
 /**
  * DietPage - Comprehensive nutrition and diet management interface
@@ -19,17 +21,37 @@ type TabType = 'overview' | 'calendar' | 'reminders';
 
 const DietPage: React.FC<DietPageProps> = ({ sidebarOpen = true }) => {
     const [activeTab, setActiveTab] = useState<TabType>('overview');
+    const [isAddFormOpen, setIsAddFormOpen] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    const handleAddSuccess = () => {
+        // Refresh the data after successful addition
+        setRefreshKey(prev => prev + 1);
+        setIsAddFormOpen(false);
+    };
 
     return (
         <div className={`flex-1 flex flex-col h-screen bg-[#f8f6f1] transition-all duration-300 ease-in-out ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
             {/* Header Section */}
             <div className="p-[30px]">
                 <div className="max-w-7xl mx-auto">
-                    <div className="space-y-1 mb-6">
-                        <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">
-                            Diet & Nutrition
-                        </h1>
-                        <div className="w-12 h-0.5 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full"></div>
+                    <div className="flex items-start justify-between mb-6">
+                        <div className="space-y-1">
+                            <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">
+                                Diet & Nutrition
+                            </h1>
+                            <div className="w-12 h-0.5 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full"></div>
+                        </div>
+                        {/* Add Diet Entry Button - Only visible in overview tab */}
+                        {activeTab === 'overview' && (
+                            <button
+                                onClick={() => setIsAddFormOpen(true)}
+                                className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-all shadow-md hover:shadow-lg"
+                            >
+                                <Plus className="w-5 h-5" />
+                                Add Entry
+                            </button>
+                        )}
                     </div>
 
                     {/* Tab Navigation */}
@@ -69,43 +91,7 @@ const DietPage: React.FC<DietPageProps> = ({ sidebarOpen = true }) => {
             <div className="flex-1 p-[30px] overflow-auto">
                 <div className="max-w-7xl mx-auto">
                     {activeTab === 'overview' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                            {/* Left Column - Nutrition & Tasks */}
-                            <div className="lg:col-span-7 space-y-6">
-                                {/* Streak Cards Row */}
-                                <div className="grid grid-cols-3 gap-4">
-                                    <StreakCard
-                                        type="water"
-                                        streakCount={7}
-                                        todayProgress={75}
-                                        target="8 glasses"
-                                    />
-                                    <StreakCard
-                                        type="sleep"
-                                        streakCount={5}
-                                        todayProgress={88}
-                                        target="8 hours"
-                                    />
-                                    <StreakCard
-                                        type="diet"
-                                        streakCount={12}
-                                        todayProgress={92}
-                                        target="Daily goals"
-                                    />
-                                </div>
-
-                                {/* Nutrition Summary Card - Placeholder */}
-                                <NutritionSummary />
-
-                                {/* Upcoming Tasks - Placeholder */}
-                                <UpcomingTasks />
-                            </div>
-
-                            {/* Right Column - Add Tasks Form */}
-                            <div className="lg:col-span-5">
-                                <AddTasksForm />
-                            </div>
-                        </div>
+                        <DietOverview refreshTrigger={refreshKey} />
                     )}
 
                     {activeTab === 'calendar' && (
@@ -117,6 +103,13 @@ const DietPage: React.FC<DietPageProps> = ({ sidebarOpen = true }) => {
                     )}
                 </div>
             </div>
+
+            {/* Add Diet Entry Modal */}
+            <AddDietEntryForm
+                isOpen={isAddFormOpen}
+                onClose={() => setIsAddFormOpen(false)}
+                onSuccess={handleAddSuccess}
+            />
         </div>
     );
 };

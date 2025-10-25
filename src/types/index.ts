@@ -16,6 +16,28 @@ export type {
   ProfileListResponse,
 } from './profile';
 
+// Re-export diet entry types
+export type {
+  MealType,
+  EntryType,
+  NutritionInfo,
+  DietEntry,
+  CreateWaterEntry,
+  CreateMealEntry,
+  CreateDietEntry,
+  NutritionAnalysisResponse,
+} from './dietEntry';
+
+// Re-export habits and reminders types
+export type {
+  HabitType,
+  Habit,
+  CreateHabit,
+  Reminder,
+  CreateReminder,
+  CalorieBurnAnalysisResponse,
+} from './habits';
+
 // Priority levels for cases and tasks
 export type Priority = 'High' | 'Medium' | 'Low';
 
