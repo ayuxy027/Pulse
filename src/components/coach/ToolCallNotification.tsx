@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Database, CheckCircle, Zap, Brain } from 'lucide-react';
+import { Bot, Target, Database, CheckCircle, Zap, Brain, User, BarChart3, Calendar, Utensils, Dumbbell, Clock, Settings } from 'lucide-react';
 
 interface ToolCallNotificationProps {
     toolCalls: Array<{
@@ -17,13 +17,13 @@ const ToolCallNotification: React.FC<ToolCallNotificationProps> = ({
 }) => {
     const getToolIcon = (tool: string) => {
         switch (tool) {
-            case 'profile': return '👤';
-            case 'health': return '📊';
-            case 'today': return '📅';
-            case 'meals': return '🍽️';
-            case 'habits': return '💪';
-            case 'reminders': return '⏰';
-            default: return '🔧';
+            case 'profile': return <User className="w-5 h-5 text-gray-600" />;
+            case 'health': return <BarChart3 className="w-5 h-5 text-gray-600" />;
+            case 'today': return <Calendar className="w-5 h-5 text-gray-600" />;
+            case 'meals': return <Utensils className="w-5 h-5 text-gray-600" />;
+            case 'habits': return <Dumbbell className="w-5 h-5 text-gray-600" />;
+            case 'reminders': return <Clock className="w-5 h-5 text-gray-600" />;
+            default: return <Settings className="w-5 h-5 text-gray-600" />;
         }
     };
 
@@ -41,119 +41,61 @@ const ToolCallNotification: React.FC<ToolCallNotificationProps> = ({
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{ opacity: 0, y: 5, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            className={`mt-4 p-4 rounded-2xl border-2 ${isAutoDetected
-                ? 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-300'
-                : 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200'
+            className={`mt-2 p-3 rounded-lg border ${isAutoDetected
+                ? 'bg-gray-50 border-gray-200'
+                : 'bg-gray-50 border-gray-200'
                 }`}
         >
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-4">
-                <div className={`p-2 rounded-xl ${isAutoDetected ? 'bg-gray-200' : 'bg-gray-100'
-                    }`}>
+            {/* Compact Header */}
+            <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-gray-200 rounded-lg">
                     {isAutoDetected ? (
-                        <Brain className="w-5 h-5 text-gray-600" />
+                        <Bot className="w-4 h-4 text-gray-600" />
                     ) : (
-                        <Sparkles className="w-5 h-5 text-gray-600" />
+                        <Target className="w-4 h-4 text-gray-600" />
                     )}
                 </div>
-                <div>
-                    <h4 className={`font-semibold text-sm ${isAutoDetected ? 'text-gray-800' : 'text-gray-800'
-                        }`}>
-                        {isAutoDetected ? '🤖 Auto-detected your needs' : '✨ Fetching your data'}
-                    </h4>
-                    <p className={`text-xs ${isAutoDetected ? 'text-gray-600' : 'text-gray-600'
-                        }`}>
-                        {isAutoDetected
-                            ? 'I automatically detected what data you need for this question'
-                            : 'Getting relevant information to help you better'
-                        }
-                    </p>
+                <div className="flex-1">
+                    <span className="text-sm font-medium text-gray-700">
+                        {isAutoDetected ? 'Auto-detected tools' : 'Fetching data'}
+                    </span>
                 </div>
             </div>
 
-            {/* Tool Calls Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {/* Compact Tool List */}
+            <div className="flex flex-wrap gap-2">
                 {toolCalls.map((toolCall, index) => (
                     <motion.div
                         key={toolCall.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className={`flex items-center gap-3 p-3 rounded-xl border ${isAutoDetected
-                            ? 'bg-white/60 border-gray-300'
-                            : 'bg-white/60 border-gray-200'
-                            }`}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg border border-gray-200"
                     >
-                        {/* Tool Icon */}
-                        <div className="text-2xl">
+                        <div className="w-5 h-5 bg-gray-100 rounded flex items-center justify-center">
                             {getToolIcon(toolCall.tool)}
                         </div>
-
-                        {/* Tool Info */}
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                                <span className={`font-medium text-sm ${isAutoDetected ? 'text-gray-800' : 'text-gray-800'
-                                    }`}>
-                                    {getToolName(toolCall.tool)}
-                                </span>
-
-                                {/* Status Indicator */}
-                                <div className="flex items-center gap-1">
-                                    {toolCall.status === 'initiated' && (
-                                        <>
-                                            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-gray-500">Starting...</span>
-                                        </>
-                                    )}
-                                    {toolCall.status === 'fetching' && (
-                                        <>
-                                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-ping"></div>
-                                            <span className="text-xs text-gray-500">Fetching...</span>
-                                        </>
-                                    )}
-                                    {toolCall.status === 'completed' && (
-                                        <>
-                                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                            <span className="text-xs text-green-600 font-medium">✓ Done</span>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Status Icon */}
-                        <div className="flex-shrink-0">
-                            {toolCall.status === 'initiated' && (
-                                <Zap className="w-4 h-4 text-yellow-500" />
-                            )}
-                            {toolCall.status === 'fetching' && (
-                                <Database className="w-4 h-4 text-blue-500 animate-pulse" />
-                            )}
-                            {toolCall.status === 'completed' && (
-                                <CheckCircle className="w-4 h-4 text-green-500" />
-                            )}
-                        </div>
+                        <span className="text-xs font-medium text-gray-700">
+                            {getToolName(toolCall.tool)}
+                        </span>
+                        {toolCall.status === 'completed' && (
+                            <CheckCircle className="w-3 h-3 text-green-500" />
+                        )}
                     </motion.div>
                 ))}
             </div>
 
-            {/* Footer Message */}
+            {/* Compact Footer */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className={`mt-3 p-2 rounded-lg text-center ${isAutoDetected
-                    ? 'bg-blue-100/50 text-blue-700'
-                    : 'bg-gray-100/50 text-gray-700'
-                    }`}
+                transition={{ delay: 0.3 }}
+                className="mt-2 text-center"
             >
-                <span className="text-xs font-medium">
-                    {isAutoDetected
-                        ? '🎯 Using this data to give you the best personalized advice!'
-                        : '📊 Analyzing your data to provide personalized insights...'
-                    }
+                <span className="text-xs text-gray-500">
+                    {isAutoDetected ? 'Personalized advice ready' : 'Analyzing data...'}
                 </span>
             </motion.div>
         </motion.div>

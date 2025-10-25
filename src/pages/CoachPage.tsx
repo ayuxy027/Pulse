@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import ChatInterface from '../components/coach/ChatInterface';
 import DeleteChatModal from '../components/coach/DeleteChatModal';
-import { MessageSquare, History, Bot, User, Trash2, MoreVertical } from 'lucide-react';
+import { MessageSquare, History, Bot, User, Trash2, MoreVertical, Search, Plus, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchRecentChats, fetchChatMessages, deleteChat, RecentChat } from '../services/chatService';
 import { getSupabaseUser } from '../services/authService';
@@ -24,6 +24,8 @@ const CoachPage: React.FC = () => {
     const [hoveredChat, setHoveredChat] = useState<string | null>(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [chatToDelete, setChatToDelete] = useState<{ id: string; title: string } | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
 
     // Load recent chats on mount
     useEffect(() => {
@@ -54,8 +56,24 @@ const CoachPage: React.FC = () => {
         }));
     }, [recentChats]);
 
+    // Filter conversations based on search query
+    const filteredConversations = useMemo(() => {
+        if (!searchQuery.trim()) return conversations;
+
+        const query = searchQuery.toLowerCase();
+        return conversations.filter(conversation =>
+            conversation.title.toLowerCase().includes(query) ||
+            conversation.preview.toLowerCase().includes(query)
+        );
+    }, [conversations, searchQuery]);
+
     const handleChatSelect = useCallback((chatId: string) => {
         setSelectedChat(chatId);
+    }, []);
+
+    const handleNewChat = useCallback(() => {
+        setSelectedChat(null);
+        setSearchQuery('');
     }, []);
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>, chatId: string) => {
@@ -132,7 +150,6 @@ const CoachPage: React.FC = () => {
                         </div>
                         <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full border border-gray-200">
                             <div className="w-2 h-2 bg-gray-600 rounded-full animate-pulse"></div>
-                            <span className="text-xs font-medium text-gray-700">Online</span>
                         </div>
                     </div>
                 </div>
@@ -154,17 +171,48 @@ const CoachPage: React.FC = () => {
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className="w-80 bg-gradient-to-b from-white to-gray-50 flex flex-col border-l border-gray-200 shadow-xl"
             >
-                {/* Header */}
-                <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl">
-                            <History className="w-5 h-5 text-blue-700" />
+                {/* Enhanced Header with Search & New Chat */}
+                <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-slate-50">
+                    {/* Search Bar */}
+                    <div className="relative mb-4">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className={`w-4 h-4 transition-colors ${isSearchFocused ? 'text-gray-600' : 'text-gray-400'}`} />
                         </div>
-                        <div>
-                            <h3 className="text-lg font-semibold tracking-tight text-gray-900">Chat History</h3>
-                            <p className="text-xs text-gray-500">Previous conversations</p>
-                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search conversations..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onFocus={() => setIsSearchFocused(true)}
+                            onBlur={() => setIsSearchFocused(false)}
+                            className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <span className="text-lg">×</span>
+                            </button>
+                        )}
                     </div>
+
+                    {/* New Chat Button */}
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleNewChat}
+                        className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                        <div className="p-1.5 bg-white/20 rounded-lg">
+                            <Plus className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 text-left">
+                            <div className="font-semibold text-sm">New Chat</div>
+                            <div className="text-xs text-gray-300">Start a fresh conversation</div>
+                        </div>
+                        <Sparkles className="w-4 h-4 text-yellow-300" />
+                    </motion.button>
                 </div>
 
                 {/* Chat List */}
@@ -180,67 +228,75 @@ const CoachPage: React.FC = () => {
                     {/* Conversations List */}
                     {!isLoadingChats && (
                         <AnimatePresence>
-                            {conversations.map((conversation, index) => (
-                                <motion.div
-                                    key={conversation.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.1 }}
-                                    onClick={() => handleChatSelect(conversation.id)}
-                                    role="button"
-                                    tabIndex={0}
-                                    onKeyDown={(e) => handleKeyDown(e, conversation.id)}
-                                    onMouseEnter={() => setHoveredChat(conversation.id)}
-                                    onMouseLeave={() => setHoveredChat(null)}
-                                    className={`group p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${selectedChat === conversation.id
-                                        ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300 shadow-lg'
-                                        : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow-lg hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50'
-                                        }`}
-                                >
-                                    <div className="flex items-start gap-3 mb-2">
-                                        <div className={`p-2 rounded-xl ${selectedChat === conversation.id
-                                            ? 'bg-gradient-to-br from-blue-200 to-indigo-200'
-                                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-blue-100 group-hover:to-indigo-100'
-                                            }`}>
-                                            <MessageSquare className={`w-4 h-4 ${selectedChat === conversation.id
-                                                ? 'text-blue-700'
-                                                : 'text-gray-600 group-hover:text-blue-600'
-                                                }`} />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className={`font-semibold text-sm truncate tracking-tight ${selectedChat === conversation.id
-                                                ? 'text-gray-900'
-                                                : 'text-gray-900'
+                            {filteredConversations.length === 0 && searchQuery ? (
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    <Search className="w-8 h-8 text-gray-400 mb-2" />
+                                    <p className="text-sm text-gray-500">No conversations found</p>
+                                    <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
+                                </div>
+                            ) : (
+                                filteredConversations.map((conversation, index) => (
+                                    <motion.div
+                                        key={conversation.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.1 }}
+                                        onClick={() => handleChatSelect(conversation.id)}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => handleKeyDown(e, conversation.id)}
+                                        onMouseEnter={() => setHoveredChat(conversation.id)}
+                                        onMouseLeave={() => setHoveredChat(null)}
+                                        className={`group p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${selectedChat === conversation.id
+                                            ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300 shadow-lg'
+                                            : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow-lg hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50'
+                                            }`}
+                                    >
+                                        <div className="flex items-start gap-3 mb-2">
+                                            <div className={`p-2 rounded-xl ${selectedChat === conversation.id
+                                                ? 'bg-gradient-to-br from-blue-200 to-indigo-200'
+                                                : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-blue-100 group-hover:to-indigo-100'
                                                 }`}>
-                                                {conversation.title}
-                                            </h4>
+                                                <MessageSquare className={`w-4 h-4 ${selectedChat === conversation.id
+                                                    ? 'text-blue-700'
+                                                    : 'text-gray-600 group-hover:text-blue-600'
+                                                    }`} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className={`font-semibold text-sm truncate tracking-tight ${selectedChat === conversation.id
+                                                    ? 'text-gray-900'
+                                                    : 'text-gray-900'
+                                                    }`}>
+                                                    {conversation.title}
+                                                </h4>
+                                            </div>
+                                            {/* Delete Button - Only show on hover */}
+                                            <AnimatePresence>
+                                                {hoveredChat === conversation.id && (
+                                                    <motion.button
+                                                        initial={{ opacity: 0, scale: 0.8 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        exit={{ opacity: 0, scale: 0.8 }}
+                                                        onClick={(e) => handleDeleteChat(conversation.id, conversation.title, e)}
+                                                        className="p-2 rounded-xl bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                                                        title="Delete chat"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </motion.button>
+                                                )}
+                                            </AnimatePresence>
                                         </div>
-                                        {/* Delete Button - Only show on hover */}
-                                        <AnimatePresence>
-                                            {hoveredChat === conversation.id && (
-                                                <motion.button
-                                                    initial={{ opacity: 0, scale: 0.8 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    exit={{ opacity: 0, scale: 0.8 }}
-                                                    onClick={(e) => handleDeleteChat(conversation.id, conversation.title, e)}
-                                                    className="p-2 rounded-xl bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm hover:shadow-md"
-                                                    title="Delete chat"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </motion.button>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-                                    <p className="text-sm text-gray-600 line-clamp-2 ml-8">
-                                        {conversation.preview}
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-3 ml-8">
-                                        <span className="text-xs text-gray-400">
-                                            {conversation.timestamp}
-                                        </span>
-                                    </div>
-                                </motion.div>
-                            ))}
+                                        <p className="text-sm text-gray-600 line-clamp-2 ml-8">
+                                            {conversation.preview}
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-3 ml-8">
+                                            <span className="text-xs text-gray-400">
+                                                {conversation.timestamp}
+                                            </span>
+                                        </div>
+                                    </motion.div>
+                                ))
+                            )}
                         </AnimatePresence>
                     )}
 

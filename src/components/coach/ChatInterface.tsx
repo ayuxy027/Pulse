@@ -257,20 +257,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 status: 'completed' as const
             })) || [];
 
-            // Add tool usage notification message if tools were used
-            if (autoDetectedToolCalls.length > 0) {
-                const toolNames = autoDetectedToolCalls.map(tc => tc.tool).join(', ');
-                const toolNotificationMessage: ChatMessage = {
-                    id: `tool-notification-${Date.now()}`,
-                    content: `🔍 **I automatically analyzed your data:**\n\nI used these tools to give you the best personalized advice:\n• **${toolNames}**\n\nThis helps me provide accurate, personalized recommendations based on your current health status!`,
-                    role: 'assistant',
-                    timestamp: new Date(),
-                };
-                setMessages(prev => [...prev, toolNotificationMessage]);
-
-                // Add a small delay to make the notification more visible
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
+            // No separate tool notification - tools will be shown in main response
 
             // Add streaming delay for better UX
             await new Promise(resolve => setTimeout(resolve, 1000));
