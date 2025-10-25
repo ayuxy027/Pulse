@@ -25,6 +25,8 @@ interface GeminiRequestBody {
   generationConfig?: {
     temperature?: number
     maxOutputTokens?: number
+    topP?: number
+    topK?: number
   }
 }
 
@@ -119,7 +121,9 @@ export async function analyzeDocument(
     const requestBody: GeminiRequestBody = {
       contents: [{ parts }],
       generationConfig: {
-        temperature: 0.7,
+        temperature: 0.2,
+        topP: 0.9,
+        topK: 40,
         maxOutputTokens: 4096,
       },
     }
