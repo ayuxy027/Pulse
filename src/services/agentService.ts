@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { getGroqResponse, getDeepSeekResponse } from './llmService';
+import { getGroqResponse} from './llmService';
 import { storeChatMessage } from './chatService';
 
 interface UserHealthContext {
@@ -90,7 +90,7 @@ export class AgentService {
   ): Promise<any> {
     // Phase 1: Auto-detect tool calls needed based on query content
     const autoDetectedTools = this.autoDetectRequiredTools(userQuery);
-    const finalContextFilter = contextFilter || autoDetectedTools;
+    const finalContextFilter = [...new Set([...(contextFilter || []), ...autoDetectedTools])];
     
     // Phase 2: Analysis - Fetch user data with auto-detected tools
     const context = await this.analyzeUserContext(userId, finalContextFilter);
@@ -121,7 +121,7 @@ export class AgentService {
     return {
       ...result,
       chatId: userChatResult.chatId,
-      autoDetectedTools: autoDetectedTools
+      toolsUsed: finalContextFilter
     };
   }
 
