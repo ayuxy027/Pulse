@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import ChatInterface from '../components/coach/ChatInterface';
 import DeleteChatModal from '../components/coach/DeleteChatModal';
-import { MessageSquare, Bot, User, Trash2, Search, Plus } from 'lucide-react';
+import { Bot, User, Trash2, Search, Plus } from 'lucide-react';
+import { LuMessageSquareQuote } from "react-icons/lu";
 import { motion } from 'framer-motion';
 import { fetchRecentChats, deleteChat, RecentChat } from '../services/chatService';
 import { getSupabaseUser } from '../services/authService';
@@ -244,7 +245,7 @@ const CoachPage: React.FC = () => {
                                                 ? 'bg-gray-200'
                                                 : 'bg-gray-100'
                                                 }`}>
-                                                <MessageSquare className={`w-3.5 h-3.5 ${selectedChat === conversation.id
+                                                <LuMessageSquareQuote className={`w-3.5 h-3.5 ${selectedChat === conversation.id
                                                     ? 'text-gray-700'
                                                     : 'text-gray-600'
                                                     }`} />
@@ -281,7 +282,7 @@ const CoachPage: React.FC = () => {
                     {!isLoadingChats && conversations.length === 0 && (
                         <div className="flex flex-col items-center justify-center h-full text-center p-8">
                             <div className="p-4 bg-gray-100 rounded-full mb-4">
-                                <MessageSquare className="w-8 h-8 text-gray-400" />
+                                <LuMessageSquareQuote className="w-8 h-8 text-gray-400" />
                             </div>
                             <p className="text-sm font-medium text-gray-600 mb-1">No conversations yet</p>
                             <p className="text-xs text-gray-500">Start chatting to see history here</p>
