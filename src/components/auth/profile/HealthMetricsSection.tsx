@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Edit2, Save, X } from 'lucide-react';
+import { Edit2, Save, X, Heart, TrendingDown, TrendingUp, ArrowRight, Dumbbell, Activity, AlertTriangle, Ban, Wine, Beer } from 'lucide-react';
 import RadioGroup, { RadioOption } from '../../ui/RadioGroup';
 import { HealthMetrics, HealthMetricsSectionProps } from '../../../types/profile';
 
@@ -43,45 +43,45 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
   };
 
   const goalOptions: RadioOption[] = [
-    { value: 'Weight Loss', label: '📉 Weight Loss' },
-    { value: 'Weight Gain', label: '📈 Weight Gain' },
-    { value: 'Maintain', label: '➡️ Maintain' },
-    { value: 'Boost Immunity', label: '💪 Boost Immunity' },
+    { value: 'Weight Loss', label: 'Weight Loss' },
+    { value: 'Weight Gain', label: 'Weight Gain' },
+    { value: 'Maintain', label: 'Maintain' },
+    { value: 'Boost Immunity', label: 'Boost Immunity' },
   ];
 
   const activityOptions: RadioOption[] = [
     {
       value: 'Sedentary',
-      label: '🪑 Sedentary',
+      label: 'Sedentary',
       description: 'Office job, minimal movement',
     },
     {
       value: 'Light',
-      label: '🚶 Light',
+      label: 'Light',
       description: '1-2 workouts/week',
     },
     {
       value: 'Moderate',
-      label: '🏃 Moderate',
+      label: 'Moderate',
       description: '3-4 workouts/week',
     },
     {
       value: 'High',
-      label: '🏋️ High',
+      label: 'High',
       description: '5+ workouts/week',
     },
   ];
 
   const smokingOptions: RadioOption[] = [
-    { value: 'Yes', label: '🚬 Yes' },
-    { value: 'No', label: '✅ No' },
-    { value: 'Sometimes', label: '⚠️ Sometimes' },
+    { value: 'Yes', label: 'Yes' },
+    { value: 'No', label: 'No' },
+    { value: 'Sometimes', label: 'Sometimes' },
   ];
 
   const alcoholOptions: RadioOption[] = [
-    { value: 'Never', label: '🚫 Never' },
-    { value: 'Occasionally', label: '🍷 Occasionally' },
-    { value: 'Often', label: '🍺 Often' },
+    { value: 'Never', label: 'Never' },
+    { value: 'Occasionally', label: 'Occasionally' },
+    { value: 'Often', label: 'Often' },
   ];
 
   const handleSave = async () => {
@@ -118,7 +118,8 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <span>❤️</span> Health Metrics
+          <Heart className="w-6 h-6 text-red-600" />
+          Health Metrics
         </h2>
         {!isEditing && (
           <button
@@ -148,21 +149,19 @@ const HealthMetricsSection: React.FC<HealthMetricsSectionProps> = ({
             <div className="flex gap-2">
               <button
                 onClick={() => setHeightUnit('cm')}
-                className={`px-4 py-2 rounded-lg border-2 transition-colors ${
-                  heightUnit === 'cm'
+                className={`px-4 py-2 rounded-lg border-2 transition-colors ${heightUnit === 'cm'
                     ? 'border-[#2D3643] bg-blue-50 text-gray-900'
                     : 'border-gray-200 bg-white text-gray-600'
-                }`}
+                  }`}
               >
                 CM
               </button>
               <button
                 onClick={() => setHeightUnit('ft')}
-                className={`px-4 py-2 rounded-lg border-2 transition-colors ${
-                  heightUnit === 'ft'
+                className={`px-4 py-2 rounded-lg border-2 transition-colors ${heightUnit === 'ft'
                     ? 'border-[#2D3643] bg-blue-50 text-gray-900'
                     : 'border-gray-200 bg-white text-gray-600'
-                }`}
+                  }`}
               >
                 FT+IN
               </button>
