@@ -123,3 +123,7 @@ Goal nudges based on streaks or missed targets
 User onboarding → profile creation → dual-agent chat → image + diet logging → unified tracker → gamification → proactive insights.
 
 Every feature is interconnected, feeding Supabase → AI → Tracker → User.
+
+also in the avatar, ad user avatar once their auth is completed
+
+also add their name in the dashboard
