@@ -57,11 +57,11 @@ const CalorieBurnCard: React.FC<CalorieBurnCardProps> = ({
             {/* Top Section - Flame Icon and Calories */}
             <div className="p-6 flex flex-col items-center gap-4">
                 {/* Flame Icon */}
-                <div className={`relative p-4 rounded-xl bg-gradient-to-br ${scheme.gradient} group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                <div className={`relative p-4 rounded-xl bg-linear-to-br ${scheme.gradient} group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                     <Flame size={32} className="text-white" />
-                    
+
                     {/* Glow effect on hover */}
-                    <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${scheme.gradient} opacity-0 group-hover:opacity-50 blur-xl transition-opacity duration-300`}></div>
+                    <div className={`absolute inset-0 rounded-xl bg-linear-to-br ${scheme.gradient} opacity-0 group-hover:opacity-50 blur-xl transition-opacity duration-300`}></div>
                 </div>
 
                 {/* Calories */}
@@ -86,11 +86,10 @@ const CalorieBurnCard: React.FC<CalorieBurnCardProps> = ({
                         </div>
                     )}
                     {trend !== 'stable' && (
-                        <div className={`flex items-center gap-1 ${
-                            trend === 'up' ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                            <TrendingUp 
-                                size={12} 
+                        <div className={`flex items-center gap-1 ${trend === 'up' ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                            <TrendingUp
+                                size={12}
                                 className={trend === 'down' ? 'rotate-180' : ''}
                             />
                             <span className="font-medium">

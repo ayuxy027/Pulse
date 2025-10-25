@@ -5,8 +5,7 @@ import { getTodayHealthStats, HealthStats as HealthStatsData } from '../../servi
 // BMI Background with Shorter Bars
 const BMIBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Shorter Bars - Reduced Height Values */}
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     <div className="absolute inset-4 flex items-end justify-between">
       {[0.1, 0.2, 0.15, 0.3, 0.25, 0.4, 0.3, 0.45, 0.35, 0.5, 0.4, 0.45].map((height, i) => (
         <div
@@ -21,8 +20,7 @@ const BMIBackground = () => (
 
 const WaterBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Line Chart Spanning Card */}
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     <div className="absolute inset-4">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <polyline
@@ -46,8 +44,7 @@ const WaterBackground = () => (
 
 const CaloriesBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Shorter Bars - Reduced Height Values */}
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     <div className="absolute inset-4 flex items-end justify-between">
       {[0.15, 0.25, 0.2, 0.35, 0.3, 0.4, 0.25, 0.45, 0.35, 0.3, 0.4, 0.3, 0.35, 0.45, 0.4].map((height, i) => (
         <div
@@ -62,11 +59,9 @@ const CaloriesBackground = () => (
 
 const StepsBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Double line chart spanning card */}
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     <div className="absolute inset-8">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {/* Goal line */}
         <polyline
           className="text-gray-500"
           stroke="currentColor"
@@ -75,7 +70,6 @@ const StepsBackground = () => (
           strokeDasharray="5,5"
           points="5,30 15,32 25,28 35,31 45,29 55,30 65,28 75,31 85,29 95,30"
         />
-        {/* Actual progress line */}
         <polyline
           className="text-gray-600"
           stroke="currentColor"
@@ -90,11 +84,9 @@ const StepsBackground = () => (
 
 const SleepBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Sleep pattern wave chart */}
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     <div className="absolute inset-6">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {/* Sleep wave pattern */}
         <polyline
           className="text-gray-600"
           stroke="currentColor"
@@ -102,7 +94,6 @@ const SleepBackground = () => (
           fill="none"
           points="5,70 15,60 25,75 35,50 45,80 55,40 65,70 75,45 85,75 95,60"
         />
-        {/* Deep sleep line */}
         <polyline
           className="text-gray-500"
           stroke="currentColor"
@@ -118,11 +109,9 @@ const SleepBackground = () => (
 
 const HeartRateBackground = () => (
   <div className="absolute inset-0 opacity-25">
-    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-200 rounded-lg"></div>
-    {/* Heart rate pattern */}
+    <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-200 rounded-lg"></div>
     <div className="absolute inset-6">
       <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {/* Heart rate spikes */}
         <polyline
           className="text-gray-600"
           stroke="currentColor"
@@ -130,7 +119,6 @@ const HeartRateBackground = () => (
           fill="none"
           points="5,60 10,40 15,60 20,30 25,60 30,35 35,60 40,45 45,60 50,25 55,60 60,40 65,60 70,50 75,60 80,35 85,60 90,45 95,60"
         />
-        {/* Resting heart rate line */}
         <polyline
           className="text-gray-500"
           stroke="currentColor"
@@ -163,7 +151,6 @@ const HealthStatCard: React.FC<HealthStatCardProps> = ({
 }) => {
   return (
     <div className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 bg-white rounded-xl border border-gray-100 hover:border-gray-200 overflow-hidden relative">
-      {/* Subtle background visualization */}
       {Chart && (
         <div className="absolute inset-0">
           <Chart />
@@ -234,22 +221,19 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading: externalLoading, err
     fetchHealthStats();
   }, []);
 
-  // Use external loading/error if provided, otherwise use internal state
   const isLoading = externalLoading !== undefined ? externalLoading : loading;
   const displayError = externalError !== undefined ? externalError : error;
 
   if (isLoading) {
     return (
       <div className="flex flex-col space-y-4">
-        {/* Section Header */}
         <div className="space-y-1 flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">
             Health Overview
           </h2>
-          <div className="w-10 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
+          <div className="w-10 h-0.5 bg-linear-to-r from-gray-300 to-gray-400 rounded-full"></div>
         </div>
 
-        {/* Loading Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
@@ -272,12 +256,11 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading: externalLoading, err
   if (displayError) {
     return (
       <div className="flex flex-col space-y-4">
-        {/* Section Header */}
         <div className="space-y-1 flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">
             Health Overview
           </h2>
-          <div className="w-10 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
+          <div className="w-10 h-0.5 bg-linear-to-r from-gray-300 to-gray-400 rounded-full"></div>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-6 text-center flex items-center justify-center min-h-[200px]">
@@ -289,22 +272,20 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading: externalLoading, err
 
   return (
     <div className="flex flex-col space-y-4">
-      {/* Section Header */}
       <div className="space-y-1 flex-shrink-0">
         <h2 className="text-xl font-bold text-gray-900 tracking-tight">
           Health Overview
         </h2>
-        <div className="w-10 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
+        <div className="w-10 h-0.5 bg-linear-to-r from-gray-300 to-gray-400 rounded-full"></div>
       </div>
 
-      {/* Health Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         <HealthStatCard
           title="BMI"
           value={healthData?.bmi?.value ? healthData.bmi.value.toString() : "N/A"}
           subtitle={healthData?.bmi?.category || "No data"}
           icon={Activity}
-          color="bg-gradient-to-br from-gray-600 to-gray-700"
+          color="bg-linear-to-br from-gray-600 to-gray-700"
           chart={BMIBackground}
         />
         <HealthStatCard
@@ -312,7 +293,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading: externalLoading, err
           value={healthData?.waterIntake ? `${healthData.waterIntake.current}L` : "0L"}
           subtitle={healthData?.waterIntake ? `Goal: ${healthData.waterIntake.goal}L` : "Goal: 2.5L"}
           icon={Droplets}
-          color="bg-gradient-to-br from-gray-500 to-gray-600"
+          color="bg-linear-to-br from-gray-500 to-gray-600"
           chart={WaterBackground}
         />
         <HealthStatCard
@@ -320,7 +301,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading: externalLoading, err
           value={healthData?.calories ? healthData.calories.current.toLocaleString() : "0"}
           subtitle={healthData?.calories ? `Goal: ${healthData.calories.goal.toLocaleString()}` : "Goal: 2,000"}
           icon={Utensils}
-          color="bg-gradient-to-br from-gray-700 to-gray-800"
+          color="bg-linear-to-br from-gray-700 to-gray-800"
           chart={CaloriesBackground}
         />
         <HealthStatCard
@@ -328,7 +309,7 @@ const HealthStats: React.FC<HealthStatsProps> = ({ loading: externalLoading, err
           value="8,432"
           subtitle="Goal: 10,000"
           icon={Target}
-          color="bg-gradient-to-br from-gray-600 to-gray-700"
+          color="bg-linear-to-br from-gray-600 to-gray-700"
           chart={StepsBackground}
         />
         <HealthStatCard

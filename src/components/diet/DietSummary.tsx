@@ -29,7 +29,7 @@ export const DietSummary: React.FC = () => {
 
       <div className="grid grid-cols-2 gap-4">
         {/* Average Calories */}
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4">
+        <div className="bg-linear-to-br from-orange-50 to-orange-100 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <Activity className="w-5 h-5 text-orange-600" />
             <span className="text-xs font-medium text-orange-700">Avg Calories</span>
@@ -39,7 +39,7 @@ export const DietSummary: React.FC = () => {
         </div>
 
         {/* Total Meals */}
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4">
+        <div className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-5 h-5 text-green-600" />
             <span className="text-xs font-medium text-green-700">Total Meals</span>
@@ -49,7 +49,7 @@ export const DietSummary: React.FC = () => {
         </div>
 
         {/* Water Goals Met */}
-        <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl p-4">
+        <div className="bg-linear-to-br from-cyan-50 to-cyan-100 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <Award className="w-5 h-5 text-cyan-600" />
             <span className="text-xs font-medium text-cyan-700">Water Goals</span>
@@ -59,7 +59,7 @@ export const DietSummary: React.FC = () => {
         </div>
 
         {/* Streak */}
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+        <div className="bg-linear-to-br from-purple-50 to-purple-100 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <Award className="w-5 h-5 text-purple-600" />
             <span className="text-xs font-medium text-purple-700">Current Streak</span>

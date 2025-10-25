@@ -18,9 +18,9 @@ interface UpcomingTasksProps {
     onTaskToggle?: (taskId: string) => void;
 }
 
-const UpcomingTasks: React.FC<UpcomingTasksProps> = ({ 
+const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
     tasks: propTasks,
-    onTaskToggle 
+    onTaskToggle
 }) => {
     // Default tasks if none provided
     const defaultTasks: DietTask[] = [
@@ -57,9 +57,9 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
     const [tasks, setTasks] = useState<DietTask[]>(propTasks || defaultTasks);
 
     const handleToggle = (taskId: string) => {
-        setTasks(prev => 
-            prev.map(task => 
-                task.id === taskId 
+        setTasks(prev =>
+            prev.map(task =>
+                task.id === taskId
                     ? { ...task, completed: !task.completed }
                     : task
             )
@@ -117,11 +117,10 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
                             >
                                 {/* Custom Checkbox */}
                                 <div className="flex-shrink-0">
-                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
-                                        task.completed
+                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${task.completed
                                             ? 'bg-green-500 border-green-500'
                                             : 'border-gray-300 group-hover:border-green-500'
-                                    }`}>
+                                        }`}>
                                         {task.completed && (
                                             <Check size={14} className="text-white" />
                                         )}
@@ -130,11 +129,10 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
 
                                 {/* Task Content */}
                                 <div className="flex-1 min-w-0">
-                                    <p className={`text-sm font-medium transition-all duration-200 ${
-                                        task.completed 
-                                            ? 'text-gray-400 line-through' 
+                                    <p className={`text-sm font-medium transition-all duration-200 ${task.completed
+                                            ? 'text-gray-400 line-through'
                                             : 'text-gray-900'
-                                    }`}>
+                                        }`}>
                                         {task.title}
                                     </p>
                                     <div className="flex items-center gap-2 mt-1">
@@ -199,9 +197,9 @@ const UpcomingTasks: React.FC<UpcomingTasksProps> = ({
                     </div>
                     <div className="mt-2 w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                         <div
-                            className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-500 ease-out"
-                            style={{ 
-                                width: `${tasks.length > 0 ? (completedTasks.length / tasks.length) * 100 : 0}%` 
+                            className="h-full bg-linear-to-r from-green-400 to-green-600 rounded-full transition-all duration-500 ease-out"
+                            style={{
+                                width: `${tasks.length > 0 ? (completedTasks.length / tasks.length) * 100 : 0}%`
                             }}
                         ></div>
                     </div>

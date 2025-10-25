@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { getGroqResponse, getDeepSeekResponse } from './llmService';
+import { storeChatMessage } from './chatService';
 
 interface UserHealthContext {
   profile: any;
@@ -81,7 +82,12 @@ export class AgentService {
     };
   }
 
-  async processUserQuery(userId: string, userQuery: string, contextFilter?: string[]): Promise<any> {
+  async processUserQuery(
+    userId: string, 
+    userQuery: string, 
+    contextFilter?: string[],
+    chatId?: string | null
+  ): Promise<any> {
     // Phase 1: Analysis - Fetch user data
     const context = await this.analyzeUserContext(userId, contextFilter);
     
@@ -91,7 +97,27 @@ export class AgentService {
     // Phase 3: Dual Agent Response
     const result = await this.getDualAgentResponse(userQuery, contextSummary);
     
-    return result;
+    // Phase 4: Store messages in database
+    const currentChatId = chatId || null;
+    
+    // Store user message
+    const userChatResult = await storeChatMessage(
+      userId,
+      currentChatId,
+      { role: 'user', content: userQuery }
+    );
+    
+    // Store assistant response with the chat_id from user message
+    await storeChatMessage(
+      userId,
+      userChatResult.chatId,
+      { role: 'assistant', content: result.response }
+    );
+    
+    return {
+      ...result,
+      chatId: userChatResult.chatId
+    };
   }
 
   private async getDualAgentResponse(userQuery: string, context: string) {

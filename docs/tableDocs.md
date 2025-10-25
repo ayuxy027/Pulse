@@ -163,6 +163,30 @@ Indexes:
 RLS: Enabled with policies for user-specific access
 ```
 
+### 8. `recent_chats` Table
+**Purpose**: Stores recent chat history for users in the coach component
+```sql
+recent_chats (
+  id: UUID (PK, gen_random_uuid()),
+  user_id: UUID (FK, references auth.users(id), CASCADE DELETE),
+  chat_id: UUID NOT NULL (gen_random_uuid()), -- Unique identifier for grouping messages in a conversation
+  chat_title: TEXT NOT NULL,
+  message_content: TEXT NOT NULL,
+  sender_type: TEXT NOT NULL CHECK (in 'user', 'coach', 'analyzer'),
+  sender_name: TEXT, -- Display name (e.g., "AI Health Coach")
+  created_at: TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at: TIMESTAMPTZ NOT NULL DEFAULT NOW()
+)
+Indexes:
+- idx_recent_chats_user_id
+- idx_recent_chats_chat_id
+- idx_recent_chats_created_at
+- idx_recent_chats_user_chat (user_id, chat_id, created_at DESC)
+Triggers:
+- update_recent_chats_timestamp (auto-updates updated_at)
+RLS: Enabled with policies for user-specific access
+```
+
 ---
 
 ## 🎯 Implementation Strategy for PRD Features
@@ -196,8 +220,8 @@ RLS: Enabled with policies for user-specific access
 
 ### 3. Coach System (Dual-Agent Chat)
 **How it connects to DB**:
-- Analyzer Agent reads from all tables: `user_profiles`, `health_metrics`, `daily_tracking`, `diet_entries`, `habits`, `reminders`
-- Stores chat context in Supabase (new chat_history table may be needed)
+- Analyzer Agent reads from all tables: `user_profiles`, `health_metrics`, `daily_tracking`, `diet_entries`, `habits`, `reminders`, `recent_chats`
+- Stores chat context in Supabase for persistent conversation history
 
 **Implementation Steps**:
 1. When user sends message → Analyzer Agent queries current user data:
@@ -207,9 +231,10 @@ RLS: Enabled with policies for user-specific access
    - Diet: `SELECT * FROM diet_entries WHERE user_id = auth.uid() AND created_at >= NOW() - INTERVAL '24 hours'`
    - Habits: `SELECT * FROM habits WHERE user_id = auth.uid() AND created_at >= NOW() - INTERVAL '7 days'`
    - Reminders: `SELECT * FROM reminders WHERE user_id = auth.uid() AND reminder_date >= CURRENT_DATE`
+   - Recent Chats: `SELECT * FROM recent_chats WHERE user_id = auth.uid() ORDER BY created_at DESC LIMIT 10`
 2. Format data for Coach Agent
 3. Coach Agent generates response considering all context
-4. Store conversation in chat history
+4. Store conversation in `recent_chats` table for future reference
 
 ### 4. Tracker / Dashboard & Diet Planner
 **How it connects to DB**:
@@ -256,6 +281,7 @@ RLS: Enabled with policies for user-specific access
    - `daily_tracking` (today's food logged)
    - `diet_entries` (what user ate today)
    - `health_metrics` (goals)
+   - `recent_chats` (previous conversation context)
 3. **Analyzer formats** all data in structured context
 4. **Coach Agent** receives context + user question
 5. **Coach processes** through LLMs (Groq + DeepSeek)
@@ -268,6 +294,7 @@ RLS: Enabled with policies for user-specific access
 - `@meals` → queries `diet_entries` (last 7 days)
 - `@habits` → queries `habits` (active ones)
 - `@reminders` → queries `reminders` (active ones)
+- `@chats` → queries `recent_chats` (recent conversations)
 
 ---
 

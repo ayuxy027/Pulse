@@ -1,43 +1,44 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, AtSign, ArrowUpCircle, Image as ImageIcon } from 'lucide-react';
-import PromptEnhancer from './PromptEnhancer'; // Assuming PromptEnhancer is in the same directory
+import { AtSign, ArrowUpCircle } from 'lucide-react';
+import PromptEnhancer from './PromptEnhancer';
 
 interface ChatInputProps {
     onSendMessage: (message: string) => void;
     onAttachData: (dataType: string) => void;
-    onAttachImage: (file: File) => void;
     disabled?: boolean;
+    showWrapper?: boolean;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
     onSendMessage,
     onAttachData,
-    onAttachImage,
-    disabled
+    disabled,
+    showWrapper = true
 }) => {
     const [inputValue, setInputValue] = useState('');
-    const [isLoading, setIsLoading] = useState(false); // This isLoading is for the input component itself, not the overall chat
     const [isEnhancing, setIsEnhancing] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const [suggestionIndex, setSuggestionIndex] = useState(0);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Handle @ mentions
+    // Handle @ mentions - Use useRef to store suggestions
+    const allSuggestions = useRef([
+        'profile', 'health', 'today', 'meals', 'habits', 'reminders'
+    ]);
+
     useEffect(() => {
         const words = inputValue.split(' ');
         const lastWord = words[words.length - 1];
 
         if (lastWord.startsWith('@')) {
             const query = lastWord.substring(1).toLowerCase();
-            const allSuggestions = [
-                'profile', 'health', 'today', 'meals', 'habits', 'reminders'
-            ];
-            setSuggestions(
-                allSuggestions.filter(s => s.toLowerCase().includes(query)).map(s => `@${s}`)
-            );
-            setShowSuggestions(true);
+            const filteredSuggestions = allSuggestions.current
+                .filter(s => s.toLowerCase().includes(query))
+                .map(s => `@${s}`);
+
+            setSuggestions(filteredSuggestions);
+            setShowSuggestions(filteredSuggestions.length > 0);
         } else {
             setShowSuggestions(false);
         }
@@ -80,18 +81,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
     };
 
     const handleSend = () => {
-        if (inputValue.trim() && !disabled && !isLoading && !isEnhancing) {
+        if (inputValue.trim() && !disabled && !isEnhancing) {
             onSendMessage(inputValue.trim());
             setInputValue('');
         }
-    };
-
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files && files[0]) {
-            onAttachImage(files[0]);
-        }
-        e.target.value = ''; // Clear the input
     };
 
     const handleEnhancementComplete = (enhancedPrompt: string) => {
@@ -99,13 +92,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
         setIsEnhancing(false);
     };
 
-    return (
-        <div
-            className="w-full p-4 bg-gray-50 border-t border-gray-200"
-        >
-            <div
-                className="w-full flex flex-col gap-2 rounded-xl border border-gray-200 bg-white shadow-sm p-4"
-            >
+    const inputContent = (
+        <>
+            <div className="relative w-full flex flex-col gap-1.5 rounded-xl border border-gray-200 bg-white shadow-sm p-3">
                 {/* Suggestions Dropdown */}
                 {showSuggestions && suggestions.length > 0 && (
                     <div className="absolute bottom-full mb-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto w-full">
@@ -130,7 +119,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder={
-                        disabled || isLoading
+                        disabled || isEnhancing
                             ? "Processing..."
                             : isEnhancing
                                 ? "Enhancing prompt..."
@@ -138,22 +127,15 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     }
                     className="bg-transparent outline-none w-full resize-none text-gray-800 placeholder-gray-400 text-sm font-normal leading-tight"
                     rows={1}
-                    style={{ minHeight: '22px', maxHeight: '100px' }} // Adjust as needed
-                    disabled={disabled || isLoading || isEnhancing}
+                    style={{ minHeight: '22px', maxHeight: '100px' }}
+                    disabled={disabled || isEnhancing}
+                    aria-label="Chat input"
+                    aria-describedby="chat-input-description"
                 />
 
                 {/* Icons Section */}
                 <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                        {/* Plus for attachments (general) */}
-                        <button
-                            onClick={() => fileInputRef.current?.click()} // Re-using for image for now
-                            className="p-1 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
-                            title="Attach file"
-                            disabled={disabled || isLoading || isEnhancing}
-                        >
-                            <Plus size={16} />
-                        </button>
+                    <div className="flex items-center gap-2">
                         {/* AtSign for @mentions */}
                         <button
                             onClick={() => {
@@ -168,7 +150,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                             }}
                             className="p-1 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
                             title="Attach user data with @"
-                            disabled={disabled || isLoading || isEnhancing}
+                            disabled={disabled || isEnhancing}
                         >
                             <AtSign size={16} />
                         </button>
@@ -177,10 +159,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
                         <PromptEnhancer
                             inputValue={inputValue}
                             onEnhancementComplete={handleEnhancementComplete}
-                            disabled={disabled || isLoading || isEnhancing}
-                            setIsEnhancing={setIsEnhancing} // Pass setter to manage internal state
+                            disabled={disabled || isEnhancing}
                         />
-                        {(disabled || isLoading || isEnhancing) ? (
+                        {(disabled || isEnhancing) ? (
                             <div className="w-5 h-5 flex items-center justify-center">
                                 <div className="w-3 h-3 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
                             </div>
@@ -197,17 +178,18 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     </div>
                 </div>
             </div>
-
-            {/* Hidden file input for image uploads */}
-            <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageUpload}
-                accept="image/*"
-                className="hidden"
-            />
-        </div>
+        </>
     );
+
+    if (showWrapper) {
+        return (
+            <div className="w-full p-4 bg-[#f8f6f1] border-t border-gray-200">
+                {inputContent}
+            </div>
+        );
+    }
+
+    return <div className="w-full">{inputContent}</div>;
 };
 
 export default ChatInput;

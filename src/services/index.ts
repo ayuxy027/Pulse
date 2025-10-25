@@ -10,4 +10,5 @@ export * from './aiSummaryService';
 export { profileService } from './profileService';
 export * from './healthStatsService';
 
+export * from './chatService';
 

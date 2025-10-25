@@ -37,7 +37,7 @@ const SuggestedItem: React.FC<SuggestedItemProps> = ({
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-gray-200 group-hover:to-gray-300 transition-all duration-300">
+                            <div className="p-2 rounded-lg bg-linear-to-br from-gray-100 to-gray-200 group-hover:from-gray-200 group-hover:to-gray-300 transition-all duration-300">
                                 <Icon size={14} className="text-gray-600" />
                             </div>
                             <h4 className="font-semibold text-gray-900 text-sm leading-tight">
@@ -100,11 +100,11 @@ const SuggestedSection: React.FC = () => {
                 <h2 className="text-xl font-bold text-gray-900 tracking-tight">
                     Features
                 </h2>
-                <div className="w-10 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
+                <div className="w-10 h-0.5 bg-linear-to-r from-gray-300 to-gray-400 rounded-full"></div>
             </div>
 
             {/* Daily Health Tip Card */}
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 p-4 group cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-gray-200/50 flex-shrink-0">
+            <div className="bg-linear-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 p-4 group cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-gray-200/50 flex-shrink-0">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-white shadow-sm group-hover:shadow-md transition-all duration-300">
                         <Sparkles size={16} className="text-gray-600" />

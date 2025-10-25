@@ -18,7 +18,7 @@ const HeroSection: React.FC = () => {
             <p className="text-2xl font-semibold text-gray-600 leading-relaxed">
                 How are your Fitness Goals Today?
             </p>
-            <div className="w-16 h-1 bg-gradient-to-r from-gray-300 to-gray-400 rounded-full"></div>
+            <div className="w-16 h-1 bg-linear-to-r from-gray-300 to-gray-400 rounded-full"></div>
         </div>
     );
 };
