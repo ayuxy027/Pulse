@@ -173,7 +173,7 @@ RESPONSE STYLE:
 
 Respond as a professional health coach with direct, actionable advice:`;
 
-    const deepSeekResponse = await getDeepSeekResponse(coachPrompt);
+    const deepSeekResponse = await getGroqResponse(coachPrompt, 'llama-3.3-70b-versatile');
 
     return {
       thinking: groqResponse, // What the analyzer thought

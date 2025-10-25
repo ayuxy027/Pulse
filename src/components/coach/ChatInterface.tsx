@@ -16,8 +16,8 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
         <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
-                li: ({ ...props }) => <li className="list-item marker:text-blue-600" {...props} />,
-                a: ({ ...props }) => <a target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" {...props} />,
+                li: ({ ...props }) => <li className="list-item marker:text-gray-600" {...props} />,
+                a: ({ ...props }) => <a target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:underline" {...props} />,
                 code: ({ className, children, ...props }) => {
                     const match = /language-(\w+)/.exec(className || '');
                     return !match ? (
@@ -53,7 +53,7 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
                     <em className="italic text-gray-600" {...props}>{children}</em>
                 ),
                 blockquote: ({ children, ...props }) => (
-                    <blockquote className="border-l-4 border-blue-200 pl-4 italic text-gray-600 my-3" {...props}>{children}</blockquote>
+                    <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 my-3" {...props}>{children}</blockquote>
                 )
             }}
         >
@@ -267,7 +267,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     timestamp: new Date(),
                 };
                 setMessages(prev => [...prev, toolNotificationMessage]);
+
+                // Add a small delay to make the notification more visible
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
+
+            // Add streaming delay for better UX
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             const assistantMessage: ChatMessage = {
                 id: `ai-${Date.now()}`,
@@ -315,7 +321,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                 {/* Avatar - Only for assistant */}
                                 {message.role === 'assistant' && (
                                     <div className="shrink-0">
-                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
+                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg">
                                             <Bot className="w-5 h-5 text-white" />
                                         </div>
                                     </div>
@@ -327,8 +333,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     animate={{ scale: 1, opacity: 1 }}
                                     whileHover={{ scale: 1.02 }}
                                     className={`max-w-[80%] p-4 rounded-2xl shadow-lg border-2 transition-all duration-200 ${message.role === 'user'
-                                        ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border-blue-500 ml-auto'
-                                        : 'bg-white text-gray-800 border-gray-200 hover:border-blue-300 hover:shadow-xl'
+                                        ? 'bg-gradient-to-br from-gray-700 to-gray-800 text-white border-gray-600 ml-auto'
+                                        : 'bg-white text-gray-800 border-gray-200 hover:border-gray-400 hover:shadow-xl'
                                         }`}
                                 >
                                     {/* Message Content */}
@@ -369,21 +375,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             className="flex justify-start"
                         >
                             <div className="flex gap-4 max-w-4xl">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shrink-0">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg shrink-0">
                                     <Bot className="w-5 h-5 text-white" />
                                 </div>
                                 <motion.div
                                     initial={{ scale: 0.95, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     whileHover={{ scale: 1.02 }}
-                                    className="max-w-[80%] bg-white text-gray-800 rounded-2xl p-4 shadow-lg border-2 border-gray-200 hover:border-blue-300 hover:shadow-xl flex items-center gap-3"
+                                    className="max-w-[80%] bg-white text-gray-800 rounded-2xl p-4 shadow-lg border-2 border-gray-200 hover:border-gray-400 hover:shadow-xl flex items-center gap-3"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl">
-                                            <Brain className="w-5 h-5 text-blue-600 animate-pulse" />
+                                        <div className="p-2 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl">
+                                            <Brain className="w-5 h-5 text-gray-600 animate-pulse" />
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                                            <Loader2 className="w-5 h-5 animate-spin text-gray-600" />
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-semibold text-gray-800">AI is thinking...</span>
                                                 <span className="text-xs text-gray-500">Analyzing your question and gathering insights</span>
@@ -396,17 +402,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                         <motion.div
                                             animate={{ opacity: [0.4, 1, 0.4] }}
                                             transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-                                            className="w-2 h-2 bg-blue-500 rounded-full"
+                                            className="w-2 h-2 bg-gray-500 rounded-full"
                                         />
                                         <motion.div
                                             animate={{ opacity: [0.4, 1, 0.4] }}
                                             transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-                                            className="w-2 h-2 bg-blue-500 rounded-full"
+                                            className="w-2 h-2 bg-gray-500 rounded-full"
                                         />
                                         <motion.div
                                             animate={{ opacity: [0.4, 1, 0.4] }}
                                             transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-                                            className="w-2 h-2 bg-blue-500 rounded-full"
+                                            className="w-2 h-2 bg-gray-500 rounded-full"
                                         />
                                     </div>
                                 </motion.div>

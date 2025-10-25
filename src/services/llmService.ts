@@ -4,10 +4,10 @@
 
 import { sendDirectMessage, sendMessage } from './groqClient';
 
-export async function getGroqResponse(prompt: string): Promise<string> {
+export async function getGroqResponse(prompt: string, model: string = 'gpt-oss-20b'): Promise<string> {
   try {
     // Use existing groqClient for consistency
-    const response = await sendDirectMessage(prompt);
+    const response = await sendDirectMessage(prompt, model);
     
     if (!response.success) {
       console.error('Groq API error:', response.error);
