@@ -91,19 +91,25 @@ const ScannerPage: React.FC = () => {
         setCurrentStep(0);
 
         try {
-            // Simulate processing steps with progress
+            // Send API request and run progress animation concurrently
+            addProcessingStep("Initializing AI analysis pipeline...");
+            setAnalysisProgress(15);
+
+            // Start API request
+            const apiPromise = analyzeFoodImage(uploadedImage);
+
+            // Run progress animation concurrently
             const steps = [
-                { message: "Initializing AI analysis pipeline...", duration: 1000 },
                 { message: "Uploading image to cloud...", duration: 1500 },
                 { message: "Performing cloud-based image analysis...", duration: 2000 },
-                { message: "Running AI model predictions...", duration: 2500 },
-                { message: "Analyzing nutrition patterns...", duration: 2000 },
+                { message: "Running AI model predictions...", duration: 2000 },
+                { message: "Analyzing nutrition patterns...", duration: 1500 },
                 { message: "Generating health recommendations...", duration: 1500 },
                 { message: "Finalizing analysis report...", duration: 1000 },
             ];
 
-            let progress = 0;
-            const progressIncrement = 100 / steps.length;
+            let progress = 15;
+            const progressIncrement = (85) / steps.length;
 
             for (let i = 0; i < steps.length; i++) {
                 const step = steps[i];
@@ -113,21 +119,23 @@ const ScannerPage: React.FC = () => {
                 const startProgress = progress;
                 const endProgress = progress + progressIncrement;
                 const duration = step.duration;
-                const startTime = Date.now();
+                const stepStart = Date.now();
 
                 while (progress < endProgress) {
-                    const elapsed = Date.now() - startTime;
+                    const elapsed = Date.now() - stepStart;
                     const percentage = Math.min(elapsed / duration, 1);
                     progress = startProgress + progressIncrement * percentage;
                     setAnalysisProgress(Math.min(progress, 99));
                     await new Promise((r) => setTimeout(r, 50));
                 }
-                await new Promise((r) => setTimeout(r, 200));
+                await new Promise((r) => setTimeout(r, 100));
             }
 
-            const result = await analyzeFoodImage(uploadedImage);
+            // Wait for API to complete
+            const result = await apiPromise;
+
             setAnalysisProgress(100);
-            await new Promise((r) => setTimeout(r, 500));
+            await new Promise((r) => setTimeout(r, 300));
             addProcessingStep("Analysis complete!");
             setAnalysisResult(result);
         } catch (err) {
@@ -703,7 +711,7 @@ const ScannerPage: React.FC = () => {
                                                 transition={{ duration: 1, delay: 0.8 }}
                                             ></motion.div>
                                         </div>
-                                        <span className="text-sm font-medium text-gray-700">{analysisResult.confidenceLevel}%</span>
+                                        <span className="pt-2 text-sm font-medium text-gray-700">{analysisResult.confidenceLevel}%</span>
                                     </div>
                                 </div>
                             </motion.div>
