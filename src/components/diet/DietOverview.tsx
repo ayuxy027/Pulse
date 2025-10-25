@@ -2,13 +2,17 @@
  * DietOverview Component
  * Real-time nutrition tracking with visual stats and activity summary
  */
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import React, { useState, useEffect } from 'react';
-import { Flame, Droplet, Loader2 } from 'lucide-react';
+import { Flame, Droplet, Loader2, Sun, Apple, Coffee, Moon } from 'lucide-react';
 import { getDietEntriesByDate } from '../../services/dietEntryService';
 import { getUserHabits } from '../../services/habitsService';
 import { updateTodaySummary } from '../../services/daySummaryService';
+import { deleteDietEntry } from '../../services/dietEntryService'; // Added
 import { Habit } from '../../types/habits';
+
+type MealType = 'breakfast' | 'lunch' | 'snacks' | 'dinner';
 
 interface TodayStats {
   calories: number;
@@ -22,6 +26,20 @@ interface TodayStats {
   carbsGoal: number;
   fatGoal: number;
   waterGoal: number;
+}
+
+interface DietEntry {
+  id: string;
+  entry_type: 'meal' | 'water';
+  meal_type?: MealType;
+  water_amount?: number;
+  nutrition?: {
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+  };
+  created_at: string;
 }
 
 interface DietOverviewProps {
@@ -42,7 +60,8 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
     fatGoal: 65,
     waterGoal: 8,
   });
-  
+
+  const [todayEntries, setTodayEntries] = useState<DietEntry[]>([]);
   const [todayHabits, setTodayHabits] = useState<Habit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -59,8 +78,11 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
     const habitsResult = await getUserHabits();
 
     if (entriesResult.success && entriesResult.data) {
+      setTodayEntries(entriesResult.data);
+
+      // Calculate nutrition totals
       let calories = 0, protein = 0, carbs = 0, fat = 0, water = 0;
-      
+
       entriesResult.data.forEach(entry => {
         if (entry.entry_type === 'water' && entry.water_amount) {
           water += entry.water_amount;
@@ -72,6 +94,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
         }
       });
 
+      // Calculate calories burned from habits
       let caloriesBurned = 0;
       if (habitsResult.success && habitsResult.data) {
         const completedToday = habitsResult.data.filter(habit => {
@@ -79,11 +102,11 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
           const completedDate = new Date(habit.completed_at).toISOString().split('T')[0];
           return completedDate === today && habit.calories_burned;
         });
-        
+
         completedToday.forEach(habit => {
           caloriesBurned += habit.calories_burned || 0;
         });
-        
+
         setTodayHabits(completedToday);
       }
 
@@ -103,6 +126,43 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
 
   const calculatePercentage = (value: number, goal: number) => {
     return Math.min((value / goal) * 100, 100);
+  };
+
+  const getMealTypeIcon = (mealType?: MealType) => {
+    switch (mealType) {
+      case 'breakfast': return <Sun className="w-4 h-4" />;
+      case 'lunch': return <Apple className="w-4 h-4" />;
+      case 'snacks': return <Coffee className="w-4 h-4" />;
+      case 'dinner': return <Moon className="w-4 h-4" />;
+      default: return <Apple className="w-4 h-4" />;
+    }
+  };
+
+  const getMealTypeColor = (mealType?: MealType) => {
+    switch (mealType) {
+      case 'breakfast': return 'bg-yellow-100 text-yellow-700';
+      case 'lunch': return 'bg-blue-100 text-blue-700';
+      case 'snacks': return 'bg-purple-100 text-purple-700';
+      case 'dinner': return 'bg-orange-100 text-orange-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const formatTime = (timestamp: string) => {
+    return new Date(timestamp).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
+
+  const handleDeleteEntry = async (entryId: string) => {
+    if (confirm('Are you sure you want to delete this entry?')) {
+      const result = await deleteDietEntry(entryId);
+      if (result.success) {
+        await fetchTodayData();
+      }
+    }
   };
 
   if (isLoading) {
@@ -152,11 +212,10 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
               </div>
             </div>
 
-            {/* Hover Overlay */}
             <div className="absolute inset-0 bg-white rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               <div className="h-full flex flex-col justify-center items-center p-5 text-center">
                 <Droplet size={32} className="text-blue-500 mb-2" />
-                <p className="text-xs font-semibold text-gray-900 mb-1">Keep Hydrated! 💧</p>
+                <p className="text-xs font-semibold text-gray-900 mb-1">Keep Hydrated!</p>
                 <p className="text-[10px] text-gray-500">
                   {todayStats.water >= todayStats.waterGoal 
                     ? 'Goal achieved today!' 
@@ -199,11 +258,10 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
               </div>
             </div>
 
-            {/* Hover Overlay */}
             <div className="absolute inset-0 bg-white rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               <div className="h-full flex flex-col justify-center items-center p-5 text-center">
                 <Flame size={32} className="text-purple-500 mb-2" />
-                <p className="text-xs font-semibold text-gray-900 mb-1">Keep it up! �</p>
+                <p className="text-xs font-semibold text-gray-900 mb-1">Keep it up!</p>
                 <p className="text-[10px] text-gray-500">
                   {todayStats.calories < todayStats.calorieGoal 
                     ? `${todayStats.calorieGoal - todayStats.calories} kcal remaining` 
@@ -246,11 +304,10 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
               </div>
             </div>
 
-            {/* Hover Overlay */}
             <div className="absolute inset-0 bg-white rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               <div className="h-full flex flex-col justify-center items-center p-5 text-center">
                 <Flame size={32} className="text-orange-500 mb-2" />
-                <p className="text-xs font-semibold text-gray-900 mb-1">Great Work! 🔥</p>
+                <p className="text-xs font-semibold text-gray-900 mb-1">Great Work!</p>
                 <p className="text-[10px] text-gray-500">
                   {todayStats.caloriesBurned > 0 
                     ? `${todayStats.caloriesBurned} kcal from ${todayHabits.length} activities` 
@@ -261,7 +318,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
           </div>
         </div>
 
-        {/* Nutrition Summary Card - Enhanced with circular progress */}
+        {/* Nutrition Summary Card */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Nutrition Summary</h3>
@@ -269,7 +326,6 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Left Side - Circular Progress Chart */}
             <div className="flex items-center justify-center">
               <div className="relative">
                 <svg width={180} height={180} className="transform -rotate-90">
@@ -296,7 +352,6 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
               </div>
             </div>
 
-            {/* Right Side - Nutrition Stats */}
             <div className="flex flex-col justify-center space-y-6">
               {/* Carbs */}
               <div className="space-y-2">
@@ -357,7 +412,6 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
             </div>
           </div>
 
-          {/* Summary Footer */}
           <div className="mt-6 pt-6 border-t border-gray-100">
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
@@ -377,7 +431,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0 }
         </div>
       </div>
 
-      {/* Right Column - Calories Burned Card */}
+      {/* Right Column - Activity Summary */}
       <div className="lg:col-span-5">
         <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl border border-orange-200 shadow-sm p-6 sticky top-6">
           <div className="flex items-center justify-between mb-6">

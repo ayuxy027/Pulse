@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Edit2, Save, X } from 'lucide-react';
+import { Edit2, Save, X, FileText } from 'lucide-react';
 import RadioGroup, { RadioOption } from '../../ui/RadioGroup';
 import MultiSelect, { MultiSelectOption } from '../../ui/MultiSelect';
 import { StaticProfile, StaticInfoSectionProps } from '../../../types/profile';
@@ -42,20 +42,20 @@ const StaticInfoSection: React.FC<StaticInfoSectionProps> = ({
   ];
 
   const dietOptions: RadioOption[] = [
-    { value: 'Vegetarian', label: '🥬 Vegetarian' },
-    { value: 'Non-Vegetarian', label: '🍗 Non-Vegetarian' },
-    { value: 'Vegan', label: '🌱 Vegan' },
-    { value: 'Jain', label: '🙏 Jain' },
-    { value: 'Eggetarian', label: '🥚 Eggetarian' },
+    { value: 'Vegetarian', label: 'Vegetarian' },
+    { value: 'Non-Vegetarian', label: 'Non-Vegetarian' },
+    { value: 'Vegan', label: 'Vegan' },
+    { value: 'Jain', label: 'Jain' },
+    { value: 'Eggetarian', label: 'Eggetarian' },
   ];
 
   const medicalConditionOptions: MultiSelectOption[] = [
-    { value: 'Diabetes', label: '🩺 Diabetes' },
-    { value: 'Thyroid', label: '🧬 Thyroid' },
-    { value: 'PCOS', label: '⚕️ PCOS' },
-    { value: 'Asthma', label: '💨 Asthma' },
-    { value: 'None', label: '✅ None' },
-    { value: 'Other', label: '📝 Other' },
+    { value: 'Diabetes', label: 'Diabetes' },
+    { value: 'Thyroid', label: 'Thyroid' },
+    { value: 'PCOS', label: 'PCOS' },
+    { value: 'Asthma', label: 'Asthma' },
+    { value: 'None', label: 'None' },
+    { value: 'Other', label: 'Other' },
   ];
 
   const handleSave = async () => {
@@ -88,7 +88,8 @@ const StaticInfoSection: React.FC<StaticInfoSectionProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <span>📋</span> Static Information
+          <FileText className="w-6 h-6 text-gray-700" />
+          Static Information
         </h2>
         {!isEditing && (
           <button
@@ -176,8 +177,8 @@ const StaticInfoSection: React.FC<StaticInfoSectionProps> = ({
             <RadioGroup
               name="has_food_allergies"
               options={[
-                { value: 'true', label: '✅ Yes' },
-                { value: 'false', label: '❌ No' },
+                { value: 'true', label: 'Yes' },
+                { value: 'false', label: 'No' },
               ]}
               value={formData.has_food_allergies ? 'true' : 'false'}
               onChange={(value) =>
@@ -241,8 +242,8 @@ const StaticInfoSection: React.FC<StaticInfoSectionProps> = ({
             <RadioGroup
               name="on_regular_medication"
               options={[
-                { value: 'true', label: '✅ Yes' },
-                { value: 'false', label: '❌ No' },
+                { value: 'true', label: 'Yes' },
+                { value: 'false', label: 'No' },
               ]}
               value={formData.on_regular_medication ? 'true' : 'false'}
               onChange={(value) =>

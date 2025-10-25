@@ -220,7 +220,7 @@ const DailyTrackingSection: React.FC<DailyTrackingSectionProps> = ({
                     options={exerciseOptions}
                     value={formData.exercise_type || ''}
                     onChange={(value) =>
-                      setFormData({ ...formData, exercise_type: value as any })
+                      setFormData({ ...formData, exercise_type: value as DailyTracking['exercise_type'] })
                     }
                   />
                 </div>
@@ -267,7 +267,7 @@ const DailyTrackingSection: React.FC<DailyTrackingSectionProps> = ({
               max={5}
               value={formData.stress_mood_level || 3}
               onChange={(value) =>
-                setFormData({ ...formData, stress_mood_level: value as any })
+                setFormData({ ...formData, stress_mood_level: value as DailyTracking['stress_mood_level'] })
               }
               label="😊 Stress/Mood Level"
               labels={moodLabels}

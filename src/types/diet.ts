@@ -145,3 +145,73 @@ export interface DietPreferences {
     dietaryRestrictions: string[];
     allergens: string[];
 }
+
+// Food Analysis Types
+export interface FoodAnalysisResult {
+    foodName: string;
+    calories: number;
+    servingSize: string;
+    nutrientBreakdown: NutrientBreakdown;
+    micronutrients?: Micronutrients;
+    healthVerdict: HealthVerdict;
+    immunityImpact: ImmunityImpact;
+    prosAndCons: ProsAndCons;
+    recommendations: string[];
+    confidenceLevel: number;
+    analysisSummary: string;
+    allergenicProperties?: AllergenicProperties;
+    dietaryTags?: string[];
+    personalizedInsights?: PersonalizedInsights;
+}
+
+export interface NutrientBreakdown {
+    protein: number;
+    carbs: number;
+    fat: number;
+    fiber: number;
+    sugar: number;
+    sodium: number;
+}
+
+export interface Micronutrients {
+    vitamins: { [key: string]: number };
+    minerals: { [key: string]: number };
+    antioxidants: string[];
+    keyNutrients: string[];
+}
+
+export interface HealthVerdict {
+    isHealthy: boolean;
+    rating: number;
+    reason: string;
+    healthScore: number;
+}
+
+export interface ImmunityImpact {
+    boosting: string[];
+    suppressing: string[];
+    overall: 'positive' | 'negative' | 'neutral';
+    immunityScore: number;
+    immuneProperties: string[];
+}
+
+export interface ProsAndCons {
+    pros: string[];
+    cons: string[];
+}
+
+export interface AllergenicProperties {
+    commonAllergens: string[];
+    glutenFree: boolean;
+    dairyFree: boolean;
+    nutFree: boolean;
+    vegan: boolean;
+    vegetarian: boolean;
+}
+
+export interface PersonalizedInsights {
+    suitabilityForDiet: string;
+    mealTiming: string;
+    portionRecommendation: string;
+    healthGoalsAlignment: string[];
+}

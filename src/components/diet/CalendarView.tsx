@@ -1,12 +1,10 @@
 /**
- * Optimized CalendarView Component
- * Fast calendar using pre-calculated daily_summaries table
- * Loads entire month with single query
+ * CalendarView Component
+ * Interactive calendar showing diet tracking data by day
  */
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X, Flame, Droplet, Apple, Loader2, Sparkles, TrendingUp } from 'lucide-react';
-import { getDailySummaries } from '../../services/daySummaryService';
 import { getDietEntriesByDate, getUserDietEntries } from '../../services/dietEntryService';
 import { getUserHabits } from '../../services/habitsService';
 import { generateDaySummary, generateFallbackSummary, DaySummaryData } from '../../services/aiSummaryService';
@@ -16,10 +14,8 @@ import { Habit } from '../../types/habits';
 
 const CalendarView: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [monthSummaries, setMonthSummaries] = useState<Map<string, DailySummary>>(new Map());
   const [datesWithData, setDatesWithData] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [hoveredDay, setHoveredDay] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [dayDetails, setDayDetails] = useState<{
     summary: DailySummary;
@@ -32,32 +28,21 @@ const CalendarView: React.FC = () => {
 
   useEffect(() => {
     loadMonthData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDate]);
 
   const loadMonthData = async () => {
     setLoading(true);
-    
+
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    
+
     // Calculate first and last day of month
     const firstDay = new Date(year, month, 1).toISOString().split('T')[0];
     const lastDay = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
-    
-    // Try to get summaries from database first
-    const result = await getDailySummaries(firstDay, lastDay);
-    
-    const summariesMap = new Map<string, DailySummary>();
+
     const datesSet = new Set<string>();
-    
-    if (result.success && result.data && result.data.length > 0) {
-      console.log('Found summaries in database:', result.data.length);
-      result.data.forEach(summary => {
-        summariesMap.set(summary.date, summary);
-        datesSet.add(summary.date);
-      });
-    }
-    
+
     // Get all entries for the month to check which dates have data
     const entriesResult = await getUserDietEntries(firstDay + 'T00:00:00', lastDay);
     if (entriesResult.success && entriesResult.data) {
@@ -72,27 +57,21 @@ const CalendarView: React.FC = () => {
         datesSet.add(entryDate);
       });
     }
-    
-    console.log('Dates with data:', Array.from(datesSet).sort());
-    setMonthSummaries(summariesMap);
+
     setDatesWithData(datesSet);
     setLoading(false);
   };
 
   const handleDayClick = async (dateStr: string) => {
-    console.log('Day clicked:', dateStr);
-    
     // Check if this date has data
-    if (!datesWithData.has(dateStr) && !monthSummaries.has(dateStr)) {
-      console.log('No data for this date');
+    if (!datesWithData.has(dateStr)) {
       return;
     }
-    
+
     setSelectedDay(dateStr);
     setLoadingDetails(true);
     setDayDetails(null);
 
-    console.log('Fetching day details...');
     // Fetch full day details
     const [entriesResult, habitsResult] = await Promise.all([
       getDietEntriesByDate(dateStr),
@@ -101,9 +80,7 @@ const CalendarView: React.FC = () => {
 
     const entries = entriesResult.success ? entriesResult.data || [] : [];
     const allHabits = habitsResult.success ? habitsResult.data || [] : [];
-    
-    console.log('Entries:', entries.length, 'All habits:', allHabits.length);
-    
+
     // Filter habits completed on this day
     const habits = allHabits.filter(habit => {
       if (!habit.is_completed || !habit.completed_at) return false;
@@ -111,11 +88,9 @@ const CalendarView: React.FC = () => {
       return completedDate === dateStr;
     });
 
-    console.log('Habits completed on this day:', habits.length);
-
     // Calculate totals from entries
     let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, waterIntake = 0, mealCount = 0;
-    
+
     entries.forEach(entry => {
       if (entry.entry_type === 'water' && entry.water_amount) {
         waterIntake += entry.water_amount;
@@ -135,8 +110,8 @@ const CalendarView: React.FC = () => {
       habitCount++;
     });
 
-    // Create summary object (from database or calculated)
-    const summary: DailySummary = monthSummaries.get(dateStr) || {
+    // Create summary object
+    const summary: DailySummary = {
       id: '',
       user_id: '',
       date: dateStr,
@@ -154,7 +129,6 @@ const CalendarView: React.FC = () => {
 
     // Double-check if there's any data
     if (mealCount === 0 && waterIntake === 0 && habitCount === 0) {
-      console.log('No data found after fetching');
       setLoadingDetails(false);
       setSelectedDay(null);
       return;
@@ -173,15 +147,11 @@ const CalendarView: React.FC = () => {
       caloriesBurned,
     };
 
-    console.log('Generating AI summary with data:', summaryData);
     const aiResult = await generateDaySummary(summaryData);
-    console.log('AI Result:', aiResult);
-    
+
     // Use fallback if AI fails
     if (!aiResult.success) {
-      console.log('AI failed, using fallback');
       const fallback = generateFallbackSummary(summaryData);
-      console.log('Fallback result:', fallback);
       setDayDetails({
         summary,
         entries,
@@ -190,7 +160,6 @@ const CalendarView: React.FC = () => {
         insights: fallback.insights,
       });
     } else {
-      console.log('AI success, setting details');
       setDayDetails({
         summary,
         entries,
@@ -201,7 +170,6 @@ const CalendarView: React.FC = () => {
     }
 
     setLoadingDetails(false);
-    console.log('Done loading details');
   };
 
   const monthNames = [
@@ -245,15 +213,12 @@ const CalendarView: React.FC = () => {
     // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const summary = monthSummaries.get(dateStr);
       const today = isToday(dateStr);
-      const hasData = datesWithData.has(dateStr) || summary !== undefined;
+      const hasData = datesWithData.has(dateStr);
 
       days.push(
         <div
           key={day}
-          onMouseEnter={() => hasData && setHoveredDay(dateStr)}
-          onMouseLeave={() => setHoveredDay(null)}
           onClick={() => hasData && handleDayClick(dateStr)}
           className="relative group h-20"
         >
@@ -263,61 +228,21 @@ const CalendarView: React.FC = () => {
               ${today
                 ? 'border-2 border-blue-500 bg-blue-50 font-semibold cursor-pointer'
                 : hasData
-                ? 'bg-green-50 hover:bg-green-100 border border-green-200 cursor-pointer hover:shadow-md'
-                : 'border border-gray-100 cursor-not-allowed opacity-40'
+                  ? 'bg-green-50 hover:bg-green-100 border border-green-200 cursor-pointer hover:shadow-md'
+                  : 'border border-gray-100 cursor-not-allowed opacity-40'
               }
             `}
           >
-            <span className={`text-sm mb-1 ${today ? 'text-blue-600 font-bold' : hasData ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
+            <span className={`text-sm ${today ? 'text-blue-600 font-bold' : hasData ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
               {day}
             </span>
-            
-            {hasData && summary && (
-              <div className="flex items-center gap-1 text-xs">
-                <span className="text-orange-600 font-medium">{summary.total_calories}</span>
-                <Flame className="w-3 h-3 text-orange-500" />
+
+            {hasData && (
+              <div className="mt-1 text-xs text-green-600">
+                <span>•</span>
               </div>
             )}
           </div>
-
-          {/* Hover Tooltip */}
-          {hoveredDay === dateStr && hasData && summary && (
-            <div className="absolute z-20 top-full left-1/2 transform -translate-x-1/2 mt-2 w-56 bg-gray-900 text-white rounded-lg shadow-xl p-3 pointer-events-none">
-              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-gray-900 rotate-45"></div>
-              
-              <div className="relative">
-                <p className="text-xs font-semibold mb-2 text-gray-200">
-                  {new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                </p>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400">Calories</span>
-                    <span className="font-medium">{summary.total_calories} kcal</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400">Protein</span>
-                    <span className="font-medium">{summary.total_protein}g</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400">Water</span>
-                    <span className="font-medium">{summary.water_intake} cups</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400">Burned</span>
-                    <span className="font-medium text-orange-400">{summary.calories_burned} kcal</span>
-                  </div>
-                </div>
-
-                <div className="mt-3 pt-2 border-t border-gray-700">
-                  <p className="text-xs text-gray-400">
-                    {summary.meal_count} meal{summary.meal_count !== 1 ? 's' : ''} • {summary.habit_count} habit{summary.habit_count !== 1 ? 's' : ''}
-                  </p>
-                  <p className="text-xs text-blue-400 mt-1">Click for AI summary →</p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       );
     }
@@ -399,11 +324,11 @@ const CalendarView: React.FC = () => {
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
               <div>
                 <h3 className="text-2xl font-semibold text-gray-900">
-                  {new Date(selectedDay).toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    month: 'long', 
-                    day: 'numeric', 
-                    year: 'numeric' 
+                  {new Date(selectedDay).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
                   })}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">Detailed nutrition and activity summary</p>
