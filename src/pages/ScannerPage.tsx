@@ -10,15 +10,25 @@ import { GiMuscleUp } from 'react-icons/gi';
 import Button from '../components/ui/Button';
 
 /**
- * ScannerPage - Modern Food Scanner Interface
- * Clean, dashboard-inspired design with persistent image display
+ * ScannerPage - AI-Based Food Scanner Interface
+ * Purpose: Let users upload or snap a picture of their meal to get instant nutrition analysis
  */
+// Animation variants
+const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 },
+    transition: { duration: 0.5 },
+};
+
+
 const ScannerPage: React.FC = () => {
     const [dragActive, setDragActive] = useState(false);
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<FoodAnalysisResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isImageUploaded, setIsImageUploaded] = useState(false);
     const [analysisProgress, setAnalysisProgress] = useState(0);
     const [processingSteps, setProcessingSteps] = useState<string[]>([]);
     const [currentStep, setCurrentStep] = useState<number>(0);
@@ -166,9 +176,9 @@ const ScannerPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8f6f1]">
-            <div className="max-w-4xl mx-auto px-6 py-8">
-                {/* Modern Hero Header - Flat Design */}
+        <div className="relative min-h-screen bg-[#f8f6f1]">
+            <div className="px-4 py-8 mx-auto max-w-7xl md:py-12 sm:px-6 lg:px-8">
+                {/* Enhanced Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -183,10 +193,7 @@ const ScannerPage: React.FC = () => {
                         Smart Food Scanner
                     </motion.h1>
 
-                {/* Single Column Layout */}
-                <div className="space-y-6">
-                    {/* Image Upload/Display - Smaller & Flat */}
-                    <motion.div
+                    <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
@@ -276,9 +283,6 @@ const ScannerPage: React.FC = () => {
                                     onDragLeave={handleDrag}
                                     onDragOver={handleDrag}
                                     onDrop={handleDrop}
-                                    className={`max-w-xl mx-auto aspect-[16/10] rounded-xl border-2 border-dashed transition-colors ${
-                                        dragActive ? 'border-gray-400 bg-gray-50' : 'border-gray-300 bg-gray-50/50'
-                                    }`}
                                 >
                                     <input
                                         type="file"
@@ -317,7 +321,6 @@ const ScannerPage: React.FC = () => {
                                             }}
                                             disabled={isAnalyzing}
                                             onClick={handleBrowseClick}
-                                            className="px-5 py-2.5 text-sm font-semibold text-white bg-[#1a1a1a] rounded-xl hover:bg-black transition-colors"
                                         >
                                             {isAnalyzing ? "Processing..." : "Select File"}
                                         </motion.button>
@@ -401,118 +404,78 @@ const ScannerPage: React.FC = () => {
                                 Please wait while our AI examines your food...
                             </p>
 
-                            {/* Action Buttons - Below Image */}
-                            {uploadedImage && !analysisResult && (
-                                <motion.button
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    onClick={handleAnalyze}
-                                    disabled={isAnalyzing}
-                                    className={`w-full mt-4 py-3.5 rounded-xl font-bold text-base transition-all ${
-                                        isAnalyzing
-                                            ? 'bg-gray-400 cursor-not-allowed text-white'
-                                            : 'bg-[#1a1a1a] hover:bg-black text-white'
-                                    }`}
+                            {/* Circular Progress Indicator */}
+                            <div className="relative w-40 h-40 mb-6">
+                                <svg
+                                    className="absolute top-0 left-0 w-full h-full"
+                                    viewBox="0 0 100 100"
                                 >
-                                    {isAnalyzing ? (
-                                        <span className="flex items-center justify-center gap-2.5">
-                                            <Loader className="w-5 h-5 animate-spin" />
-                                            Analyzing...
-                                        </span>
-                                    ) : (
-                                        <span className="flex items-center justify-center gap-2.5">
-                                            <Sparkles className="w-5 h-5" />
-                                            Analyze Food
-                                        </span>
-                                    )}
-                                </motion.button>
-                            )}
-
-                            {analysisResult && (
-                                <motion.button
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    onClick={() => {
-                                        setUploadedImage(null);
-                                        setAnalysisResult(null);
-                                        setAnalysisProgress(0);
-                                        setProcessingSteps([]);
-                                        setCurrentStep(0);
-                                        setError(null);
-                                    }}
-                                    className="w-full mt-4 py-3.5 bg-[#1a1a1a] text-white rounded-xl font-bold text-base hover:bg-black transition-all flex items-center justify-center gap-2.5"
-                                >
-                                    <RefreshCw className="w-5 h-5" />
-                                    New Analysis
-                                </motion.button>
-                            )}
-                        </div>
-                    </motion.div>
-
-                    {/* Loading State or Results */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="space-y-6"
-                    >
-                        {/* Loading State */}
-                        {isAnalyzing && (
-                            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg border border-gray-200 p-8 shadow-sm">
-                                <div className="flex flex-col items-center text-center">
-                                    <div className="relative w-36 h-36 mb-6">
-                                        <svg className="w-full h-full -rotate-90">
-                                            <circle
-                                                cx="72"
-                                                cy="72"
-                                                r="68"
-                                                stroke="#E5E7EB"
-                                                strokeWidth="8"
-                                                fill="none"
-                                            />
-                                            <circle
-                                                cx="72"
-                                                cy="72"
-                                                r="68"
-                                                stroke="url(#gradient)"
-                                                strokeWidth="8"
-                                                fill="none"
-                                                strokeDasharray={`${2 * Math.PI * 68}`}
-                                                strokeDashoffset={`${2 * Math.PI * 68 * (1 - analysisProgress / 100)}`}
-                                                strokeLinecap="round"
-                                                className="transition-all duration-500"
-                                            />
-                                            <defs>
-                                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                    <stop offset="0%" stopColor="#374151" />
-                                                    <stop offset="50%" stopColor="#4B5563" />
-                                                    <stop offset="100%" stopColor="#6B7280" />
-                                                </linearGradient>
-                                            </defs>
-                                        </svg>
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                            <span className="text-3xl font-bold bg-gradient-to-br from-gray-700 to-gray-600 bg-clip-text text-transparent">
-                                                {Math.round(analysisProgress)}%
-                                            </span>
-                                            <Sparkles className="w-4 h-4 text-gray-400 mt-1" />
-                                        </div>
-                                    </div>
-                                    <h3 className="text-lg font-bold text-gray-800 mb-2">
-                                        Analyzing Food
-                                    </h3>
-                                    <AnimatePresence mode="wait">
-                                        <motion.p
-                                            key={currentStep}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -10 }}
-                                            className="text-sm text-gray-600 font-medium"
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="45"
+                                        stroke="#E5E7EB"
+                                        strokeWidth="10"
+                                        fill="transparent"
+                                    />
+                                    <motion.circle
+                                        cx="50"
+                                        cy="50"
+                                        r="45"
+                                        stroke="url(#progressGradient)"
+                                        strokeWidth="10"
+                                        fill="transparent"
+                                        strokeLinecap="round"
+                                        transform="rotate(-90 50 50)"
+                                        style={{
+                                            strokeDasharray: "282.74",
+                                            strokeDashoffset: "282.74",
+                                        }}
+                                        animate={{
+                                            strokeDashoffset:
+                                                282.74 - (analysisProgress / 100) * 282.74,
+                                        }}
+                                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                                    />
+                                    <defs>
+                                        <linearGradient
+                                            id="progressGradient"
+                                            x1="0%"
+                                            y1="0%"
+                                            x2="100%"
+                                            y2="100%"
                                         >
-                                            {processingSteps[currentStep] || "Processing..."}
-                                        </motion.p>
+                                            <stop offset="0%" stopColor="#6B7280" />
+                                            <stop offset="100%" stopColor="#374151" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <AnimatePresence mode="wait">
+                                        <motion.div
+                                            key={currentStep}
+                                            initial={{ opacity: 0, scale: 0.5 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.5 }}
+                                            transition={{ duration: 0.3, ease: "backInOut" }}
+                                        >
+                                            <div className="w-20 h-20 rounded-full flex items-center justify-center bg-gray-50">
+                                                {[
+                                                    <Upload key="upload" className="w-10 h-10 text-gray-600" />,
+                                                    <ImageIcon key="image" className="w-10 h-10 text-gray-600" />,
+                                                    <BrainCircuit key="brain" className="w-10 h-10 text-gray-600" />,
+                                                    <Microscope key="microscope" className="w-10 h-10 text-gray-600" />,
+                                                    <Activity key="activity" className="w-10 h-10 text-gray-600" />,
+                                                    <Target key="target" className="w-10 h-10 text-gray-600" />,
+                                                    <CheckCircle key="check" className="w-10 h-10 text-gray-600" />,
+                                                ][currentStep] || (
+                                                        <CheckCircle key="default" className="w-10 h-10 text-gray-600" />
+                                                    )}
+                                            </div>
+                                        </motion.div>
                                     </AnimatePresence>
                                 </div>
                             </div>
-                        )}
 
                             <div className="h-12 w-full max-w-xs mx-auto">
                                 <AnimatePresence mode="wait">
@@ -608,6 +571,7 @@ const ScannerPage: React.FC = () => {
                                             AI Confidence: {analysisResult.confidenceLevel}%
                                         </div>
                                     </div>
+                                </motion.div>
 
                                 {/* Calories Card */}
                                 <motion.div
@@ -632,6 +596,7 @@ const ScannerPage: React.FC = () => {
                                             Per {analysisResult.servingSize || '100g'}
                                         </div>
                                     </div>
+                                </motion.div>
 
                                 {/* Health Score Card */}
                                 <motion.div
@@ -655,17 +620,8 @@ const ScannerPage: React.FC = () => {
                                         <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full inline-block">
                                             {analysisResult.healthVerdict.isHealthy ? 'HEALTHY' : 'MODERATE'}
                                         </div>
-                                        <p className={`text-2xl font-bold capitalize mb-1 ${
-                                            analysisResult.immunityImpact.overall === 'positive' ? 'text-green-600' :
-                                            analysisResult.immunityImpact.overall === 'negative' ? 'text-red-600' : 'text-gray-700'
-                                        }`}>
-                                            {analysisResult.immunityImpact.overall}
-                                        </p>
-                                        <p className="text-sm text-gray-500 font-medium">
-                                            Impact level
-                                        </p>
                                     </div>
-                                </div>
+                                </motion.div>
 
                                 {/* Immunity Score Card */}
                                 <motion.div
@@ -772,6 +728,7 @@ const ScannerPage: React.FC = () => {
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
+                            </motion.div>
 
                             {/* Micronutrients Grid */}
                             {analysisResult.micronutrients && (
@@ -945,6 +902,7 @@ const ScannerPage: React.FC = () => {
                                         <span className="text-sm font-medium text-gray-700">{analysisResult.confidenceLevel}%</span>
                                     </div>
                                 </div>
+                            </motion.div>
 
                             {/* Pros and Cons */}
                             <motion.div
@@ -987,10 +945,8 @@ const ScannerPage: React.FC = () => {
                                     </ul>
                                 </div>
                             </motion.div>
-                        )}
 
-                        {/* Error Display */}
-                        {error && (
+                            {/* Recommendations */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -1015,7 +971,8 @@ const ScannerPage: React.FC = () => {
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="bg-red-50 border border-red-200 rounded-xl p-5"
+                                transition={{ delay: 0.9 }}
+                                className="flex justify-center"
                             >
                                 <Button
                                     variant="primary"
@@ -1037,9 +994,21 @@ const ScannerPage: React.FC = () => {
                                     New Analysis
                                 </Button>
                             </motion.div>
-                        )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Error Display */}
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        className="p-4 mb-4 text-red-700 bg-red-100 rounded-lg"
+                    >
+                        {error}
                     </motion.div>
-                </div>
+                )}
             </div>
         </div>
     );
