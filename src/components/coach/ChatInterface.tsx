@@ -3,7 +3,7 @@ import { AgentService } from '../../services/agentService';
 import { getSupabaseUser } from '../../services/authService';
 import ChatInput from './ChatInput';
 import MarkdownRenderer from '../ui/MarkdownRenderer';
-import { Bot, Loader2 } from 'lucide-react';
+import { Bot, Loader2, Zap, Database } from 'lucide-react';
 
 interface ChatMessage {
     id: string;
@@ -13,8 +13,17 @@ interface ChatMessage {
     thinking?: string; // For dual agent thinking process
     context_data?: {
         dataType?: string;
+        dataTypes?: string[];
         [key: string]: unknown;
     }; // For attached data context via @-mentions
+    toolCalls?: ToolCall[]; // Track tool calls for UI display
+}
+
+interface ToolCall {
+    id: string;
+    tool: string;
+    status: 'initiated' | 'fetching' | 'completed';
+    data?: unknown;
 }
 
 interface ChatInterfaceProps {
@@ -41,19 +50,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
     }, []);
 
     useEffect(() => {
-        // Only scroll to bottom when new messages are added, not on initial load
         if (messages.length > 1) {
             scrollToBottom();
         }
     }, [messages, scrollToBottom]);
 
-    // Extract @ mentions from query - memoized and enhanced
     const extractMentions = useCallback((text: string): string[] => {
         const mentions = text.match(/@(\w+)/g) || [];
-        return mentions.map(m => m.substring(1).toLowerCase()); // Remove @ and normalize
+        return mentions.map(m => m.substring(1).toLowerCase());
     }, []);
 
-    // Validate mention types
     const isValidMention = useCallback((mention: string): boolean => {
         const validMentions = ['profile', 'health', 'today', 'meals', 'habits', 'reminders'];
         return validMentions.includes(mention.toLowerCase());
@@ -63,24 +69,60 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
         const user = await getSupabaseUser();
         if (!user) return;
 
-        // Extract @ mentions for context filtering
         const mentions = extractMentions(content);
         const validMentions = mentions.filter(m => isValidMention(m));
 
-        // Add user message with context data
+        const toolCalls: ToolCall[] = validMentions.map((mention, idx) => ({
+            id: `tool-${Date.now()}-${idx}`,
+            tool: mention,
+            status: 'initiated'
+        }));
+
         const userMessage: ChatMessage = {
             id: Date.now().toString(),
             content,
             role: 'user',
             timestamp: new Date(),
-            context_data: validMentions.length > 0 ? { dataTypes: validMentions } : undefined
+            context_data: validMentions.length > 0 ? { dataTypes: validMentions } : undefined,
+            toolCalls: validMentions.length > 0 ? toolCalls : undefined
         };
 
         setMessages(prev => [...prev, userMessage]);
         setIsLoading(true);
 
+        const animateToolCalls = async () => {
+            for (let i = 0; i < toolCalls.length; i++) {
+                await new Promise(resolve => setTimeout(resolve, 300));
+                setMessages(prev => prev.map(msg =>
+                    msg.id === userMessage.id
+                        ? {
+                            ...msg,
+                            toolCalls: msg.toolCalls?.map((tc, idx) =>
+                                idx === i ? { ...tc, status: 'fetching' as const } : tc
+                            )
+                        }
+                        : msg
+                ));
+
+                await new Promise(resolve => setTimeout(resolve, 400));
+                setMessages(prev => prev.map(msg =>
+                    msg.id === userMessage.id
+                        ? {
+                            ...msg,
+                            toolCalls: msg.toolCalls?.map((tc, idx) =>
+                                idx === i ? { ...tc, status: 'completed' as const } : tc
+                            )
+                        }
+                        : msg
+                ));
+            }
+        };
+
+        if (validMentions.length > 0) {
+            animateToolCalls();
+        }
+
         try {
-            // Process through dual agents with context filtering
             const result = await agentService.processUserQuery(
                 user.id,
                 content,
@@ -111,16 +153,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
         }
     }, [agentService, extractMentions, isValidMention]);
 
-    const handleAttachData = useCallback((dataType: string) => {
-        // Show attachment in message for UI feedback
-        const attachedMessage: ChatMessage = {
-            id: `attach-${Date.now()}`,
-            content: `@${dataType} attached`,
-            role: 'user',
-            timestamp: new Date(),
-            context_data: { dataType }
-        };
-        setMessages(prev => [...prev, attachedMessage]);
+    const handleAttachData = useCallback(() => {
+        // No separate attachment message - sent with query
     }, []);
 
     return (
@@ -149,18 +183,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
                                     : 'bg-gray-100 text-gray-800 shadow-sm border border-gray-100'
                                     }`}
                             >
-                                {/* Thinking Process (collapsible) */}
-                                {message.thinking && message.role === 'assistant' && (
-                                    <details className="mb-2">
-                                        <summary className="text-xs text-gray-600 cursor-pointer hover:text-gray-800">
-                                            View analysis
-                                        </summary>
-                                        <div className="mt-2 p-2 bg-gray-50 rounded-lg text-xs text-gray-700 border border-gray-200">
-                                            {message.thinking}
-                                        </div>
-                                    </details>
-                                )}
-
                                 {/* Message Content */}
                                 <div className="prose prose-sm max-w-none">
                                     {message.role === 'assistant' ? (
@@ -170,10 +192,44 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
                                     )}
                                 </div>
 
-                                {/* Context Badge */}
-                                {message.context_data && message.context_data.dataType && (
-                                    <div className="mt-2 text-xs italic opacity-75">
-                                        [Attached: {message.context_data.dataType}]
+                                {/* Tool Calls - Tech Style */}
+                                {message.toolCalls && message.toolCalls.length > 0 && (
+                                    <div className="mt-3 space-y-2 pt-2 border-t border-gray-200/50">
+                                        {message.toolCalls.map((toolCall) => (
+                                            <div
+                                                key={toolCall.id}
+                                                className="flex items-center gap-2 text-xs font-mono"
+                                            >
+                                                <div className="flex items-center gap-1.5">
+                                                    {toolCall.status === 'initiated' && (
+                                                        <>
+                                                            <Zap className="w-3 h-3 text-yellow-500" />
+                                                            <span className="text-cyan-400">Tool call initiated</span>
+                                                            <span className="text-gray-500">→</span>
+                                                            <span className="text-purple-400">@{toolCall.tool}</span>
+                                                        </>
+                                                    )}
+                                                    {toolCall.status === 'fetching' && (
+                                                        <>
+                                                            <Database className="w-3 h-3 text-blue-500 animate-pulse" />
+                                                            <span className="text-blue-400">Fetching</span>
+                                                            <span className="text-gray-500">from Supabase</span>
+                                                            <span className="text-gray-500">→</span>
+                                                            <span className="text-green-400">@{toolCall.tool}</span>
+                                                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                                                        </>
+                                                    )}
+                                                    {toolCall.status === 'completed' && (
+                                                        <>
+                                                            <Database className="w-3 h-3 text-green-500" />
+                                                            <span className="text-green-400">Fetched</span>
+                                                            <span className="text-gray-500">@{toolCall.tool}</span>
+                                                            <span className="text-green-500 ml-1">✓</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
 
