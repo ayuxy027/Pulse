@@ -161,7 +161,7 @@ const DailyTrackingSection: React.FC<DailyTrackingSectionProps> = ({
           {/* Water Intake */}
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">
-              💧 Water Intake (glasses)
+              💧 Water Intake (cups - 250ml each)
             </label>
             <div className="flex items-center gap-3">
               <input

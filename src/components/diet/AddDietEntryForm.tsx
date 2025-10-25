@@ -3,11 +3,15 @@
  */
 
 import React, { useState } from 'react';
-import { X, Droplet, Utensils, Loader2, Plus, Minus, Sparkles } from 'lucide-react';
+import { X, Droplet, Utensils, Loader2, Sun, Apple, Coffee, Moon } from 'lucide-react';
+import { TbBottle as Beaker } from "react-icons/tb";
+import { LuPillBottle as Bottle } from "react-icons/lu";
+import { LuCupSoda as Glass } from "react-icons/lu";
 import { motion, AnimatePresence } from 'framer-motion';
 import { createDietEntry, updateMealNutrition } from '../../services/dietEntryService';
 import { analyzeMealNutrition } from '../../services/nutritionAnalysisService';
 import { MealType } from '../../types/dietEntry';
+import Button from '../ui/Button';
 
 interface AddDietEntryFormProps {
   isOpen: boolean;
@@ -19,9 +23,16 @@ interface AddDietEntryFormProps {
 type EntryMode = 'water' | 'meal';
 
 const waterContainers = [
-  { id: 'glass', name: 'Glass', ml: 250, icon: '🥤', emoji: '🥛', cups: 2.5 },
-  { id: 'half-liter', name: 'Half Liter', ml: 500, icon: '🍶', emoji: '🧃', cups: 5 },
-  { id: 'liter', name: '1 Liter', ml: 1000, icon: '💧', emoji: '🍾', cups: 10 },
+  { id: 'glass', name: 'Glass', ml: 250, icon: Glass, cups: 1 },
+  { id: 'half-liter', name: 'Half Liter', ml: 500, icon: Bottle, cups: 2 },
+  { id: 'liter', name: '1 Liter', ml: 1000, icon: Beaker, cups: 4 },
+];
+
+const mealTypes = [
+  { id: 'breakfast', name: 'Breakfast', icon: Sun },
+  { id: 'lunch', name: 'Lunch', icon: Apple },
+  { id: 'snacks', name: 'Snacks', icon: Coffee },
+  { id: 'dinner', name: 'Dinner', icon: Moon },
 ];
 
 export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onClose, onSuccess, onError }) => {
@@ -30,7 +41,7 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
   const [error, setError] = useState<string>('');
 
   const [selectedContainer, setSelectedContainer] = useState(waterContainers[0]);
-  const [waterQuantity, setWaterQuantity] = useState<number>(1);
+  const [waterQuantity, setWaterQuantity] = useState<string>('1');
 
   const [mealType, setMealType] = useState<MealType>('breakfast');
   const [mealDescription, setMealDescription] = useState('');
@@ -45,7 +56,7 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
 
   const resetForm = () => {
     setSelectedContainer(waterContainers[0]);
-    setWaterQuantity(1);
+    setWaterQuantity('1');
     setMealType('breakfast');
     setMealDescription('');
     const now = new Date();
@@ -67,8 +78,8 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
 
     try {
       if (mode === 'water') {
-        // Calculate total water amount in cups (100ml each)
-        const totalCups = (selectedContainer.ml * waterQuantity) / 100;
+        // Calculate total water amount in cups (250ml each)
+        const totalCups = (selectedContainer.ml * parseInt(waterQuantity || '0')) / 250;
 
         // Add water entry
         const result = await createDietEntry({
@@ -234,7 +245,7 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
                             }`}
                         >
                           <div className="flex flex-col items-center gap-2">
-                            <span className="text-4xl">{container.emoji}</span>
+                            <container.icon className="w-8 h-8 text-blue-500" />
                             <span className="text-sm font-semibold text-gray-900">{container.name}</span>
                             <span className="text-xs text-gray-500">{container.ml}ml</span>
                           </div>
@@ -255,31 +266,33 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                       Quantity
                     </label>
-                    <div className="flex items-center gap-4">
-                      <button
-                        type="button"
-                        onClick={() => setWaterQuantity(Math.max(1, waterQuantity - 1))}
-                        disabled={isSubmitting || waterQuantity <= 1}
-                        className="w-12 h-12 rounded-xl border-2 border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
-                      >
-                        <Minus className="w-5 h-5 text-gray-600" />
-                      </button>
-
-                      <div className="flex-1 text-center">
-                        <div className="text-4xl font-bold text-blue-600">{waterQuantity}</div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {selectedContainer.name}{waterQuantity > 1 ? 's' : ''}
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        value={waterQuantity}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Only allow numbers and empty string
+                          if (value === '' || /^\d+$/.test(value)) {
+                            setWaterQuantity(value);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          // Ensure we have a valid number, default to 1 if empty or invalid
+                          const value = e.target.value;
+                          if (value === '' || !/^\d+$/.test(value) || parseInt(value) < 1) {
+                            setWaterQuantity('1');
+                          }
+                        }}
+                        disabled={isSubmitting}
+                        className="w-full px-4 py-3 text-center text-2xl font-bold text-blue-600 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        placeholder="Enter quantity"
+                      />
+                      <div className="text-center">
+                        <div className="text-sm text-gray-500">
+                          {selectedContainer.name}{parseInt(waterQuantity) > 1 ? 's' : ''}
                         </div>
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={() => setWaterQuantity(Math.min(10, waterQuantity + 1))}
-                        disabled={isSubmitting || waterQuantity >= 10}
-                        className="w-12 h-12 rounded-xl border-2 border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
-                      >
-                        <Plus className="w-5 h-5 text-gray-600" />
-                      </button>
                     </div>
                   </div>
 
@@ -291,10 +304,13 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
                     </div>
                     <div className="space-y-1">
                       <div className="text-2xl font-bold text-blue-600">
-                        {selectedContainer.ml * waterQuantity}ml
+                        {selectedContainer.ml * parseInt(waterQuantity || '0')}ml
                       </div>
                       <div className="text-xs text-gray-600">
-                        = {((selectedContainer.ml * waterQuantity) / 100).toFixed(1)} cups (100ml each)
+                        = {((selectedContainer.ml * parseInt(waterQuantity || '0')) / 250).toFixed(1)} cups (250ml each)
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Daily goal: 12 cups (3L)
                       </div>
                     </div>
                   </div>
@@ -302,21 +318,35 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
               ) : (
                 <>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5">
-                      Meal Type
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      Select Meal Type
                     </label>
-                    <select
-                      value={mealType}
-                      onChange={(e) => setMealType(e.target.value as MealType)}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all bg-white"
-                      disabled={isSubmitting}
-                      required
-                    >
-                      <option value="breakfast">🌅 Breakfast</option>
-                      <option value="lunch">☀️ Lunch</option>
-                      <option value="snacks">🍪 Snacks</option>
-                      <option value="dinner">🌙 Dinner</option>
-                    </select>
+                    <div className="grid grid-cols-2 gap-3">
+                      {mealTypes.map((meal) => (
+                        <button
+                          key={meal.id}
+                          type="button"
+                          onClick={() => setMealType(meal.id as MealType)}
+                          disabled={isSubmitting}
+                          className={`relative p-4 rounded-xl border-2 transition-all ${mealType === meal.id
+                            ? 'border-green-500 bg-green-50 shadow-md'
+                            : 'border-gray-200 bg-white hover:border-green-300 hover:bg-green-50'
+                            }`}
+                        >
+                          <div className="flex flex-col items-center gap-2">
+                            <meal.icon className="w-6 h-6 text-green-500" />
+                            <span className="text-sm font-semibold text-gray-900">{meal.name}</span>
+                          </div>
+                          {mealType === meal.id && (
+                            <div className="absolute top-2 right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -372,15 +402,16 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
 
             {/* Action Buttons - Fixed at bottom */}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={handleClose}
-                className="flex-1 px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+                variant="secondary"
+                className="flex-1 w-auto h-auto px-6 py-2.5"
                 disabled={isSubmitting}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 form="diet-entry-form"
                 onClick={(e) => {
@@ -392,10 +423,10 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
                   }
                 }}
                 disabled={isSubmitting}
-                className={`flex-1 px-6 py-2.5 rounded-lg font-medium text-white transition-all flex items-center justify-center gap-2 shadow-sm ${mode === 'water'
+                className={`flex-1 w-auto h-auto px-6 py-2.5 ${mode === 'water'
                   ? 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700'
                   : 'bg-green-500 hover:bg-green-600 active:bg-green-700'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  }`}
               >
                 {isSubmitting ? (
                   <>
@@ -408,7 +439,7 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
                     Add Entry
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </motion.div>
         </motion.div>

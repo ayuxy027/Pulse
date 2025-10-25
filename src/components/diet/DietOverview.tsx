@@ -59,7 +59,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
     proteinGoal: 100,
     carbsGoal: 250,
     fatGoal: 65,
-    waterGoal: 8,
+    waterGoal: 12,
   });
 
   const [, setTodayEntries] = useState<DietEntry[]>([]);

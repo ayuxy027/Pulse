@@ -3,6 +3,7 @@ import { CalendarView, RemindersView, DietOverview } from '../components/diet';
 import { AddDietEntryForm } from '../components/diet/AddDietEntryForm';
 import { Plus, AlertCircle, Utensils, Calendar, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Button from '../components/ui/Button';
 
 /**
  * DietPage - Comprehensive nutrition and diet management interface
@@ -82,19 +83,22 @@ const DietPage: React.FC<DietPageProps> = () => {
                         {/* Add Diet Entry Button - Only visible in overview tab */}
                         <AnimatePresence>
                             {activeTab === 'overview' && (
-                                <motion.button
+                                <motion.div
                                     initial={{ opacity: 0, scale: 0.8 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.8 }}
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={handleFormOpen}
-                                    className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-green-700 transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                                    aria-label="Add new diet entry"
                                 >
-                                    <Plus className="w-5 h-5" />
-                                    Add Entry
-                                </motion.button>
+                                    <Button
+                                        onClick={handleFormOpen}
+                                        className="flex items-center gap-2 px-6 py-3 bg-linear-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-green-700 transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 w-auto h-auto"
+                                        aria-label="Add new diet entry"
+                                    >
+                                        <Plus className="w-5 h-5" />
+                                        Add Entry
+                                    </Button>
+                                </motion.div>
                             )}
                         </AnimatePresence>
                     </div>
@@ -131,33 +135,37 @@ const DietPage: React.FC<DietPageProps> = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="bg-white rounded-2xl border border-gray-200 shadow-lg p-1 inline-flex gap-2"
+                        className="bg-white rounded-2xl text-grey-700 border border-gray-200 shadow-lg p-1 inline-flex gap-2"
                         role="tablist"
                         aria-label="Diet page navigation tabs"
                     >
                         {tabConfig.map((tab, index) => (
-                            <motion.button
+                            <motion.div
                                 key={tab.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3 + index * 0.1 }}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={() => handleTabChange(tab.id as TabType)}
-                                className={`px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 ${activeTab === tab.id
-                                    ? 'bg-linear-to-r from-gray-600 to-gray-700 text-white shadow-md'
-                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                                    }`}
-                                role="tab"
-                                aria-selected={activeTab === tab.id}
-                                aria-label={tab.ariaLabel}
-                                tabIndex={activeTab === tab.id ? 0 : -1}
                             >
-                                {tab.id === 'overview' && <Utensils className="w-4 h-4" />}
-                                {tab.id === 'calendar' && <Calendar className="w-4 h-4" />}
-                                {tab.id === 'reminders' && <Bell className="w-4 h-4" />}
-                                {tab.label}
-                            </motion.button>
+                                <Button
+                                    onClick={() => handleTabChange(tab.id as TabType)}
+                                    variant={activeTab === tab.id ? "primary" : "secondary"}
+                                    className={`px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 w-auto h-auto ${activeTab === tab.id
+                                        ? 'bg-linear-to-r from-gray-600 to-gray-700 text-white shadow-md'
+                                        : 'text-gray-900 hover:text-gray-900 hover:bg-gray-50'
+                                        }`}
+                                    role="tab"
+                                    aria-selected={activeTab === tab.id}
+                                    aria-label={tab.ariaLabel}
+                                    tabIndex={activeTab === tab.id ? 0 : -1}
+                                >
+                                    {tab.id === 'overview' && <Utensils className="w-4 h-4" />}
+                                    {tab.id === 'calendar' && <Calendar className="w-4 h-4" />}
+                                    {tab.id === 'reminders' && <Bell className="w-4 h-4" />}
+                                    {tab.label}
+                                </Button>
+                            </motion.div>
                         ))}
                     </motion.div>
                 </div>

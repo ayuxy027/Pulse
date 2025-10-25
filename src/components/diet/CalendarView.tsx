@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, X, Flame, Droplet, Apple, Loader2, Sparkles, TrendingUp, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Button from '../ui/Button';
 import { getDietEntriesByDate, getUserDietEntries } from '../../services/dietEntryService';
 import { getUserHabits } from '../../services/habitsService';
 import { generateDaySummary, generateFallbackSummary, DaySummaryData } from '../../services/aiSummaryService';
@@ -310,14 +311,18 @@ const CalendarView: React.FC = () => {
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <motion.button
+          <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={previousMonth}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
-          </motion.button>
+            <Button
+              onClick={previousMonth}
+              variant="secondary"
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors w-auto h-auto"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-600" />
+            </Button>
+          </motion.div>
 
           <motion.h2
             key={`${currentDate.getMonth()}-${currentDate.getFullYear()}`}
@@ -329,14 +334,18 @@ const CalendarView: React.FC = () => {
             {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
           </motion.h2>
 
-          <motion.button
+          <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={nextMonth}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <ChevronRight className="w-5 h-5 text-gray-600" />
-          </motion.button>
+            <Button
+              onClick={nextMonth}
+              variant="secondary"
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors w-auto h-auto"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-600" />
+            </Button>
+          </motion.div>
         </div>
 
         {/* Calendar Grid */}
@@ -397,15 +406,16 @@ const CalendarView: React.FC = () => {
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">Detailed nutrition and activity summary</p>
               </div>
-              <button
+              <Button
                 onClick={() => {
                   setSelectedDay(null);
                   setDayDetails(null);
                 }}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                variant="secondary"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors w-auto h-auto"
               >
                 <X className="w-5 h-5 text-gray-500" />
-              </button>
+              </Button>
             </div>
 
             {/* Modal Content */}
