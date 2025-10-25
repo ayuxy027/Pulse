@@ -1,6 +1,5 @@
 /**
- * RemindersSection Component
- * Manages one-time reminders that auto-delete when checked
+ * RemindersSection - Manages one-time reminders that auto-delete when checked
  */
 
 import React, { useState, useEffect } from 'react';
@@ -119,16 +118,27 @@ export const RemindersSection: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Reminders</h2>
-          <p className="text-sm text-gray-500 mt-1">Set one-time reminders for your tasks</p>
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 rounded-lg bg-purple-100">
+            <Bell size={16} className="text-purple-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">Reminders</h2>
+            <p className="text-[10px] text-gray-500 mt-0.5">
+              {reminders.length} active
+            </p>
+          </div>
         </div>
         <button
           onClick={() => setIsFormOpen(!isFormOpen)}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-xl font-medium hover:bg-purple-600 transition-all shadow-sm"
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all shadow-sm text-sm ${
+            isFormOpen
+              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              : 'bg-purple-500 text-white hover:bg-purple-600'
+          }`}
         >
           {isFormOpen ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
           {isFormOpen ? 'Cancel' : 'Add Reminder'}
@@ -137,15 +147,15 @@ export const RemindersSection: React.FC = () => {
 
       {/* Add Reminder Form */}
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded-xl space-y-4">
+        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-100 space-y-3">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
               Reminder Description
             </label>
             <input
@@ -153,32 +163,38 @@ export const RemindersSection: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="E.g., Take medication, Call doctor, Drink water"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-100 outline-none transition-all text-sm"
               disabled={isSubmitting}
               required
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 mb-1.5">
+                <Calendar size={12} />
+                Date
+              </label>
               <input
                 type="date"
                 value={reminderDate}
                 onChange={(e) => setReminderDate(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-100 outline-none transition-all text-sm"
                 disabled={isSubmitting}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Time</label>
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 mb-1.5">
+                <Clock size={12} />
+                Time
+              </label>
               <input
                 type="time"
                 value={reminderTime}
                 onChange={(e) => setReminderTime(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-100 outline-none transition-all text-sm"
                 disabled={isSubmitting}
                 required
               />
@@ -188,7 +204,7 @@ export const RemindersSection: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full px-4 py-2.5 bg-purple-500 text-white rounded-lg font-semibold hover:bg-purple-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
           >
             {isSubmitting ? (
               <>
@@ -209,42 +225,42 @@ export const RemindersSection: React.FC = () => {
         </div>
       ) : reminders.length === 0 ? (
         <div className="text-center py-12">
-          <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">No reminders yet. Create your first reminder!</p>
+          <Bell size={32} className="text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-400 text-sm">No reminders yet. Create your first reminder!</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2 max-h-[500px] overflow-y-auto">
           {reminders.map((reminder) => {
             const overdue = isOverdue(reminder.reminder_date, reminder.reminder_time);
             
             return (
               <div
                 key={reminder.id}
-                className={`p-4 border rounded-xl transition-all ${
+                className={`group p-3 rounded-xl border transition-all duration-200 ${
                   overdue
                     ? 'bg-red-50 border-red-200'
-                    : 'bg-white border-gray-300 hover:border-purple-300'
+                    : 'bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   {/* Checkbox */}
                   <button
                     onClick={() => handleComplete(reminder.id)}
-                    className="flex-shrink-0 w-6 h-6 rounded-lg border-2 border-gray-300 hover:border-purple-500 transition-all flex items-center justify-center hover:bg-purple-50"
+                    className="shrink-0 w-6 h-6 rounded-lg border-2 border-gray-300 hover:border-purple-500 transition-all flex items-center justify-center hover:bg-purple-50"
                   >
                     <Check className="w-4 h-4 text-transparent hover:text-purple-500" />
                   </button>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900">{reminder.description}</p>
+                    <p className="font-medium text-gray-900 text-sm">{reminder.description}</p>
                     
-                    <div className="flex items-center gap-3 mt-2 text-xs">
-                      <span className={`flex items-center gap-1 ${overdue ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
+                    <div className="flex items-center gap-2 mt-1.5 text-xs">
+                      <span className={`flex items-center gap-1 ${overdue ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>
                         <Calendar className="w-3 h-3" />
                         {formatDate(reminder.reminder_date)}
                       </span>
-                      <span className={`flex items-center gap-1 ${overdue ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
+                      <span className={`flex items-center gap-1 ${overdue ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>
                         <Clock className="w-3 h-3" />
                         {reminder.reminder_time}
                       </span>
@@ -259,7 +275,7 @@ export const RemindersSection: React.FC = () => {
                   {/* Delete Button */}
                   <button
                     onClick={() => handleDelete(reminder.id)}
-                    className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 transition-colors"
+                    className="shrink-0 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

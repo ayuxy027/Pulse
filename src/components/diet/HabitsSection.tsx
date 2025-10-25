@@ -1,6 +1,5 @@
 /**
- * HabitsSection Component
- * Manages user habits with AI-powered calorie tracking
+ * HabitsSection - Manages user habits with AI-powered calorie tracking
  */
 
 import React, { useState, useEffect } from 'react';
@@ -98,25 +97,28 @@ export const HabitsSection: React.FC = () => {
     }
   };
 
-  const getHabitTypeColor = (type: HabitType) => {
-    switch (type) {
-      case 'daily': return 'bg-blue-100 text-blue-700';
-      case 'weekly': return 'bg-green-100 text-green-700';
-      case 'monthly': return 'bg-purple-100 text-purple-700';
-    }
-  };
-
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Habits</h2>
-          <p className="text-sm text-gray-500 mt-1">Track your daily, weekly, and monthly habits</p>
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 rounded-lg bg-blue-100">
+            <Flame size={16} className="text-blue-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">Habits</h2>
+            <p className="text-[10px] text-gray-500 mt-0.5">
+              {habits.filter(h => h.is_completed).length} completed today
+            </p>
+          </div>
         </div>
         <button
           onClick={() => setIsFormOpen(!isFormOpen)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-all shadow-sm"
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all shadow-sm text-sm ${
+            isFormOpen
+              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              : 'bg-blue-500 text-white hover:bg-blue-600'
+          }`}
         >
           {isFormOpen ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
           {isFormOpen ? 'Cancel' : 'Add Habit'}
@@ -125,15 +127,15 @@ export const HabitsSection: React.FC = () => {
 
       {/* Add Habit Form */}
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded-xl space-y-4">
+        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100 space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
               Habit Description
             </label>
             <input
@@ -141,7 +143,7 @@ export const HabitsSection: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="E.g., Morning run, Yoga session, Gym workout"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-1 focus:ring-blue-100 outline-none transition-all text-sm"
               disabled={isSubmitting}
               required
             />
@@ -149,11 +151,11 @@ export const HabitsSection: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Habit Type</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">Habit Type</label>
             <select
               value={habitType}
               onChange={(e) => setHabitType(e.target.value as HabitType)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-1 focus:ring-blue-100 outline-none transition-all text-sm"
               disabled={isSubmitting}
             >
               <option value="daily">Daily</option>
@@ -165,7 +167,7 @@ export const HabitsSection: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full px-4 py-2.5 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
           >
             {isSubmitting ? (
               <>
@@ -186,24 +188,25 @@ export const HabitsSection: React.FC = () => {
         </div>
       ) : habits.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">No habits yet. Create your first habit!</p>
+          <Flame size={32} className="text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-400 text-sm">No habits yet. Create your first habit!</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2 max-h-[500px] overflow-y-auto">
           {habits.map((habit) => (
             <div
               key={habit.id}
-              className={`p-4 border rounded-xl transition-all ${
+              className={`group p-3 rounded-xl border transition-all duration-200 ${
                 habit.is_completed
-                  ? 'bg-gray-50 border-gray-200'
-                  : 'bg-white border-gray-300 hover:border-blue-300'
+                  ? 'bg-green-50 border-green-200'
+                  : 'bg-white border-gray-200 hover:bg-blue-50 hover:border-blue-200'
               }`}
             >
               <div className="flex items-start gap-3">
                 {/* Checkbox */}
                 <button
                   onClick={() => handleToggleCompletion(habit.id, habit.is_completed)}
-                  className={`flex-shrink-0 w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center ${
+                  className={`shrink-0 w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center ${
                     habit.is_completed
                       ? 'bg-green-500 border-green-500'
                       : 'border-gray-300 hover:border-blue-500'
@@ -214,16 +217,20 @@ export const HabitsSection: React.FC = () => {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <p className={`font-medium ${habit.is_completed ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
+                  <p className={`font-medium text-sm ${habit.is_completed ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
                     {habit.description}
                   </p>
                   
-                  <div className="flex items-center gap-3 mt-2 text-xs text-gray-600">
-                    <span className={`px-2 py-1 rounded-full ${getHabitTypeColor(habit.habit_type)}`}>
+                  <div className="flex items-center gap-2 mt-1.5 text-xs">
+                    <span className={`px-2 py-0.5 rounded-full font-medium ${
+                      habit.habit_type === 'daily' ? 'bg-blue-100 text-blue-700' :
+                      habit.habit_type === 'weekly' ? 'bg-green-100 text-green-700' :
+                      'bg-purple-100 text-purple-700'
+                    }`}>
                       {habit.habit_type}
                     </span>
                     {habit.calories_burned && (
-                      <span className="flex items-center gap-1 text-orange-600 font-medium">
+                      <span className="flex items-center gap-1 text-orange-600 font-semibold">
                         <Flame className="w-3 h-3" />
                         {habit.calories_burned} cal
                       </span>
@@ -234,7 +241,7 @@ export const HabitsSection: React.FC = () => {
                 {/* Delete Button */}
                 <button
                   onClick={() => handleDelete(habit.id)}
-                  className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  className="shrink-0 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

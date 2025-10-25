@@ -1,10 +1,9 @@
 /**
- * AddDietEntryForm Component
- * Modal form for adding water intake or meals to the diet tracker
+ * AddDietEntryForm - Modal form for adding water intake and meal entries
  */
 
 import React, { useState } from 'react';
-import { X, Droplet, Utensils, Loader2 } from 'lucide-react';
+import { X, Droplet, Utensils, Loader2, Plus, Minus } from 'lucide-react';
 import { createDietEntry, updateMealNutrition } from '../../services/dietEntryService';
 import { analyzeMealNutrition } from '../../services/nutritionAnalysisService';
 import { MealType } from '../../types/dietEntry';
@@ -17,15 +16,20 @@ interface AddDietEntryFormProps {
 
 type EntryMode = 'water' | 'meal';
 
+const waterContainers = [
+  { id: 'glass', name: 'Glass', ml: 250, icon: '🥤', emoji: '🥛', cups: 2.5 },
+  { id: 'half-liter', name: 'Half Liter', ml: 500, icon: '🍶', emoji: '🧃', cups: 5 },
+  { id: 'liter', name: '1 Liter', ml: 1000, icon: '💧', emoji: '🍾', cups: 10 },
+];
+
 export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onClose, onSuccess }) => {
   const [mode, setMode] = useState<EntryMode>('water');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
 
-  // Water form state
-  const [waterAmount, setWaterAmount] = useState<number>(1);
+  const [selectedContainer, setSelectedContainer] = useState(waterContainers[0]);
+  const [waterQuantity, setWaterQuantity] = useState<number>(1);
 
-  // Meal form state
   const [mealType, setMealType] = useState<MealType>('breakfast');
   const [mealDescription, setMealDescription] = useState('');
   const [mealDate, setMealDate] = useState(() => {
@@ -38,7 +42,8 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
   });
 
   const resetForm = () => {
-    setWaterAmount(1);
+    setSelectedContainer(waterContainers[0]);
+    setWaterQuantity(1);
     setMealType('breakfast');
     setMealDescription('');
     const now = new Date();
@@ -60,10 +65,13 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
 
     try {
       if (mode === 'water') {
+        // Calculate total water amount in cups (100ml each)
+        const totalCups = (selectedContainer.ml * waterQuantity) / 100;
+        
         // Add water entry
         const result = await createDietEntry({
           entry_type: 'water',
-          water_amount: waterAmount,
+          water_amount: totalCups,
         });
 
         if (!result.success) {
@@ -177,24 +185,88 @@ export const AddDietEntryForm: React.FC<AddDietEntryFormProps> = ({ isOpen, onCl
 
           {mode === 'water' ? (
             <>
+              {/* Container Selection */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2.5">
-                  Amount (100ml cups)
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Select Container Type
                 </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={waterAmount}
-                  onChange={(e) => setWaterAmount(parseInt(e.target.value) || 1)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
-                  disabled={isSubmitting}
-                  required
-                />
-                <p className="mt-2 text-xs text-gray-500 flex items-center gap-1">
-                  <Droplet className="w-3 h-3" />
-                  {waterAmount} cup(s) = {waterAmount * 100}ml
-                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  {waterContainers.map((container) => (
+                    <button
+                      key={container.id}
+                      type="button"
+                      onClick={() => setSelectedContainer(container)}
+                      disabled={isSubmitting}
+                      className={`relative p-4 rounded-xl border-2 transition-all ${
+                        selectedContainer.id === container.id
+                          ? 'border-blue-500 bg-blue-50 shadow-md'
+                          : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50'
+                      }`}
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-4xl">{container.emoji}</span>
+                        <span className="text-sm font-semibold text-gray-900">{container.name}</span>
+                        <span className="text-xs text-gray-500">{container.ml}ml</span>
+                      </div>
+                      {selectedContainer.id === container.id && (
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quantity Selector */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Quantity
+                </label>
+                <div className="flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setWaterQuantity(Math.max(1, waterQuantity - 1))}
+                    disabled={isSubmitting || waterQuantity <= 1}
+                    className="w-12 h-12 rounded-xl border-2 border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                  >
+                    <Minus className="w-5 h-5 text-gray-600" />
+                  </button>
+                  
+                  <div className="flex-1 text-center">
+                    <div className="text-4xl font-bold text-blue-600">{waterQuantity}</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {selectedContainer.name}{waterQuantity > 1 ? 's' : ''}
+                    </div>
+                  </div>
+                  
+                  <button
+                    type="button"
+                    onClick={() => setWaterQuantity(Math.min(10, waterQuantity + 1))}
+                    disabled={isSubmitting || waterQuantity >= 10}
+                    className="w-12 h-12 rounded-xl border-2 border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                  >
+                    <Plus className="w-5 h-5 text-gray-600" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Summary Card */}
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">Total Water</span>
+                  <Droplet className="w-5 h-5 text-blue-500" />
+                </div>
+                <div className="space-y-1">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {selectedContainer.ml * waterQuantity}ml
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    = {((selectedContainer.ml * waterQuantity) / 100).toFixed(1)} cups (100ml each)
+                  </div>
+                </div>
               </div>
             </>
           ) : (
