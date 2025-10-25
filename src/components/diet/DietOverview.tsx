@@ -5,9 +5,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import React, { useState, useEffect } from 'react';
-import { Flame, Droplet, Loader2, Utensils, Target, TrendingUp, Clock } from 'lucide-react';
+import { Flame, Droplet, Loader2, Utensils, Target, TrendingUp, Clock, Edit2, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { getDietEntriesByDate } from '../../services/dietEntryService';
+import { getDietEntriesByDate, deleteDietEntry } from '../../services/dietEntryService';
 import { getUserHabits } from '../../services/habitsService';
 import { updateTodaySummary } from '../../services/daySummaryService';
 import { Habit } from '../../types/habits';
@@ -173,6 +173,25 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
 
   const calculatePercentage = (value: number, goal: number) => {
     return Math.min((value / goal) * 100, 100);
+  };
+
+  const handleDeleteMeal = async (mealId: string) => {
+    try {
+      const result = await deleteDietEntry(mealId);
+      if (result.success) {
+        fetchTodayData();
+        updateTodaySummary();
+      } else {
+        console.error('Failed to delete meal:', result.error);
+      }
+    } catch (error) {
+      console.error('Error deleting meal:', error);
+    }
+  };
+
+  const handleEditMeal = (mealId: string) => {
+    // TODO: Implement edit functionality
+    console.log('Edit meal:', mealId);
   };
 
 
@@ -691,7 +710,7 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
                   <h4 className="text-sm font-semibold text-gray-700">Today's Meals</h4>
                   <div className="space-y-2">
                     {todayStats.meals.map((meal) => (
-                      <div key={meal.id} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
+                      <div key={meal.id} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-100 group hover:bg-green-100 transition-colors">
                         <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center shrink-0">
                           <Utensils className="w-4 h-4 text-white" />
                         </div>
@@ -704,13 +723,29 @@ export const DietOverview: React.FC<DietOverviewProps> = ({ refreshTrigger = 0, 
                             </p>
                           )}
                         </div>
-                        <div className="text-right shrink-0">
+                        <div className="flex items-center gap-2 shrink-0">
                           <p className="text-xs text-gray-500">
                             {new Date(meal.created_at).toLocaleTimeString([], {
                               hour: '2-digit',
                               minute: '2-digit'
                             })}
                           </p>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => handleEditMeal(meal.id)}
+                              className="p-1.5 rounded-lg hover:bg-white transition-colors"
+                              title="Edit meal"
+                            >
+                              <Edit2 className="w-3.5 h-3.5 text-gray-600" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteMeal(meal.id)}
+                              className="p-1.5 rounded-lg hover:bg-white transition-colors"
+                              title="Delete meal"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-gray-600" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
