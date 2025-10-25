@@ -2,6 +2,20 @@
  * Shared types and interfaces for the Pulse.ai application
  */
 
+// Re-export profile types
+export type {
+  StaticProfile,
+  HealthMetrics,
+  DailyTracking,
+  ProfileFormState,
+  SectionEditState,
+  StaticInfoSectionProps,
+  HealthMetricsSectionProps,
+  DailyTrackingSectionProps,
+  ProfileResponse,
+  ProfileListResponse,
+} from './profile';
+
 // Priority levels for cases and tasks
 export type Priority = 'High' | 'Medium' | 'Low';
 
