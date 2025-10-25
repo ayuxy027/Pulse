@@ -360,14 +360,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     </div>
                 ))}
 
-                {/* Tool Usage Notification - Show as separate message bubble */}
-                {messages.length > 0 && messages[messages.length - 1].role === 'assistant' &&
-                    messages[messages.length - 1].toolCalls && messages[messages.length - 1].toolCalls.length > 0 && (
-                        <ToolUsageNotification
-                            toolsUsed={messages[messages.length - 1].toolCalls.map(tc => tc.tool)}
-                            isFromAI={true}
-                        />
-                    )}
+                {/* Tool Usage Notification - Removed to avoid duplicates */}
 
                 {/* Loading Indicator */}
                 {isLoading && (
