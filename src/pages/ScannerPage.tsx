@@ -60,6 +60,10 @@ const ScannerPage: React.FC = () => {
             reader.onload = (e) => {
                 setUploadedImage(e.target?.result as string);
                 setIsImageUploaded(true);
+                // Auto-analyze when image is uploaded
+                setTimeout(() => {
+                    handleAnalyze();
+                }, 500); // Small delay to ensure state is set
             };
             reader.readAsDataURL(file);
         }
@@ -91,14 +95,13 @@ const ScannerPage: React.FC = () => {
         setCurrentStep(0);
 
         try {
-            // Send API request and run progress animation concurrently
+            // Start API request immediately
+            const apiPromise = analyzeFoodImage(uploadedImage);
+
+            // Start progress animation immediately in parallel
             addProcessingStep("Initializing AI analysis pipeline...");
             setAnalysisProgress(15);
 
-            // Start API request
-            const apiPromise = analyzeFoodImage(uploadedImage);
-
-            // Run progress animation concurrently
             const steps = [
                 { message: "Uploading image to cloud...", duration: 1500 },
                 { message: "Performing cloud-based image analysis...", duration: 2000 },
@@ -111,28 +114,34 @@ const ScannerPage: React.FC = () => {
             let progress = 15;
             const progressIncrement = (85) / steps.length;
 
-            for (let i = 0; i < steps.length; i++) {
-                const step = steps[i];
-                setCurrentStep(i);
-                addProcessingStep(step.message);
+            // Run progress animation in parallel with API request
+            const progressAnimation = async () => {
+                for (let i = 0; i < steps.length; i++) {
+                    const step = steps[i];
+                    setCurrentStep(i);
+                    addProcessingStep(step.message);
 
-                const startProgress = progress;
-                const endProgress = progress + progressIncrement;
-                const duration = step.duration;
-                const stepStart = Date.now();
+                    const startProgress = progress;
+                    const endProgress = progress + progressIncrement;
+                    const duration = step.duration;
+                    const stepStart = Date.now();
 
-                while (progress < endProgress) {
-                    const elapsed = Date.now() - stepStart;
-                    const percentage = Math.min(elapsed / duration, 1);
-                    progress = startProgress + progressIncrement * percentage;
-                    setAnalysisProgress(Math.min(progress, 99));
-                    await new Promise((r) => setTimeout(r, 50));
+                    while (progress < endProgress) {
+                        const elapsed = Date.now() - stepStart;
+                        const percentage = Math.min(elapsed / duration, 1);
+                        progress = startProgress + progressIncrement * percentage;
+                        setAnalysisProgress(Math.min(progress, 99));
+                        await new Promise((r) => setTimeout(r, 50));
+                    }
+                    await new Promise((r) => setTimeout(r, 100));
                 }
-                await new Promise((r) => setTimeout(r, 100));
-            }
+            };
 
-            // Wait for API to complete
-            const result = await apiPromise;
+            // Run both API request and progress animation concurrently
+            const [, result] = await Promise.all([
+                progressAnimation(),
+                apiPromise
+            ]);
 
             setAnalysisProgress(100);
             await new Promise((r) => setTimeout(r, 300));
@@ -302,6 +311,7 @@ const ScannerPage: React.FC = () => {
                                         onChange={handleFileChange}
                                         className="hidden"
                                         ref={fileInputRef}
+                                        aria-label="Upload food image"
                                     />
                                     <div className="flex flex-col items-center">
                                         <motion.div
@@ -323,7 +333,7 @@ const ScannerPage: React.FC = () => {
                                             className="mb-4 text-sm text-gray-600"
                                             animate={{ opacity: dragActive ? 0.7 : 1 }}
                                         >
-                                            or click to select a file
+                                            or click to select a file - analysis starts automatically
                                         </motion.p>
                                         <motion.button
                                             className="px-6 py-2 text-sm font-medium text-white rounded-full bg-gray-600"
@@ -351,7 +361,7 @@ const ScannerPage: React.FC = () => {
                             initial="initial"
                             animate="animate"
                             exit="exit"
-                            className="mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-200"
+                            className="relative mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-200"
                         >
                             <div className="flex flex-col md:flex-row gap-6 items-center">
                                 <div className="flex-1">
@@ -364,14 +374,6 @@ const ScannerPage: React.FC = () => {
                                             alt="Uploaded food"
                                             className="absolute inset-0 w-full h-full object-contain"
                                         />
-                                        <motion.button
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            onClick={() => { }}
-                                            className="absolute bottom-2 right-2 bg-gray-500 text-white p-2 rounded-full shadow-md hover:bg-gray-600 transition-colors duration-200"
-                                        >
-                                            <ImageIcon className="w-4 h-4" />
-                                        </motion.button>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-center">
@@ -385,7 +387,7 @@ const ScannerPage: React.FC = () => {
                                 </div>
                             </div>
                             <motion.button
-                                className="mt-4 p-2 rounded-full bg-red-100 absolute top-2 right-2"
+                                className="absolute top-3 right-3 p-2 rounded-full bg-red-100 hover:bg-red-200 transition-colors"
                                 whileHover={{ backgroundColor: "#FECACA" }}
                                 onClick={() => {
                                     setUploadedImage(null);
@@ -397,6 +399,7 @@ const ScannerPage: React.FC = () => {
                                     setProcessingSteps([]);
                                     setCurrentStep(0);
                                 }}
+                                aria-label="Remove uploaded image"
                             >
                                 <XCircle className="w-5 h-5 text-red-700" />
                             </motion.button>
@@ -541,27 +544,27 @@ const ScannerPage: React.FC = () => {
 
                             {/* Scanned Image Section */}
                             {uploadedImage && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.25 }}
-                                className="p-6 bg-white rounded-xl shadow-lg border border-gray-200"
-                            >
-                                <h3 className="text-lg font-semibold mb-4 text-gray-900">
-                                    Scanned Image
-                                </h3>
-                                <div className="relative h-80 w-full overflow-hidden rounded-lg shadow-md">
-                                    <img
-                                        src={uploadedImage}
-                                        alt="Scanned food"
-                                        className="absolute inset-0 w-full h-full object-contain bg-gray-50"
-                                    />
-                                    <div className="absolute top-3 right-3 flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-md">
-                                        <GiMuscleUp className="w-4 h-4 text-gray-600" />
-                                        <span className="text-xs font-semibold text-gray-700">AI Analyzed</span>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.25 }}
+                                    className="p-6 bg-white rounded-xl shadow-lg border border-gray-200"
+                                >
+                                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                                        Scanned Image
+                                    </h3>
+                                    <div className="relative h-80 w-full overflow-hidden rounded-lg shadow-md">
+                                        <img
+                                            src={uploadedImage}
+                                            alt="Scanned food"
+                                            className="absolute inset-0 w-full h-full object-contain bg-gray-50"
+                                        />
+                                        <div className="absolute top-3 right-3 flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-md">
+                                            <GiMuscleUp className="w-4 h-4 text-gray-600" />
+                                            <span className="text-xs font-semibold text-gray-700">AI Analyzed</span>
+                                        </div>
                                     </div>
-                                </div>
-                            </motion.div>
+                                </motion.div>
                             )}
 
                             {/* Top Row - Key Metrics */}
