@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Home, Utensils, LucideIcon } from 'lucide-react';
 import { LuBookText } from 'react-icons/lu';
 import { TbZoomScan, TbCookieMan } from 'react-icons/tb';
-import knowliaLogo from '../../assets/Icon/KnowliaLogo.svg';
+import logo from '../../assets/logo.png';
 import { useSession } from '@supabase/auth-helpers-react';
 import Button from '../ui/Button';
 import Avatar from '../ui/Avatar';
@@ -60,8 +60,8 @@ const Navbar: React.FC = () => {
                     {/* Logo */}
                     <div className="flex items-center space-x-3">
                         <img
-                            src={knowliaLogo}
-                            alt="Knowlia Logo"
+                            src={logo}
+                            alt="Pulse Logo"
                             className="w-8 h-8 flex-shrink-0"
                         />
                         <button

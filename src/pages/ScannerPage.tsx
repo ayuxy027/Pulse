@@ -1,8 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Sparkles, Shield, TrendingUp, CheckCircle, BrainCircuit, Microscope, Leaf, XCircle, Activity, Target, Image as ImageIcon } from 'lucide-react';
 import { analyzeFoodImage, FoodAnalysisResult } from '../services/foodAnalysisService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, BarChart, Bar } from 'recharts';
+import { BsDatabaseCheck } from "react-icons/bs";
+import { LuFileHeart } from "react-icons/lu";
+import { MdOutlineZoomInMap } from "react-icons/md";
+import { GiMuscleUp } from 'react-icons/gi';
+import Button from '../components/ui/Button';
 
 /**
  * ScannerPage - AI-Based Food Scanner Interface
@@ -28,6 +33,24 @@ const ScannerPage: React.FC = () => {
     const [processingSteps, setProcessingSteps] = useState<string[]>([]);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Load from localStorage on mount
+    useEffect(() => {
+        const saved = localStorage.getItem('foodAnalysis');
+        const savedImage = localStorage.getItem('uploadedImage');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                setAnalysisResult(data);
+                setAnalysisProgress(100);
+                if (savedImage) {
+                    setUploadedImage(savedImage);
+                }
+            } catch (e) {
+                console.error('Failed to load saved analysis');
+            }
+        }
+    }, []);
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -55,6 +78,11 @@ const ScannerPage: React.FC = () => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 setUploadedImage(e.target?.result as string);
+                setIsImageUploaded(true);
+                // Auto-analyze when image is uploaded
+                setTimeout(() => {
+                    handleAnalyze();
+                }, 500); // Small delay to ensure state is set
             };
             reader.readAsDataURL(file);
         }
@@ -86,45 +114,60 @@ const ScannerPage: React.FC = () => {
         setCurrentStep(0);
 
         try {
-            // Simulate processing steps with progress
+            // Start API request immediately
+            const apiPromise = analyzeFoodImage(uploadedImage);
+
+            // Start progress animation immediately in parallel
+            addProcessingStep("Initializing AI analysis pipeline...");
+            setAnalysisProgress(15);
+
             const steps = [
-                { message: "Initializing AI analysis pipeline...", duration: 1000 },
                 { message: "Uploading image to cloud...", duration: 1500 },
                 { message: "Performing cloud-based image analysis...", duration: 2000 },
-                { message: "Running AI model predictions...", duration: 2500 },
-                { message: "Analyzing nutrition patterns...", duration: 2000 },
+                { message: "Running AI model predictions...", duration: 2000 },
+                { message: "Analyzing nutrition patterns...", duration: 1500 },
                 { message: "Generating health recommendations...", duration: 1500 },
                 { message: "Finalizing analysis report...", duration: 1000 },
             ];
 
-            let progress = 0;
-            const progressIncrement = 100 / steps.length;
+            let progress = 15;
+            const progressIncrement = (85) / steps.length;
 
-            for (let i = 0; i < steps.length; i++) {
-                const step = steps[i];
-                setCurrentStep(i);
-                addProcessingStep(step.message);
+            // Run progress animation in parallel with API request
+            const progressAnimation = async () => {
+                for (let i = 0; i < steps.length; i++) {
+                    const step = steps[i];
+                    setCurrentStep(i);
+                    addProcessingStep(step.message);
 
-                const startProgress = progress;
-                const endProgress = progress + progressIncrement;
-                const duration = step.duration;
-                const startTime = Date.now();
+                    const startProgress = progress;
+                    const endProgress = progress + progressIncrement;
+                    const duration = step.duration;
+                    const stepStart = Date.now();
 
-                while (progress < endProgress) {
-                    const elapsed = Date.now() - startTime;
-                    const percentage = Math.min(elapsed / duration, 1);
-                    progress = startProgress + progressIncrement * percentage;
-                    setAnalysisProgress(Math.min(progress, 99));
-                    await new Promise((r) => setTimeout(r, 50));
+                    while (progress < endProgress) {
+                        const elapsed = Date.now() - stepStart;
+                        const percentage = Math.min(elapsed / duration, 1);
+                        progress = startProgress + progressIncrement * percentage;
+                        setAnalysisProgress(Math.min(progress, 99));
+                        await new Promise((r) => setTimeout(r, 50));
+                    }
+                    await new Promise((r) => setTimeout(r, 100));
                 }
-                await new Promise((r) => setTimeout(r, 200));
-            }
+            };
 
-            const result = await analyzeFoodImage(uploadedImage);
+            // Run both API request and progress animation concurrently
+            const [, result] = await Promise.all([
+                progressAnimation(),
+                apiPromise
+            ]);
+
             setAnalysisProgress(100);
-            await new Promise((r) => setTimeout(r, 500));
+            await new Promise((r) => setTimeout(r, 300));
             addProcessingStep("Analysis complete!");
             setAnalysisResult(result);
+            localStorage.setItem('foodAnalysis', JSON.stringify(result));
+            localStorage.setItem('uploadedImage', uploadedImage || '');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Analysis failed');
         } finally {
@@ -139,24 +182,13 @@ const ScannerPage: React.FC = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 text-center md:mb-12"
+                    className="mb-12 text-center"
                 >
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex gap-2 items-center px-4 py-2 mb-4 rounded-full border shadow-lg backdrop-blur-md bg-white/80 border-gray-500/20"
-                    >
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
-                        <span className="text-sm font-semibold text-gray-600">
-                            AI-Powered Nutrition Analysis
-                        </span>
-                    </motion.div>
-
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-800 md:text-4xl"
+                        className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tighter text-gray-900 leading-tight max-w-4xl mx-auto text-center"
                     >
                         Smart Food Scanner
                     </motion.h1>
@@ -165,11 +197,56 @@ const ScannerPage: React.FC = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="mt-3 text-sm text-gray-600 md:mt-4 md:text-base"
+                        className="text-lg text-gray-600 max-w-3xl mx-auto mb-8"
                     >
-                        Advanced AI-powered food analysis with real-time nutrition insights and health recommendations
+                        Upload a photo of your meal and get instant AI-powered nutrition analysis,
+                        health insights, and personalized recommendations.
                     </motion.p>
+
+                    {!import.meta.env.VITE_GEMINI_API_KEY && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl max-w-lg mx-auto"
+                        >
+                            <p className="text-sm text-yellow-800">
+                                <strong>Demo Mode:</strong> API key not configured. Using mock data for demonstration.
+                            </p>
+                        </motion.div>
+                    )}
                 </motion.div>
+
+                {/* Features Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8"
+                >
+                    <div className="text-center p-4">
+                        <div className="flex justify-center mb-2">
+                            <BsDatabaseCheck size={24} className="text-gray-600" />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">Instant Analysis</h3>
+                        <p className="text-gray-600 text-xs">Get nutrition breakdown in seconds with advanced AI recognition</p>
+                    </div>
+                    <div className="text-center p-4">
+                        <div className="flex justify-center mb-2">
+                            <LuFileHeart size={24} className="text-gray-600" />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">Health Insights</h3>
+                        <p className="text-gray-600 text-xs">Receive personalized recommendations based on your meal</p>
+                    </div>
+                    <div className="text-center p-4">
+                        <div className="flex justify-center mb-2">
+                            <MdOutlineZoomInMap size={24} className="text-gray-600" />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">Smart Tracking</h3>
+                        <p className="text-gray-600 text-xs">Monitor your nutrition intake and health progress over time</p>
+                    </div>
+                </motion.div>
+
 
                 {/* Upload Section */}
                 <AnimatePresence mode="wait">
@@ -213,6 +290,7 @@ const ScannerPage: React.FC = () => {
                                         onChange={handleFileChange}
                                         className="hidden"
                                         ref={fileInputRef}
+                                        aria-label="Upload food image"
                                     />
                                     <div className="flex flex-col items-center">
                                         <motion.div
@@ -234,7 +312,7 @@ const ScannerPage: React.FC = () => {
                                             className="mb-4 text-sm text-gray-600"
                                             animate={{ opacity: dragActive ? 0.7 : 1 }}
                                         >
-                                            or click to select a file
+                                            or click to select a file - analysis starts automatically
                                         </motion.p>
                                         <motion.button
                                             className="px-6 py-2 text-sm font-medium text-white rounded-full bg-gray-600"
@@ -262,7 +340,7 @@ const ScannerPage: React.FC = () => {
                             initial="initial"
                             animate="animate"
                             exit="exit"
-                            className="mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-200"
+                            className="relative mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-200"
                         >
                             <div className="flex flex-col md:flex-row gap-6 items-center">
                                 <div className="flex-1">
@@ -275,14 +353,6 @@ const ScannerPage: React.FC = () => {
                                             alt="Uploaded food"
                                             className="absolute inset-0 w-full h-full object-contain"
                                         />
-                                        <motion.button
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            onClick={() => { }}
-                                            className="absolute bottom-2 right-2 bg-gray-500 text-white p-2 rounded-full shadow-md hover:bg-gray-600 transition-colors duration-200"
-                                        >
-                                            <ImageIcon className="w-4 h-4" />
-                                        </motion.button>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-center">
@@ -296,12 +366,19 @@ const ScannerPage: React.FC = () => {
                                 </div>
                             </div>
                             <motion.button
-                                className="mt-4 p-2 rounded-full bg-red-100 absolute top-2 right-2"
+                                className="absolute top-3 right-3 p-2 rounded-full bg-red-100 hover:bg-red-200 transition-colors"
                                 whileHover={{ backgroundColor: "#FECACA" }}
                                 onClick={() => {
                                     setUploadedImage(null);
                                     setIsImageUploaded(false);
+                                    setAnalysisResult(null);
+                                    setError(null);
+                                    setIsAnalyzing(false);
+                                    setAnalysisProgress(0);
+                                    setProcessingSteps([]);
+                                    setCurrentStep(0);
                                 }}
+                                aria-label="Remove uploaded image"
                             >
                                 <XCircle className="w-5 h-5 text-red-700" />
                             </motion.button>
@@ -444,6 +521,31 @@ const ScannerPage: React.FC = () => {
                                 </span>
                             </motion.div>
 
+                            {/* Scanned Image Section */}
+                            {uploadedImage && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.25 }}
+                                    className="p-6 bg-white rounded-xl shadow-lg border border-gray-200"
+                                >
+                                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                                        Scanned Image
+                                    </h3>
+                                    <div className="relative h-80 w-full overflow-hidden rounded-lg shadow-md">
+                                        <img
+                                            src={uploadedImage}
+                                            alt="Scanned food"
+                                            className="absolute inset-0 w-full h-full object-contain bg-gray-50"
+                                        />
+                                        <div className="absolute top-3 right-3 flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-md">
+                                            <GiMuscleUp className="w-4 h-4 text-gray-600" />
+                                            <span className="text-xs font-semibold text-gray-700">AI Analyzed</span>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+
                             {/* Top Row - Key Metrics */}
                             <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 md:grid-cols-2">
                                 {/* Food Name Card */}
@@ -451,9 +553,9 @@ const ScannerPage: React.FC = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.1 }}
-                                    className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-xl backdrop-blur-sm border-gray-100/50"
+                                    className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300"
                                 >
-                                    <div className="flex gap-3 items-center mb-4">
+                                    <div className="flex gap-3 items-center mb-6">
                                         <div className="p-3 bg-gray-100 rounded-xl">
                                             <Leaf className="w-6 h-6 text-gray-600" />
                                         </div>
@@ -462,10 +564,10 @@ const ScannerPage: React.FC = () => {
                                         </h3>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-2xl font-bold text-gray-600 mb-2">
+                                        <div className="text-2xl font-bold text-gray-900 mb-3 line-clamp-2">
                                             {analysisResult.foodName}
                                         </div>
-                                        <div className="text-sm text-gray-600">
+                                        <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full inline-block">
                                             AI Confidence: {analysisResult.confidenceLevel}%
                                         </div>
                                     </div>
@@ -476,9 +578,9 @@ const ScannerPage: React.FC = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2 }}
-                                    className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-xl backdrop-blur-sm border-gray-100/50"
+                                    className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300"
                                 >
-                                    <div className="flex gap-3 items-center mb-4">
+                                    <div className="flex gap-3 items-center mb-6">
                                         <div className="p-3 bg-gray-100 rounded-xl">
                                             <TrendingUp className="w-6 h-6 text-gray-600" />
                                         </div>
@@ -487,81 +589,86 @@ const ScannerPage: React.FC = () => {
                                         </h3>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-4xl font-bold text-gray-600 mb-2">
+                                        <div className="text-4xl font-bold text-gray-900 mb-3">
                                             {analysisResult.calories}
                                         </div>
-                                        <div className="text-sm text-gray-600">
-                                            Energy Content
+                                        <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full inline-block">
+                                            Per {analysisResult.servingSize || '100g'}
                                         </div>
                                     </div>
                                 </motion.div>
 
-                                {/* Health Verdict Card */}
+                                {/* Health Score Card */}
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.3 }}
-                                    className={`p-6 rounded-2xl border shadow-xl backdrop-blur-sm ${analysisResult.healthVerdict.isHealthy
-                                        ? 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
-                                        : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
-                                        }`}
+                                    className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300"
                                 >
-                                    <div className="flex gap-3 items-center mb-4">
-                                        <div className={`p-3 rounded-xl ${analysisResult.healthVerdict.isHealthy ? 'bg-gray-100' : 'bg-gray-100'
-                                            }`}>
-                                            {analysisResult.healthVerdict.isHealthy ? (
-                                                <CheckCircle className="w-6 h-6 text-gray-600" />
-                                            ) : (
-                                                <XCircle className="w-6 h-6 text-gray-600" />
-                                            )}
+                                    <div className="flex gap-3 items-center mb-6">
+                                        <div className="p-3 bg-gray-100 rounded-xl">
+                                            <CheckCircle className="w-6 h-6 text-gray-600" />
                                         </div>
                                         <h3 className="text-lg font-bold text-gray-900">
-                                            Health Verdict
+                                            Health Score
                                         </h3>
                                     </div>
                                     <div className="text-center">
-                                        <div className={`text-2xl font-bold mb-2 ${analysisResult.healthVerdict.isHealthy ? 'text-gray-600' : 'text-gray-600'
-                                            }`}>
-                                            {analysisResult.healthVerdict.isHealthy ? 'HEALTHY' : 'NOT HEALTHY'}
+                                        <div className="text-4xl font-bold text-gray-900 mb-3">
+                                            {analysisResult.healthVerdict.rating}/10
                                         </div>
-                                        <div className="text-sm text-gray-600">
-                                            Rating: {analysisResult.healthVerdict.rating}/10
+                                        <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full inline-block">
+                                            {analysisResult.healthVerdict.isHealthy ? 'HEALTHY' : 'MODERATE'}
                                         </div>
                                     </div>
                                 </motion.div>
 
-                                {/* Immunity Impact Card */}
+                                {/* Immunity Score Card */}
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
-                                    className={`p-6 rounded-2xl border shadow-xl backdrop-blur-sm ${analysisResult.immunityImpact.overall === 'positive'
-                                        ? 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
+                                    className={`p-6 rounded-2xl border shadow-lg hover:shadow-xl transition-shadow duration-300 ${analysisResult.immunityImpact.overall === 'positive'
+                                        ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-100/50'
                                         : analysisResult.immunityImpact.overall === 'negative'
-                                            ? 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
+                                            ? 'bg-gradient-to-br from-red-50 to-red-100 border-red-100/50'
                                             : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100/50'
                                         }`}
                                 >
-                                    <div className="flex gap-3 items-center mb-4">
-                                        <div className={`p-3 rounded-xl ${analysisResult.immunityImpact.overall === 'positive' ? 'bg-gray-100' :
-                                            analysisResult.immunityImpact.overall === 'negative' ? 'bg-gray-100' : 'bg-gray-100'
+                                    <div className="flex gap-3 items-center mb-6">
+                                        <div className={`p-3 rounded-xl ${analysisResult.immunityImpact.overall === 'positive'
+                                            ? 'bg-green-100'
+                                            : analysisResult.immunityImpact.overall === 'negative'
+                                                ? 'bg-red-100'
+                                                : 'bg-gray-100'
                                             }`}>
-                                            <Shield className={`w-6 h-6 ${analysisResult.immunityImpact.overall === 'positive' ? 'text-gray-600' :
-                                                analysisResult.immunityImpact.overall === 'negative' ? 'text-gray-600' : 'text-gray-600'
+                                            <Shield className={`w-6 h-6 ${analysisResult.immunityImpact.overall === 'positive'
+                                                ? 'text-green-600'
+                                                : analysisResult.immunityImpact.overall === 'negative'
+                                                    ? 'text-red-600'
+                                                    : 'text-gray-600'
                                                 }`} />
                                         </div>
                                         <h3 className="text-lg font-bold text-gray-900">
-                                            Immunity Impact
+                                            Immunity Score
                                         </h3>
                                     </div>
                                     <div className="text-center">
-                                        <div className={`text-2xl font-bold mb-2 ${analysisResult.immunityImpact.overall === 'positive' ? 'text-gray-600' :
-                                            analysisResult.immunityImpact.overall === 'negative' ? 'text-gray-600' : 'text-gray-600'
+                                        <div className={`text-4xl font-bold mb-3 ${analysisResult.immunityImpact.overall === 'positive'
+                                            ? 'text-green-600'
+                                            : analysisResult.immunityImpact.overall === 'negative'
+                                                ? 'text-red-600'
+                                                : 'text-gray-600'
+                                            }`}>
+                                            {analysisResult.immunityImpact?.immunityScore || analysisResult.immunityImpact.overall === 'positive' ? '92' : analysisResult.immunityImpact.overall === 'negative' ? '35' : '65'}/100
+                                        </div>
+                                        <div className={`text-sm px-3 py-1 rounded-full inline-block ${analysisResult.immunityImpact.overall === 'positive'
+                                            ? 'bg-green-50 text-green-700'
+                                            : analysisResult.immunityImpact.overall === 'negative'
+                                                ? 'bg-red-50 text-red-700'
+                                                : 'bg-gray-50 text-gray-600'
                                             }`}>
                                             {analysisResult.immunityImpact.overall.toUpperCase()}
-                                        </div>
-                                        <div className="text-sm text-gray-600">
-                                            Immune System Effect
                                         </div>
                                     </div>
                                 </motion.div>
@@ -572,63 +679,225 @@ const ScannerPage: React.FC = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.5 }}
-                                className="p-6 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200"
+                                className="p-6 bg-white rounded-xl border border-gray-200"
                             >
-                                <div className="flex gap-3 items-center mb-6">
-                                    <div className="p-2 bg-gray-100 rounded-lg">
-                                        <Activity className="w-5 h-5 text-gray-600" />
-                                    </div>
-                                    <h3 className="text-lg font-semibold text-gray-900">
-                                        Nutrition Breakdown
-                                    </h3>
+                                <div className="mb-6">
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Macronutrients</h3>
+                                    <p className="text-sm text-gray-600">Per {analysisResult.servingSize || '100g'} serving</p>
                                 </div>
-                                <div className="h-80">
-                                    <ResponsiveContainer width="100%" height="100%">
+
+                                <div className="h-64 min-h-[256px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%" minHeight={256}>
                                         <BarChart data={[
-                                            { name: 'Protein', value: analysisResult.nutrientBreakdown.protein, color: '#10B981' },
-                                            { name: 'Carbs', value: analysisResult.nutrientBreakdown.carbs, color: '#3B82F6' },
-                                            { name: 'Fat', value: analysisResult.nutrientBreakdown.fat, color: '#F59E0B' },
-                                            { name: 'Fiber', value: analysisResult.nutrientBreakdown.fiber, color: '#8B5CF6' },
-                                            { name: 'Sugar', value: analysisResult.nutrientBreakdown.sugar, color: '#EF4444' },
-                                            { name: 'Sodium', value: analysisResult.nutrientBreakdown.sodium, color: '#6B7280' },
+                                            { name: 'Protein', value: analysisResult.nutrientBreakdown.protein || 0, color: '#10B981', fill: '#10B981' },
+                                            { name: 'Carbs', value: analysisResult.nutrientBreakdown.carbs || 0, color: '#3B82F6', fill: '#3B82F6' },
+                                            { name: 'Fat', value: analysisResult.nutrientBreakdown.fat || 0, color: '#F59E0B', fill: '#F59E0B' },
+                                            { name: 'Fiber', value: analysisResult.nutrientBreakdown.fiber || 0, color: '#8B5CF6', fill: '#8B5CF6' },
+                                            { name: 'Sugar', value: analysisResult.nutrientBreakdown.sugar || 0, color: '#EF4444', fill: '#EF4444' },
                                         ]}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                            <XAxis dataKey="name" stroke="#666" fontSize={12} />
-                                            <YAxis stroke="#666" fontSize={12} />
-                                            <Tooltip />
-                                            <Bar dataKey="value" fill="#6B7280" />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" strokeOpacity={0.6} />
+                                            <XAxis
+                                                dataKey="name"
+                                                stroke="#666"
+                                                fontSize={12}
+                                                tickLine={false}
+                                                axisLine={false}
+                                            />
+                                            <YAxis
+                                                stroke="#666"
+                                                fontSize={12}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                tickFormatter={(value) => `${value}g`}
+                                            />
+                                            <Tooltip
+                                                contentStyle={{
+                                                    backgroundColor: 'white',
+                                                    border: '1px solid #E5E7EB',
+                                                    borderRadius: '12px',
+                                                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+                                                    fontSize: '14px',
+                                                    fontWeight: '500'
+                                                }}
+                                                formatter={(value) => [`${value}g`, '']}
+                                            />
+                                            <Bar
+                                                dataKey="value"
+                                                radius={[4, 4, 0, 0]}
+                                            />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
                             </motion.div>
 
-                            {/* Detailed Analysis Summary */}
+                            {/* Micronutrients Grid */}
+                            {analysisResult.micronutrients && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.6 }}
+                                    className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                                >
+                                    {/* Vitamins */}
+                                    <div className="p-6 bg-white rounded-xl border border-gray-200">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                            <Microscope className="w-5 h-5 text-gray-600" />
+                                            Key Vitamins
+                                        </h3>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {Object.entries(analysisResult.micronutrients.vitamins).map(([vitamin, value], idx) => (
+                                                value > 0 && (
+                                                    <div key={idx} className="p-3 bg-gray-50 rounded-lg">
+                                                        <div className="text-sm font-medium text-gray-700">{vitamin}</div>
+                                                        <div className="text-xs text-gray-500">{value}mg</div>
+                                                    </div>
+                                                )
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Minerals */}
+                                    <div className="p-6 bg-white rounded-xl border border-gray-200">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                            <Activity className="w-5 h-5 text-gray-600" />
+                                            Essential Minerals
+                                        </h3>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {Object.entries(analysisResult.micronutrients.minerals).map(([mineral, value], idx) => (
+                                                value > 0 && (
+                                                    <div key={idx} className="p-3 bg-gray-50 rounded-lg">
+                                                        <div className="text-sm font-medium text-gray-700">{mineral}</div>
+                                                        <div className="text-xs text-gray-500">{value}mg</div>
+                                                    </div>
+                                                )
+                                            ))}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {/* Immunity Properties */}
+                            {analysisResult.immunityImpact?.immuneProperties && analysisResult.immunityImpact.immuneProperties.length > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.7 }}
+                                    className="p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-100"
+                                >
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                        <Shield className="w-5 h-5 text-green-600" />
+                                        Immune-Boosting Properties
+                                    </h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {analysisResult.immunityImpact.immuneProperties.map((prop, idx) => (
+                                            <span key={idx} className="px-3 py-1.5 bg-white/80 text-sm font-medium text-gray-700 rounded-lg border border-green-200">
+                                                {prop}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {/* Dietary Tags & Allergenic Properties */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6 }}
-                                className="p-6 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200"
+                                transition={{ delay: 0.8 }}
+                                className="grid grid-cols-1 md:grid-cols-2 gap-6"
                             >
-                                <div className="flex gap-3 items-center mb-6">
-                                    <div className="p-2 bg-gray-100 rounded-lg">
-                                        <BrainCircuit className="w-5 h-5 text-gray-600" />
+                                {/* Dietary Tags */}
+                                {analysisResult.dietaryTags && analysisResult.dietaryTags.length > 0 && (
+                                    <div className="p-6 bg-white rounded-xl border border-gray-200">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Dietary Tags</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {analysisResult.dietaryTags.map((tag, idx) => (
+                                                <span key={idx} className="px-3 py-1.5 bg-gray-100 text-sm font-medium text-gray-700 rounded-lg">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
-                                    <h3 className="text-lg font-semibold text-gray-900">
-                                        AI Analysis Summary
+                                )}
+
+                                {/* Allergenic Properties */}
+                                {analysisResult.allergenicProperties && (
+                                    <div className="p-6 bg-white rounded-xl border border-gray-200">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Allergen Info</h3>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div className={`p-2 rounded-lg text-sm text-center font-medium ${analysisResult.allergenicProperties.glutenFree ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                {analysisResult.allergenicProperties.glutenFree ? '✓ Gluten Free' : '✗ Contains Gluten'}
+                                            </div>
+                                            <div className={`p-2 rounded-lg text-sm text-center font-medium ${analysisResult.allergenicProperties.dairyFree ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                {analysisResult.allergenicProperties.dairyFree ? '✓ Dairy Free' : '✗ Contains Dairy'}
+                                            </div>
+                                            <div className={`p-2 rounded-lg text-sm text-center font-medium ${analysisResult.allergenicProperties.vegan ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                {analysisResult.allergenicProperties.vegan ? '✓ Vegan' : 'Not Vegan'}
+                                            </div>
+                                            <div className={`p-2 rounded-lg text-sm text-center font-medium ${analysisResult.allergenicProperties.vegetarian ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                                {analysisResult.allergenicProperties.vegetarian ? '✓ Vegetarian' : 'Not Vegetarian'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </motion.div>
+
+                            {/* Personalized Insights */}
+                            {analysisResult.personalizedInsights && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.9 }}
+                                    className="p-6 bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-100"
+                                >
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                        <Target className="w-5 h-5 text-purple-600" />
+                                        Personalized Insights
                                     </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="p-4 bg-white/80 rounded-lg">
+                                            <div className="text-sm font-medium text-gray-600 mb-1">Best Meal Timing</div>
+                                            <div className="text-base font-semibold text-gray-900">{analysisResult.personalizedInsights.mealTiming}</div>
+                                        </div>
+                                        <div className="p-4 bg-white/80 rounded-lg">
+                                            <div className="text-sm font-medium text-gray-600 mb-1">Portion Recommendation</div>
+                                            <div className="text-base font-semibold text-gray-900">{analysisResult.personalizedInsights.portionRecommendation}</div>
+                                        </div>
+                                        <div className="p-4 bg-white/80 rounded-lg md:col-span-2">
+                                            <div className="text-sm font-medium text-gray-600 mb-2">Diet Compatibility</div>
+                                            <div className="text-base text-gray-900">{analysisResult.personalizedInsights.suitabilityForDiet}</div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {/* AI Analysis Summary */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 1.0 }}
+                                className="p-8 bg-white rounded-2xl border shadow-xl border-gray-200"
+                            >
+                                <div className="text-center mb-6">
+                                    <div className="flex gap-3 items-center justify-center mb-4">
+                                        <div className="p-3 bg-gray-100 rounded-xl">
+                                            <BrainCircuit className="w-6 h-6 text-gray-600" />
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-gray-900">
+                                            AI Analysis Summary
+                                        </h3>
+                                    </div>
                                 </div>
-                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6">
-                                    <h4 className="text-xl font-bold text-gray-900 mb-2">{analysisResult.foodName}</h4>
-                                    <p className="text-gray-600 mb-4">{analysisResult.analysisSummary}</p>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm text-gray-500">AI Confidence:</span>
-                                        <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-8">
+                                    <p className="text-gray-700 text-lg leading-relaxed text-center mb-6">{analysisResult.analysisSummary}</p>
+                                    <div className="flex items-center gap-3 max-w-md mx-auto">
+                                        <span className="text-sm font-medium text-gray-600">AI Confidence:</span>
+                                        <div className="flex-1 bg-gray-200 rounded-full h-3">
                                             <motion.div
-                                                className="bg-gray-600 h-2 rounded-full transition-all duration-500"
+                                                className="bg-gradient-to-r from-gray-600 to-gray-700 h-3 rounded-full"
                                                 initial={{ width: "0%" }}
                                                 animate={{ width: `${analysisResult.confidenceLevel}%` }}
-                                                transition={{ duration: 1, delay: 0.8 }}
-                                            ></motion.div>
+                                                transition={{ duration: 1, delay: 1.1 }}
+                                            />
                                         </div>
                                         <span className="text-sm font-medium text-gray-700">{analysisResult.confidenceLevel}%</span>
                                     </div>
@@ -639,34 +908,34 @@ const ScannerPage: React.FC = () => {
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.7 }}
+                                transition={{ delay: 1.1 }}
                                 className="grid grid-cols-1 md:grid-cols-2 gap-6"
                             >
-                                <div className="p-6 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200">
+                                <div className="p-6 bg-white rounded-2xl border shadow-lg border-gray-200">
                                     <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                        <CheckCircle size={20} className="text-gray-600" />
+                                        <CheckCircle size={20} className="text-green-600" />
                                         Health Benefits
                                     </h4>
                                     <ul className="space-y-2">
                                         {analysisResult.prosAndCons.pros.map((item, index) => (
-                                            <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
-                                                <span className="text-gray-500 mt-1">•</span>
+                                            <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
+                                                <span className="text-green-600 mt-1">✓</span>
                                                 {item}
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
 
-                                <div className="p-6 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200">
+                                <div className="p-6 bg-white rounded-2xl border shadow-lg border-gray-200">
                                     <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                        <XCircle size={20} className="text-gray-600" />
+                                        <XCircle size={20} className="text-red-600" />
                                         Health Concerns
                                     </h4>
                                     <ul className="space-y-2">
                                         {analysisResult.prosAndCons.cons.length > 0 ? (
                                             analysisResult.prosAndCons.cons.map((item, index) => (
-                                                <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
-                                                    <span className="text-gray-500 mt-1">•</span>
+                                                <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
+                                                    <span className="text-red-600 mt-1">⚠</span>
                                                     {item}
                                                 </li>
                                             ))
@@ -681,17 +950,17 @@ const ScannerPage: React.FC = () => {
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.8 }}
-                                className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 p-6"
+                                transition={{ delay: 1.2 }}
+                                className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100 p-6"
                             >
                                 <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                    <Sparkles size={20} className="text-gray-600" />
+                                    <Sparkles size={20} className="text-blue-600" />
                                     AI Recommendations
                                 </h4>
                                 <ul className="space-y-2">
                                     {analysisResult.recommendations.map((item, index) => (
                                         <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
-                                            <span className="text-gray-500 mt-1">•</span>
+                                            <span className="text-blue-600 mt-1">•</span>
                                             {item}
                                         </li>
                                     ))}
@@ -705,10 +974,8 @@ const ScannerPage: React.FC = () => {
                                 transition={{ delay: 0.9 }}
                                 className="flex justify-center"
                             >
-                                <motion.button
-                                    className="px-8 py-3 text-white font-medium rounded-full flex items-center gap-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 transition-all"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                                <Button
+                                    variant="primary"
                                     onClick={() => {
                                         setUploadedImage(null);
                                         setIsImageUploaded(false);
@@ -717,11 +984,15 @@ const ScannerPage: React.FC = () => {
                                         setProcessingSteps([]);
                                         setCurrentStep(0);
                                         setError(null);
+                                        setIsAnalyzing(false);
+                                        localStorage.removeItem('foodAnalysis');
+                                        localStorage.removeItem('uploadedImage');
                                     }}
+                                    className="w-auto"
                                 >
-                                    <Sparkles className="w-5 h-5" />
+                                    <GiMuscleUp size={20} />
                                     New Analysis
-                                </motion.button>
+                                </Button>
                             </motion.div>
                         </motion.div>
                     )}

@@ -6,3 +6,7 @@ export { default as UpcomingTasks } from './UpcomingTasks';
 export { default as AddTasksForm } from './AddTasksForm';
 export { default as CalendarView } from './CalendarView';
 export { default as RemindersView } from './RemindersView';
+export { AddDietEntryForm } from './AddDietEntryForm';
+export { DietDashboard } from './DietDashboard';
+export { DietOverview } from './DietOverview';
+export { DietSummary } from './DietSummary';
