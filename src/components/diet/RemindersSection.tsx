@@ -2,120 +2,134 @@
  * RemindersSection - Manages one-time reminders that auto-delete when checked
  */
 
-import React, { useState, useEffect } from 'react';
-import { Plus, Check, X, Loader2, Clock, Calendar, Trash2, Bell } from 'lucide-react';
-import { createReminder, getUserReminders, completeReminder, deleteReminder } from '../../services/remindersService';
-import { Reminder } from '../../types/habits';
+import React, { useState, useEffect } from "react"
+import {
+  Plus,
+  Check,
+  X,
+  Loader2,
+  Clock,
+  Calendar,
+  Trash2,
+  Bell,
+} from "lucide-react"
+import {
+  createReminder,
+  getUserReminders,
+  completeReminder,
+  deleteReminder,
+} from "../../services/remindersService"
+import { Reminder } from "../../types/habits"
 
 export const RemindersSection: React.FC = () => {
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [reminders, setReminders] = useState<Reminder[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState("")
 
   // Form state
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState("")
   const [reminderDate, setReminderDate] = useState(() => {
-    const now = new Date();
-    return now.toISOString().split('T')[0];
-  });
+    const now = new Date()
+    return now.toISOString().split("T")[0]
+  })
   const [reminderTime, setReminderTime] = useState(() => {
-    const now = new Date();
-    return now.toTimeString().slice(0, 5);
-  });
+    const now = new Date()
+    return now.toTimeString().slice(0, 5)
+  })
 
   useEffect(() => {
-    fetchReminders();
-  }, []);
+    fetchReminders()
+  }, [])
 
   const fetchReminders = async () => {
-    setIsLoading(true);
-    const result = await getUserReminders();
+    setIsLoading(true)
+    const result = await getUserReminders()
     if (result.success && result.data) {
-      setReminders(result.data);
+      setReminders(result.data)
     }
-    setIsLoading(false);
-  };
+    setIsLoading(false)
+  }
 
   const resetForm = () => {
-    setDescription('');
-    const now = new Date();
-    setReminderDate(now.toISOString().split('T')[0]);
-    setReminderTime(now.toTimeString().slice(0, 5));
-    setError('');
-  };
+    setDescription("")
+    const now = new Date()
+    setReminderDate(now.toISOString().split("T")[0])
+    setReminderTime(now.toTimeString().slice(0, 5))
+    setError("")
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsSubmitting(true);
+    e.preventDefault()
+    setError("")
+    setIsSubmitting(true)
 
     try {
       if (!description.trim()) {
-        setError('Please enter a reminder description');
-        setIsSubmitting(false);
-        return;
+        setError("Please enter a reminder description")
+        setIsSubmitting(false)
+        return
       }
 
       const result = await createReminder({
         description,
         reminder_date: reminderDate,
         reminder_time: reminderTime,
-      });
+      })
 
       if (!result.success) {
-        setError(result.error || 'Failed to create reminder');
-        setIsSubmitting(false);
-        return;
+        setError(result.error || "Failed to create reminder")
+        setIsSubmitting(false)
+        return
       }
 
-      await fetchReminders();
-      resetForm();
-      setIsFormOpen(false);
+      await fetchReminders()
+      resetForm()
+      setIsFormOpen(false)
     } catch (error) {
-      console.error('Error creating reminder:', error);
-      setError('An unexpected error occurred');
+      console.error("Error creating reminder:", error)
+      setError("An unexpected error occurred")
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleComplete = async (reminderId: string) => {
-    const result = await completeReminder(reminderId);
+    const result = await completeReminder(reminderId)
     if (result.success) {
-      await fetchReminders();
+      await fetchReminders()
     }
-  };
+  }
 
   const handleDelete = async (reminderId: string) => {
-    if (confirm('Are you sure you want to delete this reminder?')) {
-      const result = await deleteReminder(reminderId);
+    if (confirm("Are you sure you want to delete this reminder?")) {
+      const result = await deleteReminder(reminderId)
       if (result.success) {
-        await fetchReminders();
+        await fetchReminders()
       }
     }
-  };
+  }
 
   const isOverdue = (date: string, time: string) => {
-    const reminderDateTime = new Date(`${date}T${time}`);
-    return reminderDateTime < new Date();
-  };
+    const reminderDateTime = new Date(`${date}T${time}`)
+    return reminderDateTime < new Date()
+  }
 
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const date = new Date(dateStr)
+    const today = new Date()
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
 
     if (date.toDateString() === today.toDateString()) {
-      return 'Today';
+      return "Today"
     } else if (date.toDateString() === tomorrow.toDateString()) {
-      return 'Tomorrow';
+      return "Tomorrow"
     } else {
-      return date.toLocaleDateString();
+      return date.toLocaleDateString()
     }
-  };
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
@@ -136,18 +150,25 @@ export const RemindersSection: React.FC = () => {
           onClick={() => setIsFormOpen(!isFormOpen)}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all shadow-sm text-sm ${
             isFormOpen
-              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              : 'bg-purple-500 text-white hover:bg-purple-600'
+              ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              : "bg-purple-500 text-white hover:bg-purple-600"
           }`}
         >
-          {isFormOpen ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-          {isFormOpen ? 'Cancel' : 'Add Reminder'}
+          {isFormOpen ? (
+            <X className="w-4 h-4" />
+          ) : (
+            <Plus className="w-4 h-4" />
+          )}
+          {isFormOpen ? "Cancel" : "Add Reminder"}
         </button>
       </div>
 
       {/* Add Reminder Form */}
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-100 space-y-3">
+        <form
+          onSubmit={handleSubmit}
+          className="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-100 space-y-3"
+        >
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
               {error}
@@ -212,7 +233,7 @@ export const RemindersSection: React.FC = () => {
                 Creating...
               </>
             ) : (
-              'Create Reminder'
+              "Create Reminder"
             )}
           </button>
         </form>
@@ -226,20 +247,25 @@ export const RemindersSection: React.FC = () => {
       ) : reminders.length === 0 ? (
         <div className="text-center py-12">
           <Bell size={32} className="text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-400 text-sm">No reminders yet. Create your first reminder!</p>
+          <p className="text-gray-400 text-sm">
+            No reminders yet. Create your first reminder!
+          </p>
         </div>
       ) : (
         <div className="space-y-2 max-h-[500px] overflow-y-auto">
           {reminders.map((reminder) => {
-            const overdue = isOverdue(reminder.reminder_date, reminder.reminder_time);
-            
+            const overdue = isOverdue(
+              reminder.reminder_date,
+              reminder.reminder_time
+            )
+
             return (
               <div
                 key={reminder.id}
                 className={`group p-3 rounded-xl border transition-all duration-200 ${
                   overdue
-                    ? 'bg-red-50 border-red-200'
-                    : 'bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200'
+                    ? "bg-red-50 border-red-200"
+                    : "bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200"
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -253,14 +279,28 @@ export const RemindersSection: React.FC = () => {
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 text-sm">{reminder.description}</p>
-                    
+                    <p className="font-medium text-gray-900 text-sm">
+                      {reminder.description}
+                    </p>
+
                     <div className="flex items-center gap-2 mt-1.5 text-xs">
-                      <span className={`flex items-center gap-1 ${overdue ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>
+                      <span
+                        className={`flex items-center gap-1 ${
+                          overdue
+                            ? "text-red-600 font-semibold"
+                            : "text-gray-600"
+                        }`}
+                      >
                         <Calendar className="w-3 h-3" />
                         {formatDate(reminder.reminder_date)}
                       </span>
-                      <span className={`flex items-center gap-1 ${overdue ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>
+                      <span
+                        className={`flex items-center gap-1 ${
+                          overdue
+                            ? "text-red-600 font-semibold"
+                            : "text-gray-600"
+                        }`}
+                      >
                         <Clock className="w-3 h-3" />
                         {reminder.reminder_time}
                       </span>
@@ -281,10 +321,10 @@ export const RemindersSection: React.FC = () => {
                   </button>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
