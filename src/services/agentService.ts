@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { getGroqResponse, getDeepSeekResponse } from './llmService';
+import { getGroqResponse} from './llmService';
 import { storeChatMessage } from './chatService';
 
 interface UserHealthContext {
@@ -88,16 +88,20 @@ export class AgentService {
     contextFilter?: string[],
     chatId?: string | null
   ): Promise<any> {
-    // Phase 1: Analysis - Fetch user data
-    const context = await this.analyzeUserContext(userId, contextFilter);
+    // Phase 1: Auto-detect tool calls needed based on query content
+    const autoDetectedTools = this.autoDetectRequiredTools(userQuery);
+    const finalContextFilter = [...new Set([...(contextFilter || []), ...autoDetectedTools])];
     
-    // Phase 2: Format context for agents
+    // Phase 2: Analysis - Fetch user data with auto-detected tools
+    const context = await this.analyzeUserContext(userId, finalContextFilter);
+    
+    // Phase 3: Format context for agents
     const contextSummary = this.formatContextForAgent(context);
     
-    // Phase 3: Dual Agent Response
+    // Phase 4: Dual Agent Response
     const result = await this.getDualAgentResponse(userQuery, contextSummary);
     
-    // Phase 4: Store messages in database
+    // Phase 5: Store messages in database
     const currentChatId = chatId || null;
     
     // Store user message
@@ -116,7 +120,8 @@ export class AgentService {
     
     return {
       ...result,
-      chatId: userChatResult.chatId
+      chatId: userChatResult.chatId,
+      toolsUsed: finalContextFilter
     };
   }
 
@@ -139,7 +144,7 @@ Provide a concise analysis (2-3 sentences maximum).`;
     const groqResponse = await getGroqResponse(analyzerPrompt);
     
     // Coach Agent (Groq - gpt-oss-20b): Generate personalized response
-    const coachPrompt = `You are a friendly, knowledgeable health coach. Provide personalized health and nutrition advice.
+    const coachPrompt = `You are a professional health coach. Provide direct, actionable health and nutrition advice.
 
 CONTEXT ANALYSIS:
 ${groqResponse}
@@ -149,26 +154,36 @@ USER QUESTION: ${userQuery}
 USER HEALTH DATA:
 ${context}
 
-INSTRUCTIONS:
-- Be conversational and warm
-- Use the health data to provide personalized recommendations
-- Consider dietary restrictions, medical conditions, and recent meals
-- Keep response concise but helpful (3-4 sentences)
-- Use emojis sparingly for friendliness
-- If health data is limited, still provide general helpful advice
-- If the user's health data indicates protein deficiency or lack of protein intake, suggest these protein supplement referral links:
-  - https://www.fuelone.in/
-  - https://www.muscleblaze.com/
-  - https://www.gnc.com/protein/
-  - https://nutrabay.com/
+ENHANCED INSTRUCTIONS:
+- Be direct, professional, and actionable
+- Use the health data to provide SPECIFIC, personalized recommendations
+- Focus on actionable advice, not generic information
+- Use data-driven insights from their health profile
+- Be concise but comprehensive
+- Write in a formal, professional tone
+- Provide specific recommendations based on their actual data
+- Always reference the specific tools and data sources used in your analysis
+- End your response with a brief note about which data sources you analyzed
 
-Respond as a caring health coach:`;
+RESPONSE STYLE:
+- Write in clear, professional paragraphs
+- Be specific with numbers, portions, and timelines
+- Reference their actual data (meals, habits, etc.)
+- If protein deficiency is detected, suggest specific protein sources or supplements
+- Avoid emojis and casual language
+- Use formal, medical-professional tone
+- Include a brief footer noting the data sources analyzed
 
-    const deepSeekResponse = await getDeepSeekResponse(coachPrompt);
+Respond as a professional health coach with direct, actionable advice:`;
+
+    const deepSeekResponse = await getGroqResponse(coachPrompt, 'llama-3.3-70b-versatile');
+
+    // Combine analyzer insights with coach response
+    const combinedResponse = `${deepSeekResponse}\n\nData sources analyzed: ${context}`;
 
     return {
-      thinking: groqResponse, // What the analyzer thought
-      response: deepSeekResponse, // Final coach response
+      thinking: null, // No longer needed since we're combining responses
+      response: combinedResponse,
       contextUsed: context
     };
   }
@@ -240,6 +255,56 @@ Respond as a caring health coach:`;
       .eq('is_completed', false)
       .gte('reminder_date', today)
       .order('reminder_date', { ascending: true });
+  }
+
+  private autoDetectRequiredTools(userQuery: string): string[] {
+    const query = userQuery.toLowerCase();
+    const detectedTools: string[] = [];
+    
+    // Profile-related queries
+    if (query.includes('profile') || query.includes('about me') || query.includes('my info') || 
+        query.includes('diet type') || query.includes('allergies') || query.includes('medical')) {
+      detectedTools.push('profile');
+    }
+    
+    // Health metrics queries
+    if (query.includes('weight') || query.includes('height') || query.includes('bmi') || 
+        query.includes('goal') || query.includes('health') || query.includes('metrics') ||
+        query.includes('fitness') || query.includes('body')) {
+      detectedTools.push('health');
+    }
+    
+    // Today's tracking queries
+    if (query.includes('today') || query.includes('water') || query.includes('sleep') || 
+        query.includes('symptoms') || query.includes('tracking') || query.includes('daily')) {
+      detectedTools.push('today');
+    }
+    
+    // Diet/meals queries
+    if (query.includes('meal') || query.includes('food') || query.includes('eat') || 
+        query.includes('diet') || query.includes('nutrition') || query.includes('calories') ||
+        query.includes('breakfast') || query.includes('lunch') || query.includes('dinner')) {
+      detectedTools.push('meals');
+    }
+    
+    // Habits queries
+    if (query.includes('habit') || query.includes('routine') || query.includes('exercise') ||
+        query.includes('workout') || query.includes('activity')) {
+      detectedTools.push('habits');
+    }
+    
+    // Reminders queries
+    if (query.includes('reminder') || query.includes('schedule') || query.includes('appointment') ||
+        query.includes('medication') || query.includes('pill')) {
+      detectedTools.push('reminders');
+    }
+    
+    // If no specific tools detected, fetch all for comprehensive response
+    if (detectedTools.length === 0) {
+      return ['profile', 'health', 'today', 'meals', 'habits', 'reminders'];
+    }
+    
+    return detectedTools;
   }
 
   private formatContextForAgent(context: UserHealthContext): string {

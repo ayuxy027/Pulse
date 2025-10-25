@@ -42,48 +42,81 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
     // Custom components to maintain styling consistency
     const components: Components = {
-        // Headers
+        // Headers - Simple and formal
         h1: ({ children, ...props }) => (
-            <h1 {...props} style={{ fontSize: `${fontSize * 1.5}px`, fontWeight: 'bold', margin: '4px 0 2px 0' }}>
+            <h1 {...props} style={{
+                fontSize: `${fontSize * 1.5}px`,
+                fontWeight: '700',
+                margin: '12px 0 8px 0',
+                color: '#1f2937',
+                borderBottom: '2px solid #e5e7eb',
+                paddingBottom: '8px'
+            }}>
                 {children}
             </h1>
         ),
         h2: ({ children, ...props }) => (
-            <h2 {...props} style={{ fontSize: `${fontSize * 1.3}px`, fontWeight: 'bold', margin: '3px 0 1px 0' }}>
+            <h2 {...props} style={{
+                fontSize: `${fontSize * 1.3}px`,
+                fontWeight: '600',
+                margin: '10px 0 6px 0',
+                color: '#374151'
+            }}>
                 {children}
             </h2>
         ),
         h3: ({ children, ...props }) => (
-            <h3 {...props} style={{ fontSize: `${fontSize * 1.1}px`, fontWeight: 'bold', margin: '2px 0 1px 0' }}>
+            <h3 {...props} style={{
+                fontSize: `${fontSize * 1.1}px`,
+                fontWeight: '600',
+                margin: '8px 0 4px 0',
+                color: '#4b5563'
+            }}>
                 {children}
             </h3>
         ),
 
-        // Lists
+        // Lists - Simple and clean
         ul: ({ children, ...props }) => (
-            <ul {...props} style={{ margin: '2px 0', paddingLeft: '16px' }}>
+            <ul {...props} style={{
+                margin: '8px 0',
+                paddingLeft: '20px'
+            }}>
                 {children}
             </ul>
         ),
         ol: ({ children, ...props }) => (
-            <ol {...props} style={{ margin: '2px 0', paddingLeft: '16px' }}>
+            <ol {...props} style={{
+                margin: '8px 0',
+                paddingLeft: '20px'
+            }}>
                 {children}
             </ol>
         ),
         li: ({ children, ...props }) => (
-            <li {...props} style={{ margin: '1px 0' }}>
+            <li {...props} style={{
+                margin: '4px 0',
+                lineHeight: '1.6',
+                color: '#374151'
+            }}>
                 {children}
             </li>
         ),
 
-        // Emphasis
+        // Emphasis - Simple and formal
         strong: ({ children, ...props }) => (
-            <strong {...props} style={{ fontWeight: 'bold' }}>
+            <strong {...props} style={{
+                fontWeight: '600',
+                color: '#1f2937'
+            }}>
                 {children}
             </strong>
         ),
         em: ({ children, ...props }) => (
-            <em {...props} style={{ fontStyle: 'italic' }}>
+            <em {...props} style={{
+                fontStyle: 'italic',
+                color: '#6b7280'
+            }}>
                 {children}
             </em>
         ),
@@ -103,7 +136,12 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
         // Paragraphs
         p: ({ children, ...props }) => (
-            <p {...props} style={{ margin: '2px 0' }}>
+            <p {...props} style={{
+                margin: '8px 0',
+                lineHeight: '1.7',
+                color: '#374151',
+                fontSize: `${fontSize}px`
+            }}>
                 {children}
             </p>
         ),

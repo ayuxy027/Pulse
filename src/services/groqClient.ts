@@ -60,10 +60,10 @@ export async function sendMessage(message: string, onChunk?: (chunk: string) => 
  * Function to send a direct message to Groq API
  * Used for prompt enhancement and other operations
  */
-export async function sendDirectMessage(message: string): Promise<GroqResponse> {
+export async function sendDirectMessage(message: string, model: string = GROQ_MODEL): Promise<GroqResponse> {
   try {
     const chatCompletion = await groq.chat.completions.create({
-      model: GROQ_MODEL,
+      model: model,
       messages: [ { role: 'user', content: message } ],
       max_tokens: 800,
       temperature: 0.7,
