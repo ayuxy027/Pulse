@@ -152,24 +152,13 @@ const ScannerPage: React.FC = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 text-center md:mb-12"
+                    className="mb-12 text-center"
                 >
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex gap-2 items-center px-4 py-2 mb-4 rounded-full border shadow-lg backdrop-blur-md bg-white/80 border-gray-500/20"
-                    >
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
-                        <span className="text-sm font-semibold text-gray-600">
-                            AI-Powered Nutrition Analysis
-                        </span>
-                    </motion.div>
-
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-800 md:text-4xl"
+                        className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tighter text-gray-900 leading-tight max-w-4xl mx-auto text-center"
                     >
                         Smart Food Scanner
                     </motion.h1>
@@ -178,10 +167,54 @@ const ScannerPage: React.FC = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="mt-3 text-sm text-gray-600 md:mt-4 md:text-base"
+                        className="text-lg text-gray-600 max-w-3xl mx-auto mb-8"
                     >
-                        Advanced AI-powered food analysis with real-time nutrition insights and health recommendations
+                        Upload a photo of your meal and get instant AI-powered nutrition analysis,
+                        health insights, and personalized recommendations.
                     </motion.p>
+
+                    {!import.meta.env.VITE_GEMINI_API_KEY && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl max-w-lg mx-auto"
+                        >
+                            <p className="text-sm text-yellow-800">
+                                <strong>Demo Mode:</strong> API key not configured. Using mock data for demonstration.
+                            </p>
+                        </motion.div>
+                    )}
+                </motion.div>
+
+                {/* Features Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8"
+                >
+                    <div className="text-center p-4">
+                        <div className="flex justify-center mb-2">
+                            <BsDatabaseCheck size={24} className="text-gray-600" />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">Instant Analysis</h3>
+                        <p className="text-gray-600 text-xs">Get nutrition breakdown in seconds with advanced AI recognition</p>
+                    </div>
+                    <div className="text-center p-4">
+                        <div className="flex justify-center mb-2">
+                            <LuFileHeart size={24} className="text-gray-600" />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">Health Insights</h3>
+                        <p className="text-gray-600 text-xs">Receive personalized recommendations based on your meal</p>
+                    </div>
+                    <div className="text-center p-4">
+                        <div className="flex justify-center mb-2">
+                            <MdOutlineZoomInMap size={24} className="text-gray-600" />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">Smart Tracking</h3>
+                        <p className="text-gray-600 text-xs">Monitor your nutrition intake and health progress over time</p>
+                    </div>
                 </motion.div>
 
                 {/* Features Section */}
@@ -357,6 +390,12 @@ const ScannerPage: React.FC = () => {
                                 onClick={() => {
                                     setUploadedImage(null);
                                     setIsImageUploaded(false);
+                                    setAnalysisResult(null);
+                                    setError(null);
+                                    setIsAnalyzing(false);
+                                    setAnalysisProgress(0);
+                                    setProcessingSteps([]);
+                                    setCurrentStep(0);
                                 }}
                             >
                                 <XCircle className="w-5 h-5 text-red-700" />
@@ -534,7 +573,7 @@ const ScannerPage: React.FC = () => {
                                     transition={{ delay: 0.1 }}
                                     className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-xl backdrop-blur-sm border-gray-100/50"
                                 >
-                                    <div className="flex gap-3 items-center mb-4">
+                                    <div className="flex gap-3 items-center mb-6">
                                         <div className="p-3 bg-gray-100 rounded-xl">
                                             <Leaf className="w-6 h-6 text-gray-600" />
                                         </div>
@@ -543,11 +582,11 @@ const ScannerPage: React.FC = () => {
                                         </h3>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-2xl font-bold text-gray-600 mb-2">
-                                            {analysisResult.foodName}
+                                        <div className="text-3xl font-bold text-gray-900 mb-3">
+                                            ~{analysisResult.foodName}
                                         </div>
-                                        <div className="text-sm text-gray-600">
-                                            AI Confidence: {analysisResult.confidenceLevel}%
+                                        <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full inline-block">
+                                            AI Confidence: ~{analysisResult.confidenceLevel}%
                                         </div>
                                     </div>
                                 </motion.div>
@@ -559,7 +598,7 @@ const ScannerPage: React.FC = () => {
                                     transition={{ delay: 0.2 }}
                                     className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border shadow-xl backdrop-blur-sm border-gray-100/50"
                                 >
-                                    <div className="flex gap-3 items-center mb-4">
+                                    <div className="flex gap-3 items-center mb-6">
                                         <div className="p-3 bg-gray-100 rounded-xl">
                                             <TrendingUp className="w-6 h-6 text-gray-600" />
                                         </div>
@@ -568,10 +607,10 @@ const ScannerPage: React.FC = () => {
                                         </h3>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-4xl font-bold text-gray-600 mb-2">
-                                            {analysisResult.calories}
+                                        <div className="text-5xl font-bold text-gray-900 mb-3">
+                                            ~{analysisResult.calories}
                                         </div>
-                                        <div className="text-sm text-gray-600">
+                                        <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full inline-block">
                                             Energy Content
                                         </div>
                                     </div>
@@ -653,15 +692,20 @@ const ScannerPage: React.FC = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.5 }}
-                                className="p-6 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200"
+                                className="p-8 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200"
                             >
-                                <div className="flex gap-3 items-center mb-6">
-                                    <div className="p-2 bg-gray-100 rounded-lg">
-                                        <Activity className="w-5 h-5 text-gray-600" />
+                                <div className="text-center mb-8">
+                                    <div className="flex gap-3 items-center justify-center mb-4">
+                                        <div className="p-3 bg-gray-100 rounded-xl">
+                                            <Activity className="w-6 h-6 text-gray-600" />
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-gray-900">
+                                            Nutrition Breakdown
+                                        </h3>
                                     </div>
-                                    <h3 className="text-lg font-semibold text-gray-900">
-                                        Nutrition Breakdown
-                                    </h3>
+                                    <p className="text-gray-600 text-sm">
+                                        Approximate nutritional values per serving
+                                    </p>
                                 </div>
                                 <div className="h-80">
                                     <ResponsiveContainer width="100%" height="100%">
@@ -671,7 +715,6 @@ const ScannerPage: React.FC = () => {
                                             { name: 'Fat', value: analysisResult.nutrientBreakdown.fat, color: '#F59E0B' },
                                             { name: 'Fiber', value: analysisResult.nutrientBreakdown.fiber, color: '#8B5CF6' },
                                             { name: 'Sugar', value: analysisResult.nutrientBreakdown.sugar, color: '#EF4444' },
-                                            { name: 'Sodium', value: analysisResult.nutrientBreakdown.sodium, color: '#6B7280' },
                                         ]}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                             <XAxis dataKey="name" stroke="#666" fontSize={12} />
@@ -688,24 +731,26 @@ const ScannerPage: React.FC = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.6 }}
-                                className="p-6 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200"
+                                className="p-8 bg-white rounded-2xl border shadow-xl backdrop-blur-sm border-gray-200"
                             >
-                                <div className="flex gap-3 items-center mb-6">
-                                    <div className="p-2 bg-gray-100 rounded-lg">
-                                        <BrainCircuit className="w-5 h-5 text-gray-600" />
+                                <div className="text-center mb-8">
+                                    <div className="flex gap-3 items-center justify-center mb-4">
+                                        <div className="p-3 bg-gray-100 rounded-xl">
+                                            <BrainCircuit className="w-6 h-6 text-gray-600" />
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-gray-900">
+                                            AI Analysis Summary
+                                        </h3>
                                     </div>
-                                    <h3 className="text-lg font-semibold text-gray-900">
-                                        AI Analysis Summary
-                                    </h3>
                                 </div>
-                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6">
-                                    <h4 className="text-xl font-bold text-gray-900 mb-2">{analysisResult.foodName}</h4>
-                                    <p className="text-gray-600 mb-4">{analysisResult.analysisSummary}</p>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm text-gray-500">AI Confidence:</span>
-                                        <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-8">
+                                    <h4 className="text-3xl font-bold text-gray-900 mb-4 text-center">~{analysisResult.foodName}</h4>
+                                    <p className="text-gray-700 mb-6 text-lg leading-relaxed text-center">{analysisResult.analysisSummary}</p>
+                                    <div className="flex items-center gap-3 max-w-md mx-auto">
+                                        <span className="text-sm font-medium text-gray-600">AI Confidence:</span>
+                                        <div className="flex-1 bg-gray-200 rounded-full h-3">
                                             <motion.div
-                                                className="bg-gray-600 h-2 rounded-full transition-all duration-500"
+                                                className="bg-gradient-to-r from-gray-600 to-gray-700 h-3 rounded-full transition-all duration-500"
                                                 initial={{ width: "0%" }}
                                                 animate={{ width: `${analysisResult.confidenceLevel}%` }}
                                                 transition={{ duration: 1, delay: 0.8 }}
@@ -787,7 +832,7 @@ const ScannerPage: React.FC = () => {
                                 className="flex justify-center"
                             >
                                 <motion.button
-                                    className="px-8 py-3 text-white font-medium rounded-full flex items-center gap-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 transition-all"
+                                    className="px-8 py-3 text-white font-medium rounded-full flex items-center gap-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 transition-all hover:scale-105 duration-300"
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={() => {
@@ -798,9 +843,10 @@ const ScannerPage: React.FC = () => {
                                         setProcessingSteps([]);
                                         setCurrentStep(0);
                                         setError(null);
+                                        setIsAnalyzing(false);
                                     }}
                                 >
-                                    <Sparkles className="w-5 h-5" />
+                                    <GiMuscleUp size={20} className="mr-2 stroke-1" />
                                     New Analysis
                                 </motion.button>
                             </motion.div>
