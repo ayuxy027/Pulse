@@ -1,12 +1,13 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from './services/supabase';
 import LandingPage from './components/Landing';
-import ChatPage from './pages/ChatPage';
+import CoachPage from './pages/CoachPage';
 import DashboardPage from './pages/DashboardPage';
 import ScannerPage from './pages/ScannerPage';
-import DietPage from './pages/DietPage';
+import TrackerPage from './pages/TrackerPage';
+import PlannerPage from './pages/PlannerPage';
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Layout from './components/layout/Layout';
@@ -32,15 +33,24 @@ const PulseaiInterface: React.FC = () => {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<LandingPage />} />
+
+            {/* Redirect old routes to new routes */}
+            <Route path="/chat" element={<Navigate to="/coach" replace />} />
+            <Route path="/chats" element={<Navigate to="/coach" replace />} />
+            <Route path="/diet" element={<Navigate to="/tracker" replace />} />
+            <Route path="/dairy" element={<Navigate to="/planner" replace />} />
+
             <Route element={<ProtectedRoute />}>
-              <Route path="/chat" element={<ChatPage />} />
+              <Route path="/coach" element={<CoachPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/scanner" element={<ScannerPage />} />
-              <Route path="/diet" element={<DietPage />} />
+              <Route path="/tracker" element={<TrackerPage />} />
+              <Route path="/planner" element={<PlannerPage />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/chats" element={<ChatPage />} />
-              <Route path="/dairy" element={<div className="w-full bg-[#f8f6f1] p-8"><div className="p-[30px]"><h1 className="text-2xl font-bold">Dairy</h1><p>Coming soon...</p></div></div>} />
             </Route>
+
+            {/* Catch all - redirect to home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
       </Router>

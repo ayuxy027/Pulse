@@ -14,9 +14,9 @@ export { default as Layout } from './layout/Layout';
 
 // Feature Components
 export { default as SuggestedSection } from './suggested/SuggestedSection';
-export { default as ChatInput } from './chat/ChatInput';
-export { default as ChatInterface } from './chat/ChatInterface';
-export { default as PromptEnhancer } from './chat/PromptEnhancer';
+export { default as ChatInput } from './coach/ChatInput';
+export { default as ChatInterface } from './coach/ChatInterface';
+export { default as PromptEnhancer } from './coach/PromptEnhancer';
 
 // Profile Components
 export { default as StaticInfoSection } from './auth/profile/StaticInfoSection';

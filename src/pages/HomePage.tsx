@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import HeroSection from '../components/layout/HeroSection';
 import SuggestedSection from '../components/suggested/SuggestedSection';
 import HealthStats from '../components/health/HealthStats';
-import ChatInput from '../components/chat/ChatInput';
+import ChatInput from '../components/coach/ChatInput';
 import { fetchCases } from '../services/mockDataService';
 
 /**
