@@ -2,6 +2,7 @@ import { SiBento, SiRobotframework } from 'react-icons/si';
 import { BsGraphUpArrow } from 'react-icons/bs';
 import { GiMuscleUp } from 'react-icons/gi';
 import Button from './ui/Button';
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
   return (
@@ -36,7 +37,7 @@ const LandingPage = () => {
             />
           </div>
           <p className="text-gray-500 text-xs md:text-sm font-medium">
-            5000+ Healthy Users
+            500+ Healthy Users
           </p>
         </div>
         {/* Heading */}
@@ -47,14 +48,14 @@ const LandingPage = () => {
               alt="begin icon"
               className="w-6 h-6 md:w-8 md:h-8 absolute -top-1 -left-5 md:-top-2 md:-left-6"
             />
-            Eat smart with AI.
+            AI-powered Nutrition.
             <img
               src="https://i.postimg.cc/PxcrR416/star.png"
               className="absolute -right-5 -top-1 w-6 h-6 md:-right-6 md:-top-2 md:w-8 md:h-8"
               alt="star icon"
             />
             <br />
-            Live Healthier & Immune ready.
+            Plan, Strategise and Dominate.
           </h1>
         </div>
 
@@ -91,15 +92,16 @@ const LandingPage = () => {
         </div>
 
         {/* CTA Button */}
-        <Button
-          variant="primary"
-          className="mt-4 !w-auto !h-auto px-6 py-3 md:px-8 md:py-4 text-base font-semibold rounded-xl md:rounded-2xl hover:scale-105 transition-all duration-300"
-        >
-          <GiMuscleUp size={20} className="mr-2 stroke-1" />
-          Start Your Journey
-        </Button>
+        <Link to="/tracker">
+          <Button
+            variant="primary"
+            className="mt-4 !w-auto !h-auto px-6 py-3 md:px-8 md:py-4 text-base font-semibold rounded-xl md:rounded-2xl hover:scale-105 transition-all duration-300"
+          >
+            <GiMuscleUp size={20} className="mr-2 stroke-1" />
+            Start Your Journey
+          </Button>
+        </Link>
       </section>
-
       {/* <div className="h-60 sm:h-72 md:h-96 bg-[url('./bg.png')] bg-repeat bg-[#f8f6f1] relative flex items-start justify-center px-4">
         <img
           src="https://i.postimg.cc/RhkhNRF3/hola.png"
