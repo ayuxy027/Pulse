@@ -55,7 +55,7 @@ const LandingPage = () => {
               alt="star icon"
             />
             <br />
-            Plan, Strategise and Dominate.
+            Plan, Strategise & Dominate.
           </h1>
         </div>
 
